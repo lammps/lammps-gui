@@ -1985,8 +1985,8 @@ void LammpsGui::about()
         lammps.command("info config styles");
         capturer->endCapture();
         info       = capturer->getCapture();
-        auto start = info.find("LAMMPS version:");
-        auto mid   = info.find("Styles information:", start);
+        auto start = info.find("LAMMPS version");
+        auto mid   = info.find("Styles information", start);
         auto end   = info.find("Info-Info-Info", start);
 
         // protect from a failed or incomplete capture
