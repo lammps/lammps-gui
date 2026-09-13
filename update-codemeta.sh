@@ -32,7 +32,7 @@ meta.update({
     "programmingLanguage": "C++",
     "operatingSystem": ["Linux", "macOS", "Windows"],
     "softwareRequirements": ["Qt >= 6.2 (Gui, Widgets, Network, Svg)"],
-    "issueTracker": "https://github.com/akohlmey/lammps-gui/issues",
+    "issueTracker": "https://github.com/lammps/lammps-gui/issues",
     "developmentStatus": "active",
 })
 

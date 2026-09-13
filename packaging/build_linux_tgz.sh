@@ -32,6 +32,7 @@ rm -f ${DESTDIR}/lib/lib{c,dl,rt,m,pthread}-[0-9].[0-9]*.so
 rm -f ${DESTDIR}/lib/libX* ${DESTDIR}/lib/libxcb* ${DESTDIR}/lib/libxkb*
 rm -f ${DESTDIR}/lib/libgcc_s*
 rm -f ${DESTDIR}/lib/libstdc++*
+chmod +x ${DESTDIR}/lib/lib*.so.*
 
 # get Qt dir
 QTDIR=$(ldd ${DESTDIR}/bin/lammps-gui | grep libQt.Core | sed -e 's/^.*=> *//' -e 's/libQt\(.\)Core.so.*$/qt\1/')
@@ -61,8 +62,16 @@ do \
     chmod +x ${DESTDIR}/lib/${dep}
 done
 
+# get more platform plugin dependencies
+QTDEPS=$(LD_LIBRARY_PATH=${DESTDIR}/lib ldd ${QTDIR}/plugins/platforms/libqxcb.so | grep -v ${DESTDIR} | grep libxcb- | sed -e 's/^.*=> *//' -e 's/\(libxcb-.*.so.*\) .*$/\1/')
+for dep in ${QTDEPS}
+do \
+    cp ${dep} ${DESTDIR}/lib
+    chmod +x ${DESTDIR}/lib/${dep}
+done
+
 echo "Add additional plugins for Qt"
-for dir in styles imageformats tls
+for dir in styles imageformats tls iconengines
 do \
     cp -r  ${QTDIR}/plugins/${dir} ${DESTDIR}/qtplugins/
     chmod +x ${DESTDIR}/qtplugins/*/*.so

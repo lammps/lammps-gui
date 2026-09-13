@@ -35,7 +35,7 @@
   </screenshots>
 
   <url type="homepage">https://lammps-gui.lammps.org/</url>
-  <url type="bugtracker">https://github.com/akohlmey/lammps-gui/issues</url>
+  <url type="bugtracker">https://github.com/lammps/lammps-gui/issues</url>
   <url type="help">https://lammps-gui.lammps.org/</url>
 
   <update_contact>akohlmey@gmail.com</update_contact>
@@ -58,8 +58,8 @@
   <content_rating type="oars-1.1" />
 
   <releases>
-    <!-- provisional timestamp; update when 3.1.0 is actually released -->
-    <release version="3.1.0" timestamp="1785583467">
+    <!-- tentative timestamp (noon UTC, 16 September 2026); update when 3.1.0 is actually released -->
+    <release version="3.1.0" timestamp="1789560000">
       <description>
         <p>Feature release adding an alternative single-window layout and a command window.</p>
         <ul>
@@ -79,12 +79,14 @@
           <li>Show the application-wide Run, View, Tutorials, and About menus in all output windows, so a run can be started or stopped from any of them; Output, Slide Show, and file viewer windows gain a File menu</li>
           <li>Reuse the Output and Charts windows across runs instead of recreating them; the options to keep old Output, Charts, and Image windows have been removed</li>
           <li>Move the Preferences entries from the Edit menu to the View menu and add an option to open the combined main window maximized</li>
+          <li>Open the Image window from the View menu also before a snapshot was created: the entry then renders the snapshot first, like Create Image in the Run menu</li>
           <li>Ask before opening a file that does not look like what it is being opened as, such as a binary file in the editor or an image in the plotter, instead of filling a window with unreadable content</li>
           <li>Highlight the LAMMPS commands embedded in write_dump and rerun lines</li>
           <li>Step the view angles in the Image Viewer by 5 degrees instead of 10</li>
           <li>Fix LAMMPS screen output capture on Windows, which only worked when launched from a console; the capture now verifies itself and reports into the Output window when the library's output cannot reach it</li>
           <li>Remember the LAMMPS shared library path per compiler toolchain, so differently built versions of LAMMPS-GUI on one machine no longer silently use each other's library</li>
           <li>Remember separate main window sizes for the two layout styles, and report the selected layout in the About dialog</li>
+          <li>Require LAMMPS version 2 September 2026 or newer</li>
         </ul>
       </description>
     </release>

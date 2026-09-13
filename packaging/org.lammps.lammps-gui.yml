@@ -29,5 +29,5 @@ modules:
       - -D CMAKE_BUILD_TYPE=Release
     sources:
       - type: git
-        url: https://github.com/akohlmey/lammps-gui.git
+        url: https://github.com/lammps/lammps-gui.git
         branch: develop

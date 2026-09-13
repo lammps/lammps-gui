@@ -24,9 +24,9 @@ PANDOC_FLAGS := --citeproc \
                 -V colorlinks=true \
                 -M author="Axel Kohlmeyer"
 
-all: $(PDF) joss-10893.preprint.pdf
+all: $(PDF) joss-11185.preprint.pdf
 
-joss-10893.preprint.pdf: joss-10893.preprint.tex paper.bib
+joss-11185.preprint.pdf: joss-11185.preprint.tex paper.bib
 	latexmk -pdfxe $<
 
 $(PDF): $(SRC) $(BIB) | check-tools
@@ -55,12 +55,12 @@ check-tools:
 
 clean:
 	rm -vf $(PDF) \
-	joss-10893.preprint.fls \
-	joss-10893.preprint.aux \
-	joss-10893.preprint.xdv \
-	joss-10893.preprint.log \
-	joss-10893.preprint.pdf \
-	joss-10893.preprint.fdb_latexmk \
+	joss-11185.preprint.fls \
+	joss-11185.preprint.aux \
+	joss-11185.preprint.xdv \
+	joss-11185.preprint.log \
+	joss-11185.preprint.pdf \
+	joss-11185.preprint.fdb_latexmk \
 	*~
 
 .PHONY: all check-tools clean

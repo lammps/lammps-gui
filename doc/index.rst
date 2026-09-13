@@ -74,7 +74,7 @@ features and reports of bugs are always welcome.  You can use the `same
 channels as for LAMMPS itself
 <https://docs.lammps.org/Errors_bugs.html>`_ for that purpose or submit
 bug reports or pull requests in the `LAMMPS-GUI GitHub repository
-<https://github.com/akohlmey/lammps-gui>`_.
+<https://github.com/lammps/lammps-gui>`_.
 
 ------------------
 
@@ -90,13 +90,13 @@ This document describes LAMMPS-GUI version |version|.
    <hr>
    <h3>Test Status of the development branch:</h3>
    <p align="left">
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-linux-qt6.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-linux-qt6.yml/badge.svg" alt="Compile with Qt 6.x" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-macos-dmg.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-macos-dmg.yml/badge.svg" alt="Compile on macOS and build DMG" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/build-html-docs.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/build-html-docs.yml/badge.svg" alt="Build Documentation in HTML" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-windows-msvc.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-windows-msvc.yml/badge.svg" alt="Compile on Windows with MSVC" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-mingw64-cross.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-mingw64-cross.yml/badge.svg" alt="Cross-compile for Windows with MinGW64" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/build-linux-flatpak.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/build-linux-flatpak.yml/badge.svg" alt="Build LAMMPS-GUI as flatpak bundle" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/codeql-analysis.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/codeql-analysis.yml/badge.svg" alt="CodeQL Code Analysis" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/compile-linux-qt6.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/compile-linux-qt6.yml/badge.svg" alt="Compile with Qt 6.x" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/compile-macos-dmg.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/compile-macos-dmg.yml/badge.svg" alt="Compile on macOS and build DMG" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/build-html-docs.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/build-html-docs.yml/badge.svg" alt="Build Documentation in HTML" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/compile-windows-msvc.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/compile-windows-msvc.yml/badge.svg" alt="Compile on Windows with MSVC" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/compile-mingw64-cross.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/compile-mingw64-cross.yml/badge.svg" alt="Cross-compile for Windows with MinGW64" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/build-linux-flatpak.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/build-linux-flatpak.yml/badge.svg" alt="Build LAMMPS-GUI as flatpak bundle" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/codeql-analysis.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/codeql-analysis.yml/badge.svg" alt="CodeQL Code Analysis" style="max-width: 100%;"></a>
    <a href="https://scan.coverity.com/projects/akohlmey-lammps-gui"><img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/33110/badge.svg"/></a>
    </p>
 

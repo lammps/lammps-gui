@@ -9,7 +9,7 @@
 - Chart plotting capabilities
 - Image/slideshow viewing of simulation snapshots
 
-**Repository**: https://github.com/akohlmey/lammps-gui
+**Repository**: https://github.com/lammps/lammps-gui
 **Documentation**: https://lammps-gui.lammps.org/
 **Version**: 2.0.4 (see CMakeLists.txt line 4)
 **License**: GNU GPL v2

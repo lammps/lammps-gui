@@ -1,4 +1,5 @@
 AboutDialog
+accessor
 accessors
 addAction
 addShortcut
@@ -17,6 +18,7 @@ buildDumpImageCommand
 camelCase
 cecill
 Cfg
+changeEvent
 checkboxes
 CheckSize
 clearfirst
@@ -55,6 +57,7 @@ doSmooth
 Doxygen
 dumpimage
 dylib
+dx
 elif
 eps
 equipartition
@@ -71,7 +74,9 @@ fitViewerWindow
 fixSettings
 flagwarnings
 flatpak
+FontChange
 forceLayout
+fourierTransform
 Framebuffer
 frameWidth
 fromRgbF
@@ -93,12 +98,14 @@ gui
 GUIEditorChecks
 hasExe
 histo
+Hann
 Homebrew
 Hoyoung
 html
 http
 https
 iconed
+ikx
 imagecache
 imagefiles
 imagename
@@ -112,6 +119,7 @@ json
 keyPressEvent
 Khinchin
 kspace
+kx
 lammps
 lammpsImageColors
 launchable
@@ -184,6 +192,7 @@ QChart
 QColor
 QCompleter
 QDialog
+QEvent
 QFont
 QFrame
 QImage
@@ -203,6 +212,7 @@ rangeslider
 rasterizer
 README
 Rebindable
+recurse
 renameColumns
 resizable
 restoreStdout
@@ -247,6 +257,7 @@ subdirectories
 subdirectory
 subfolder
 submenu
+substituteColumnRefs
 supercomputing
 Sur
 Svg
@@ -284,6 +295,8 @@ viewport
 Viridis
 vlines
 Waals
+Wavenumbers
+wavenumbers
 webpage
 whitespace
 WidgetWithChildrenShortcut

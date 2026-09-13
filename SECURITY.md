@@ -21,7 +21,7 @@ from a "root" or "administrator" account directly or indirectly via
 Therefore what could be seen as a security vulnerability is usually
 either a user mistake or a bug in the code.  Bugs can be reported in the
 LAMMPS project [issue tracker on
-GitHub](https://github.com/akohlmey/lammps-gui/issues).
+GitHub](https://github.com/lammps/lammps-gui/issues).
 
 # Version Updates
 

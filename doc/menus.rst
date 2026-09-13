@@ -291,8 +291,10 @@ output, charts, slide show, variables, snapshot images, or the
 :ref:`Command window <commandwindow>`.  With the
 *Combined Main Window* layout these are panels docked into the main
 window instead of windows of their own, and the same entries show and
-hide the panels.  The default settings for their visibility can be
-changed in the *Preferences* dialog.
+hide the panels.  The *Image Window* entry first creates a snapshot
+image, like *Create Image* in the *Run* menu, when there is none yet.
+The default settings for their visibility can be changed in the
+*Preferences* dialog.
 
 With that layout the menu also has the *Next Panel* (`F6`) and
 *Previous Panel* (`Shift-F6`) entries, which move the keyboard focus

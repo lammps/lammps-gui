@@ -2584,6 +2584,12 @@ void LammpsGui::viewLog()
 
 void LammpsGui::viewImage()
 {
+    // on first use there is no viewer to toggle, so create the snapshot image
+    // the way the "Create snapshot image" button does; that also raises it
+    if (!imagewindow) {
+        renderImage();
+        return;
+    }
     viewlayout->toggle(ViewSlot::Image);
 }
 

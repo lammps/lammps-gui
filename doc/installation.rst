@@ -7,7 +7,7 @@ Installation
 .. index:: pre-compiled packages
 
 LAMMPS-GUI is distributed as `source code on GitHub
-<https://github.com/akohlmey/lammps-gui>`_ and can be compiled as part
+<https://github.com/lammps/lammps-gui>`_ and can be compiled as part
 of compiling LAMMPS, where it will be linked to the corresponding
 version of LAMMPS directly.  Pre-compiled packages of LAMMPS with
 LAMMPS-GUI included are available for download (see below).
@@ -40,6 +40,7 @@ source requires CMake version 3.20 or later and a suitable C++ compiler.
 
    - Ubuntu Linux 22.04LTS x86\_64 using GCC 11, Qt version 6.2
    - Ubuntu Linux 24.04LTS x86\_64 using GCC 13, Qt version 6.4
+   - AlmaLinux 9.8 x86\_64 using GCC 11, Qt version 6.6
    - Fedora Linux 43 x86\_64 using Clang 21, Qt version 6.10
    - Fedora Linux 43 x86\_64 using GCC 15, Qt version 6.10
    - Apple macOS 12 (Monterey) with Xcode 14.2 / AppleClang 14 on arm64 and x86\_64, Qt version 6.5
@@ -61,13 +62,14 @@ Packages including a full LAMMPS version
 
 For many users and especially for beginners learning to use LAMMPS, it
 is most convenient to install and use one of the pre-compiled packages
-that include both LAMMPS-GUI and the command-line version of LAMMPS.
-In these packages LAMMPS-GUI is linked directly to the included LAMMPS
+that include both LAMMPS-GUI and the command-line version of LAMMPS.  In
+these packages LAMMPS-GUI is linked directly to the included LAMMPS
 library and thus it *cannot* be changed in the :doc:`LAMMPS-GUI
 preferences dialog <dialogs>`.  Such pre-compiled LAMMPS executable
-packages are available for download for Linux x86\_64 (Ubuntu 22.04LTS
-or later and compatible), macOS (version 12 aka Monterey or later), and
-Windows (version 10 or later) from the `LAMMPS releases page on GitHub
+packages are available for download for Linux x86\_64 (Red Hat
+Enterprise Linux 9.x or Ubuntu 22.04LTS or later and compatible), macOS
+(version 12 aka Monterey or later), and Windows (version 10 or later)
+from the `LAMMPS releases page on GitHub
 <https://github.com/lammps/lammps/releases/>`_.  A backup download
 location is at https://download.lammps.org/static/ but may not always be
 up-to-date.  Occasionally, also test version packages previewing
@@ -86,7 +88,7 @@ Standalone packages with a basic LAMMPS library
 
 LAMMPS-GUI packages containing *only* LAMMPS-GUI compiled in plugin mode
 are available from the `LAMMPS-GUI releases page on GitHub
-<https://github.com/akohlmey/lammps-gui/releases>`_.  Most of these
+<https://github.com/lammps/lammps-gui/releases>`_.  Most of these
 packages include a LAMMPS shared library with some subset of LAMMPS'
 features that do not depend on additional libraries for improved
 portability.
@@ -239,15 +241,14 @@ Linux on x86\_64
 For Linux with x86\_64 CPU there are currently two variants of
 pre-compiled LAMMPS-GUI: 1) a tar file with binaries and a wrapper
 script and 2) a flatpak bundle.  The first is currently compiled on
-Ubuntu 22.04LTS (the oldest popular Linux distribution that provides the
-required C++17 compatibility out of the box and thus has the best chance
-that the pre-compiled binaries will run on current Linux installations)
-and depends on the backward compatibility of the core libraries between
-different releases on Linux distributions, and should be compatible with
-most recent Linux distributions.  The second uses the flatpak sandbox
-environment to maintain binary compatibility across platforms, but uses
-a more recent build environment and Qt library release than what is
-available on Ubuntu 22.04LTS.
+AlmaLinux 9.8 or Ubuntu 22.04LTS (the oldest popular Linux distributions
+that provide the required C++17 compatibility out of the box and thus
+have the best chance that the pre-compiled binaries will also run on
+more recent Linux installations) and depends on the backward
+compatibility of the core libraries between different releases on Linux
+distributions.  The second uses the flatpak sandbox environment to
+maintain binary compatibility across platforms; this uses a more recent
+build environment and Qt library release than the tar archive.
 
 *Linux binary tarball*
 
@@ -272,19 +273,10 @@ automatically.
 
    Since software is constantly evolving, it may be required to install
    additional software packages for your Linux distribution to achieve
-   compatibility with binaries compiled on older distributions.  For
-   example the libraries ``libxcb-xinput.so.0`` and
-   ``libxcb-xinerama.so.0`` may be missing and you thus get the error
-
-   .. code-block:: console
-
-      qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
-
-   On Ubuntu 24.04, for example, those libraries are in the packages
-   ``libxcb-xinput0`` and ``libxcb-xinerama0`` which are not installed
-   by default.  Using the flatpak bundle (see below) avoids these kind
-   of issues by compiling and running the application in a standardized
-   sandbox which is maintained by the flatpak software manager.
+   compatibility with binaries compiled on older distributions.  Using
+   the flatpak bundle (see below) avoids these kind of issues by
+   compiling and running the application in a standardized sandbox which
+   is maintained by the flatpak software manager.
 
 *Linux flatpak bundle*
 
@@ -340,7 +332,7 @@ Compilation from source
    ``tools/lammps-gui``.  Starting with LAMMPS-GUI version 1.8.0 and
    LAMMPS version 10 September 2025 the LAMMPS-GUI sources are
    distributed separately through its own git repository at
-   https://github.com/akohlmey/lammps-gui.
+   https://github.com/lammps/lammps-gui.
 
 LAMMPS-GUI can be built as part of a regular LAMMPS compilation.  It
 will be automatically downloaded from its git repository and configured.
@@ -383,7 +375,7 @@ LAMMPS-GUI plugin version
 It is possible to compile a standalone LAMMPS-GUI executable (e.g. when
 LAMMPS has been compiled with traditional make).  Rather than linking to
 the LAMMPS library during compilation, it includes a `plugin loader
-<https://github.com/akohlmey/lammps-gui/tree/main/plugin>`_ that will
+<https://github.com/lammps/lammps-gui/tree/main/plugin>`_ that will
 load a LAMMPS shared library file dynamically at runtime during the
 start of the GUI; e.g. ``liblammps.so.0`` or ``liblammps.0.dylib`` or
 ``liblammps.dll`` (depending on the operating system).  This has the
