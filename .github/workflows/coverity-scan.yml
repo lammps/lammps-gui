@@ -20,7 +20,7 @@ permissions:
 jobs:
   coverity:
     name: Build and submit to Coverity Scan
-    if: ${{ github.repository == 'akohlmey/lammps-gui' }}
+    if: ${{ github.repository == 'lammps/lammps-gui' }}
     runs-on: ubuntu-latest
 
     env:
