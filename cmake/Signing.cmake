@@ -12,7 +12,7 @@ if((CMAKE_SYSTEM_NAME STREQUAL "Windows") AND CMAKE_CROSSCOMPILING)
   option(CODE_SIGNING "Authenticode-sign Windows binaries" ON)
 else()
   option(CODE_SIGNING "Authenticode-sign Windows binaries" OFF)
-endif()  
+endif()
 
 set(SIGN_SCRIPT "${CMAKE_SOURCE_DIR}/packaging/sign.sh")
 
