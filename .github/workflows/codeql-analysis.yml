@@ -14,7 +14,7 @@ concurrency:
 jobs:
   analyze:
     name: Analyze
-    if: ${{ github.repository == 'akohlmey/lammps-gui' }}
+    if: ${{ github.repository == 'lammps/lammps-gui' }}
     runs-on: ubuntu-latest
 
     permissions:
