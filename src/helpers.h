@@ -249,6 +249,18 @@ extern QString renameToBackup(const QString &file);
 extern void relaunchApplication();
 
 /**
+ * @brief Relaunch LAMMPS-GUI, or report the failure and exit
+ *
+ * Wraps relaunchApplication() with the handling every caller needs: when the
+ * re-exec fails, the user is told that the saved settings take effect on the
+ * next start and the application exits, since continuing in a state that no
+ * longer matches the settings is worse than stopping.
+ *
+ * @param parent  Parent widget for the error dialog
+ */
+[[noreturn]] extern void relaunchOrExit(QWidget *parent);
+
+/**
  * @brief Recursively delete all files in a directory
  * @param dir The directory to purge
  */

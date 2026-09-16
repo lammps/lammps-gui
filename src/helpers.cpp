@@ -46,6 +46,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
 
@@ -118,6 +119,16 @@ void relaunchApplication()
     const auto path = QCoreApplication::applicationFilePath().toStdString();
     const auto arg0 = QCoreApplication::arguments().at(0).toStdString();
     myexecl(path.c_str(), arg0.c_str(), static_cast<char *>(nullptr));
+}
+
+void relaunchOrExit(QWidget *parent)
+{
+    relaunchApplication();
+    // only reached when the re-exec failed
+    critical(parent, "LAMMPS-GUI Error", "Relaunching LAMMPS-GUI failed.",
+             "The changed settings have been saved and take effect when LAMMPS-GUI is "
+             "started again. Click on 'Close' to exit.");
+    exit(1);
 }
 
 // compare two date strings return -1 if first is older than second, 0 if same, or 1

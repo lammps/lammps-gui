@@ -301,7 +301,7 @@ void Preferences::accept()
         warning(this, "Relaunching LAMMPS-GUI", relaunchReasons.join(' '),
                 "LAMMPS-GUI must be relaunched to activate it.");
         settings->sync();
-        relaunchApplication();
+        relaunchOrExit(this);
     }
 
     QDialog::accept();

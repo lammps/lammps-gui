@@ -723,12 +723,7 @@ void LammpsGui::setupPlugin(QSettings &settings)
                     settings.setValue(Keys::PLUGIN_PATH, canonical);
                     settings.sync();
                     // must re-launch LAMMPS-GUI to cleanly load the selected new plugin
-                    relaunchApplication();
-                    // This should not happen...
-                    critical(this, "LAMMPS-GUI Error", "Relaunching LAMMPS-GUI failed.",
-                             "LAMMPS-GUI must be restarted to correctly load the selected "
-                             "LAMMPS shared library. Click on 'Close' to exit.");
-                    exit(1);
+                    relaunchOrExit(this);
                 }
                 // user cancelled file dialog -> loop back to show the dialog again
 
@@ -753,12 +748,7 @@ void LammpsGui::setupPlugin(QSettings &settings)
                         settings.setValue(Keys::PLUGIN_PATH, pluginPath);
                         settings.sync();
                         // must re-launch LAMMPS-GUI to cleanly load the selected new plugin
-                        relaunchApplication();
-                        // This should not happen...
-                        critical(this, "LAMMPS-GUI Error", "Relaunching LAMMPS-GUI failed.",
-                                 "LAMMPS-GUI must be restarted to correctly load the selected "
-                                 "LAMMPS shared library. Click on 'Close' to exit.");
-                        exit(1);
+                        relaunchOrExit(this);
                     } else {
                         QFile::remove(libPath);
                         critical(this, "LAMMPS-GUI Error",
@@ -2860,7 +2850,7 @@ void LammpsGui::checkUpdate()
                 warning(this, "LAMMPS Shared Library Updated",
                         "The latest LAMMPS library has been downloaded successfully. "
                         "LAMMPS-GUI must be relaunched to activate it.");
-                relaunchApplication();
+                relaunchOrExit(this);
             } else {
                 critical(this, "Check for LAMMPS Update",
                          "Failed to download LAMMPS shared library.", downloader.errorString());
