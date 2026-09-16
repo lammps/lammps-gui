@@ -1987,7 +1987,8 @@ PlotData ChartWindow::chartsToPlotData() const
     // a column name has to survive whitespace-separated and comma-separated
     // formats alike, and fit labels are free text (an expression, say)
     auto exportName = [](QString name) {
-        return name.replace(QRegularExpression(QStringLiteral("[\\s,]+")), QStringLiteral("_"));
+        static const QRegularExpression separators(QStringLiteral("[\\s,]+"));
+        return name.replace(separators, QStringLiteral("_"));
     };
 
     for (const auto &c : cols) {

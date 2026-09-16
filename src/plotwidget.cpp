@@ -226,10 +226,27 @@ void PlotWidget::doRender(QPainter &p, const QRectF &target) const
     const QString xfmt = effectiveFormat(m_xaxis.labelFormat, xMajor);
     const QString yfmt = effectiveFormat(m_yaxis.labelFormat, yMajor);
 
+    // the tick labels, formatted and measured once: they are needed for the
+    // margins here and for drawing below, and this runs on every repaint
+    std::vector<QString> xlabels, ylabels;
+    std::vector<double> xlabelW, ylabelW;
+    xlabels.reserve(xticks.size());
+    xlabelW.reserve(xticks.size());
+    ylabels.reserve(yticks.size());
+    ylabelW.reserve(yticks.size());
+    for (double v : xticks) {
+        xlabels.push_back(labelText(v, xfmt));
+        xlabelW.push_back(fm.horizontalAdvance(xlabels.back()));
+    }
+    for (double v : yticks) {
+        ylabels.push_back(labelText(v, yfmt));
+        ylabelW.push_back(fm.horizontalAdvance(ylabels.back()));
+    }
+
     // widest Y tick label drives the left margin
     double maxYLabelW = 0.0;
-    for (double v : yticks)
-        maxYLabelW = std::max(maxYLabelW, fm.horizontalAdvance(labelText(v, yfmt)));
+    for (double w : ylabelW)
+        maxYLabelW = std::max(maxYLabelW, w);
 
     // margins
     const bool hasTitle  = !m_title.isEmpty();
@@ -243,8 +260,7 @@ void PlotWidget::doRender(QPainter &p, const QRectF &target) const
     const double topMargin = hasTitle ? (TITLE_VPAD + chartTitleH + TITLE_VPAD)
                                       : (OUTER + 0.5 * labelH);
     // leave room so the last X tick label is not clipped at the right edge
-    double lastXLabelW = 0.0;
-    if (!xticks.empty()) lastXLabelW = fm.horizontalAdvance(labelText(xticks.back(), xfmt));
+    const double lastXLabelW = xlabelW.empty() ? 0.0 : xlabelW.back();
     const double rightMargin = OUTER + 0.5 * lastXLabelW;
 
     QRectF plot(target.left() + leftMargin, target.top() + topMargin,
@@ -304,23 +320,21 @@ void PlotWidget::doRender(QPainter &p, const QRectF &target) const
 
     // ticks and tick labels
     p.setPen(Qt::black);
-    for (double v : xticks) {
-        const double x = mapX(v);
+    for (std::size_t i = 0; i < xticks.size(); ++i) {
+        const double x = mapX(xticks[i]);
         if (x < plot.left() - 0.5 || x > plot.right() + 0.5) continue;
         p.drawLine(QPointF(x, plot.bottom()), QPointF(x, plot.bottom() + TICK_LEN));
-        const QString lbl = labelText(v, xfmt);
-        const double w    = fm.horizontalAdvance(lbl);
-        p.drawText(QPointF(x - 0.5 * w, plot.bottom() + TICK_LEN + LABEL_GAP + fm.ascent()), lbl);
+        p.drawText(
+            QPointF(x - 0.5 * xlabelW[i], plot.bottom() + TICK_LEN + LABEL_GAP + fm.ascent()),
+            xlabels[i]);
     }
-    for (double v : yticks) {
-        const double y = mapY(v);
+    for (std::size_t i = 0; i < yticks.size(); ++i) {
+        const double y = mapY(yticks[i]);
         if (y < plot.top() - 0.5 || y > plot.bottom() + 0.5) continue;
         p.drawLine(QPointF(plot.left() - TICK_LEN, y), QPointF(plot.left(), y));
-        const QString lbl = labelText(v, yfmt);
-        const double w    = fm.horizontalAdvance(lbl);
-        p.drawText(QPointF(plot.left() - TICK_LEN - LABEL_GAP - w,
+        p.drawText(QPointF(plot.left() - TICK_LEN - LABEL_GAP - ylabelW[i],
                            y + 0.5 * fm.ascent() - 0.5 * fm.descent()),
-                   lbl);
+                   ylabels[i]);
     }
 
     // axis titles: bold, base size
