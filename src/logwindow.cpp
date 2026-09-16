@@ -39,7 +39,6 @@
 
 namespace {
 constexpr auto YAML_REGEX = R"(^(keywords:.*$|data:$|---$|\.\.\.$|  - \[.*\]$))";
-constexpr auto URL_REGEX  = "^.*(https://docs.lammps.org/err[0-9]+).*$";
 QRegularExpression is_yaml(YAML_REGEX, QRegularExpression::MultilineOption);
 } // namespace
 
@@ -203,7 +202,9 @@ void LogWindow::runBuffer()
 
 void LogWindow::nextWarning()
 {
-    auto regex = QRegularExpression(QStringLiteral("^(ERROR|WARNING).*$"));
+    // the highlighter's own notion of a warning, so the search finds exactly
+    // what is highlighted and counted
+    const QRegularExpression &regex = FlagWarnings::warningPattern();
 
     if (warnings->getNWarnings() > 0) {
         // wrap around search
@@ -304,7 +305,7 @@ void LogWindow::mouseDoubleClickEvent(QMouseEvent *event)
         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, end - begin - 1);
 
         auto text = cursor.selectedText();
-        auto url  = QRegularExpression(URL_REGEX).match(text);
+        auto url  = FlagWarnings::errorUrlPattern().match(text);
         if (url.hasMatch()) {
             errorurl = url.captured(1);
             if (!errorurl.isEmpty()) {
@@ -332,7 +333,7 @@ void LogWindow::contextMenuEvent(QContextMenuEvent *event)
 
     // process line of text where the cursor is
     auto text = textCursor().block().text().replace('\t', ' ').trimmed();
-    auto url  = QRegularExpression(URL_REGEX).match(text);
+    auto url  = FlagWarnings::errorUrlPattern().match(text);
     if (url.hasMatch()) {
         errorurl = url.captured(1);
         menu->addAction(urlAct);
