@@ -193,19 +193,11 @@ int main(int argc, char *argv[])
     if (parser.isSet("chart")) {
         const QString fileName = parser.value("chart");
         QString error;
-        // fix ave/* output needs its blocks reduced to a table first
-        const PlotBlockData blocks = loadPlotBlockData(fileName);
-        PlotData data;
-        if (blocks.isEmpty()) {
-            data = loadPlotData(fileName, &error);
-            if (data.isEmpty()) {
-                critical(nullptr, "Plot Data File",
-                         "Could not read data from file:", error.isEmpty() ? fileName : error);
-                return 1;
-            }
+        auto dialog = PlotDataDialog::fromFile(fileName, nullptr, &error);
+        if (!dialog) {
+            critical(nullptr, "Plot Data File", "Could not read data from file:", error);
+            return 1;
         }
-        auto dialog = blocks.isEmpty() ? std::make_unique<PlotDataDialog>(data, nullptr)
-                                       : std::make_unique<PlotDataDialog>(blocks, nullptr);
         if (dialog->exec() != QDialog::Accepted) return 0;
         const PlotData plotData  = dialog->buildData();
         const PlotErrors plotErr = dialog->buildErrors();

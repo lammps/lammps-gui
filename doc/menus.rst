@@ -17,8 +17,8 @@ instead of using the mouse.
 .. admonition:: LAMMPS-GUI Combined Window Mode
    :class: note
 
-   In joined window mode there can be only one menu bar, so the
-   displayed menu bar is that of the section / tab that has currently
+   In combined window mode there can be only one menu bar, so the
+   displayed menu bar is that of the section / tab that currently has
    the focus.  If access to the menu bar of a specific window is needed,
    e.g. to open a new LAMMPS input file, it may be needed to either
    first click into the corresponding area or use the `F6` or `Shift-F6`
@@ -42,8 +42,8 @@ File
      desired) and saves the buffer to it.  Writing the buffer to a different folder
      will also switch the current working directory to that folder.
    - *View Text File* opens a dialog to select a file for viewing in a *separate*
-     window (read-only) with support for on-the-fly decompression as explained
-     above.  If the selected file appears to be an image, a movie, or a binary file,
+     window (read-only) with support for on-the-fly decompression.
+     If the selected file appears to be an image, a movie, or a binary file,
      a warning is shown instead; use *View Image or Movie File(s)...* for those.
    - *View Image or Movie File(s)...* opens a dialog to select one or more image files
      and shows them together in a standalone :ref:`slide show <slideshow>` window.  This is

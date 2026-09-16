@@ -125,6 +125,13 @@ private:
     /// Build a diagnostic carrying the descriptor numbers behind it.
     std::string describe(const char *what) const;
 
+    /// One non-blocking read of the pipe into the buffer.  Returns the number
+    /// of bytes read, 0 when there was nothing, or what read() returns on an
+    /// error (-1, with errno set).  The one place for the platform difference:
+    /// on Windows the pipe cannot be made non-blocking, so it is only read
+    /// when it is known to hold data.
+    int readPipe();
+
     /// Prove a freshly set up capture: write a marker through stdout, read it
     /// back out of the pipe, and mark the capture unusable when it does not
     /// return.  Runs from beginCapture(), before anything else writes.

@@ -113,7 +113,7 @@ with ``-p ""`` and re-download the latest version.
 
 .. versionchanged:: 3.1
 
-   The minimum LAMMPS version required by LAMMPS-GUI is now 27 August 2026
+   The minimum LAMMPS version required by LAMMPS-GUI is now 2 September 2026
 
 GPU support and MPI parallelization
 -----------------------------------
@@ -206,7 +206,7 @@ corresponding cryptographic signature to sign the binaries with.
    HTTPS from their official site.
 
    If you ever wish to *remove* this certificate, you can do it with
-   with the following commands.
+   the following commands.
 
    ``certutil -delstore Root "The LAMMPS Developers"``
 
@@ -399,7 +399,7 @@ LAMMPS_GUI_USE_PLUGIN=off`` (default setting is on).  This is also the
 setting for compilation within LAMMPS.  In this case, the CMake
 configuration needs to be told where to find the LAMMPS headers and the
 LAMMPS library, via ``-D LAMMPS_SOURCE_DIR=/path/to/lammps/src`` and
-``-D LAMMPS_LIBRARY=/path/to/liblammps/file``
+``-D LAMMPS_LIBRARY=/path/to/liblammps/file``.
 
 
 Platform notes
@@ -483,13 +483,13 @@ Linux
 *Binary tarball package*
 
 Version 6.2 or later of the Qt library is required. Those are provided
-by, e.g., Ubuntu 22.04LTS or later.  Thus older Linux distributions are
-not likely to be supported, while more recent ones will work, even for
-pre-compiled executables (see above).  After compiling with
-``cmake --build <build folder>``, use ``cmake --build <build
-folder> --target tgz`` or ``make tgz`` to build a
-``LAMMPS-Linux-amd64.tar.gz`` file with the executables and their
-support libraries.
+by, e.g., Ubuntu 22.04LTS or later or RHEL 9.x or later.  Thus older
+Linux distributions are not likely to be supported, while more recent
+ones will work, even for pre-compiled executables (see above).  After
+compiling with ``cmake --build <build folder>``, use ``cmake --build
+<build folder> --target tgz`` or ``make tgz`` to build a
+``LAMMPS-GUI-Linux-x86_64-<version>.tar.gz`` file with the executables
+and their support libraries.
 
 *Flatpak bundle*
 

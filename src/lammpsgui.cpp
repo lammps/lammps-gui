@@ -723,12 +723,7 @@ void LammpsGui::setupPlugin(QSettings &settings)
                     settings.setValue(Keys::PLUGIN_PATH, canonical);
                     settings.sync();
                     // must re-launch LAMMPS-GUI to cleanly load the selected new plugin
-                    relaunchApplication();
-                    // This should not happen...
-                    critical(this, "LAMMPS-GUI Error", "Relaunching LAMMPS-GUI failed.",
-                             "LAMMPS-GUI must be restarted to correctly load the selected "
-                             "LAMMPS shared library. Click on 'Close' to exit.");
-                    exit(1);
+                    relaunchOrExit(this);
                 }
                 // user cancelled file dialog -> loop back to show the dialog again
 
@@ -753,12 +748,7 @@ void LammpsGui::setupPlugin(QSettings &settings)
                         settings.setValue(Keys::PLUGIN_PATH, pluginPath);
                         settings.sync();
                         // must re-launch LAMMPS-GUI to cleanly load the selected new plugin
-                        relaunchApplication();
-                        // This should not happen...
-                        critical(this, "LAMMPS-GUI Error", "Relaunching LAMMPS-GUI failed.",
-                                 "LAMMPS-GUI must be restarted to correctly load the selected "
-                                 "LAMMPS shared library. Click on 'Close' to exit.");
-                        exit(1);
+                        relaunchOrExit(this);
                     } else {
                         QFile::remove(libPath);
                         critical(this, "LAMMPS-GUI Error",
@@ -998,29 +988,10 @@ void LammpsGui::newDocument()
     textEdit->document()->setModified(false);
     textEdit->setStyleSheet(bannerstyle);
 
-    if (lammps.isRunning()) {
-        stopRun();
-        runner->wait();
-        runner->deleteLater();
-        runner = nullptr;
-    }
-    // close windows
-    delete chartwindow;
-    delete logwindow;
-    delete slideshow;
-    delete imagewindow;
-    delete varwindow;
-    chartwindow = nullptr;
-    logwindow   = nullptr;
-    slideshow   = nullptr;
-    imagewindow = nullptr;
-    varwindow   = nullptr;
+    abortRun();
+    closeOutputWindows();
 
-    {
-        StdoutSilencer guard;
-        lammps.close();
-    }
-    lammpsstatus->hide();
+    closeLammpsInstance();
     updateEditorTitle(QString());
     runCounter = 0;
 }
@@ -1239,30 +1210,8 @@ void LammpsGui::openFile(const QString &fileName)
         !confirmUnexpectedFile(this, fileName, "text"))
         return;
 
-    if (lammps.isRunning()) {
-        stopRun();
-        runner->wait();
-        runner->deleteLater();
-        runner = nullptr;
-    }
-    // close windows
-    delete chartwindow;
-    delete logwindow;
-    delete slideshow;
-    delete imagewindow;
-    delete varwindow;
-    chartwindow = nullptr;
-    logwindow   = nullptr;
-    slideshow   = nullptr;
-    imagewindow = nullptr;
-    varwindow   = nullptr;
-    {
-        StdoutSilencer guard;
-        lammps.close();
-    }
-
-    purgeInspectList();
-    textEdit->setStyleSheet("");
+    // The same goes for unsaved edits: a "Cancel" here must leave the run and
+    // the output windows as they were.
     if (textEdit->document()->isModified()) {
         int rv = showUnsavedChangesDialog(
             this, currentFile, "Do you want to save the file before opening a new file?");
@@ -1278,6 +1227,13 @@ void LammpsGui::openFile(const QString &fileName)
                 break;
         }
     }
+
+    abortRun();
+    closeOutputWindows();
+    closeLammpsInstance();
+
+    purgeInspectList();
+    textEdit->setStyleSheet("");
     textEdit->setHighlight(CodeEditor::NO_HIGHLIGHT, false);
 
     QFileInfo path(fileName);
@@ -1443,10 +1399,7 @@ void LammpsGui::inspectFile(const QString &fileName)
     auto shortName = QFileInfo(fileName).fileName();
 
     purgeInspectList();
-    auto *ilist  = new InspectData;
-    ilist->info  = nullptr;
-    ilist->data  = nullptr;
-    ilist->image = nullptr;
+    auto *ilist = new InspectData;
     inspectList.append(ilist);
 
     if (file.size() > Cfg::INSPECT_WARN_SIZE) {
@@ -1465,10 +1418,7 @@ void LammpsGui::inspectFile(const QString &fileName)
         mb.setEscapeButton(QMessageBox::No);
         mb.setFont(font());
 
-        auto *button = mb.button(QMessageBox::Yes);
-        button->setIcon(QIcon(":/icons/dialog-ok.svg"));
-        button = mb.button(QMessageBox::No);
-        button->setIcon(QIcon(":/icons/dialog-no.svg"));
+        styleMessageBoxButtons(mb);
 
         int rv = mb.exec();
         switch (rv) {
@@ -1620,12 +1570,7 @@ void LammpsGui::saveAs()
 
 void LammpsGui::quit()
 {
-    if (lammps.isRunning()) {
-        stopRun();
-        runner->wait();
-        runner->deleteLater();
-        runner = nullptr;
-    }
+    abortRun();
 
     autoSave();
     if (textEdit->document()->isModified()) {
@@ -1714,17 +1659,12 @@ void LammpsGui::logUpdate()
         const auto text = capturer->getChunk();
         if (!text.empty()) {
             logwindow->moveCursor(QTextCursor::End);
-            logwindow->insertPlainText(text.c_str());
+            logwindow->insertPlainText(decodeLog(text));
             logwindow->moveCursor(QTextCursor::End);
         }
     }
 
-    // get timestep
-    int step = 0;
-    if (lammps.extractSetting("bigint") == 4)
-        step = lammps.lastThermoAs<int>("step", 0);
-    else
-        step = static_cast<int>(lammps.lastThermoAs<int64_t>("step", 0));
+    const int step = currentStep();
 
     // extract cached thermo data when LAMMPS is executing a minimize or run command;
     // never during a dry run, where a kept chart window belongs to a previous run
@@ -1739,6 +1679,66 @@ void LammpsGui::logUpdate()
     }
 
     updateSlideShow();
+}
+
+// The captured output is a byte stream that reaches the log window in chunks
+// cut wherever the poll timer found them, so a multi-byte character can be
+// split between two chunks.  A decoder that keeps its state between calls
+// joins it again; decoding each chunk on its own put a replacement character
+// in its place.
+QString LammpsGui::decodeLog(const std::string &bytes)
+{
+    return logDecoder.decode(QByteArrayView(bytes.data(), static_cast<qsizetype>(bytes.size())));
+}
+
+void LammpsGui::abortRun()
+{
+    if (!lammps.isRunning()) return;
+    stopRun();
+    runner->wait();
+    runner->deleteLater();
+    runner = nullptr;
+}
+
+void LammpsGui::closeLammpsInstance()
+{
+    {
+        StdoutSilencer guard;
+        lammps.close();
+    }
+    // the file given on the command line is opened before the status bar exists
+    if (lammpsstatus) lammpsstatus->hide();
+}
+
+void LammpsGui::closeOutputWindows()
+{
+    delete chartwindow;
+    delete logwindow;
+    delete slideshow;
+    delete imagewindow;
+    delete varwindow;
+    chartwindow = nullptr;
+    logwindow   = nullptr;
+    slideshow   = nullptr;
+    imagewindow = nullptr;
+    varwindow   = nullptr;
+}
+
+void LammpsGui::beginRunStatus(const QString &message)
+{
+    progress->setValue(0);
+    dirstatus->hide();
+    progress->show();
+    cpuuse->show();
+    lastCpuBucket = -1; // force the cpuuse stylesheet to be applied on the first poll
+    status->setText(message);
+    status->repaint();
+}
+
+int LammpsGui::currentStep()
+{
+    if (lammps.extractSetting("bigint") == 4) return lammps.lastThermoAs<int>("step", 0);
+    return static_cast<int>(lammps.lastThermoAs<int64_t>("step", 0));
 }
 
 int LammpsGui::updateRunStatus()
@@ -1802,7 +1802,9 @@ int LammpsGui::updateRunStatus()
     void *ptr = lammps.lastThermo("line", 0);
     if (ptr) textEdit->setHighlight(*static_cast<int *>(ptr), false);
 
-    if (varwindow) {
+    // only when it can be seen: this runs on every poll of the run, and each
+    // refresh asks the library for every variable
+    if (varwindow && viewlayout->isVisible(ViewSlot::Variables)) {
         int nvar = lammps.idCount("variable");
         QString varinfo("\n");
         for (int i = 0; i < nvar; ++i)
@@ -1859,15 +1861,18 @@ void LammpsGui::updateSlideShow()
     QString imagefile = lammps.lastThermoString("imagename", 0);
     if (imagefile.isEmpty()) return;
 
-    const bool showslides = QSettings().value(Keys::VIEWSLIDE, true).toBool();
     if (!slideshow) {
         slideshow = new SlideShow(currentFile, this);
         viewlayout->place(ViewSlot::SlideShow, slideshow);
-        viewlayout->setVisible(ViewSlot::SlideShow, showslides);
+        viewlayout->setVisible(ViewSlot::SlideShow, showSlides);
     } else {
         slideshow->setWindowTitle(
             QString("LAMMPS-GUI - Slide Show - %1 - Run %2").arg(currentFile).arg(runCounter));
-        if (showslides) viewlayout->show(ViewSlot::SlideShow);
+        // this runs on every poll of the run's output once an image exists, and
+        // showing a view that is visible already would still re-lay out the
+        // docked panels each time
+        if (showSlides && !viewlayout->isVisible(ViewSlot::SlideShow))
+            viewlayout->show(ViewSlot::SlideShow);
     }
     slideshow->addImage(imagefile);
 }
@@ -1916,11 +1921,7 @@ void LammpsGui::warnHighBufferUsage()
 void LammpsGui::finalizeChartData()
 {
     if (chartwindow) {
-        int step = 0;
-        if (lammps.extractSetting("bigint") == 4)
-            step = lammps.lastThermoAs<int>("step", 0);
-        else
-            step = static_cast<int>(lammps.lastThermoAs<int64_t>("step", 0));
+        const int step  = currentStep();
         const int ncols = lammps.lastThermoAs<int>("num", 0);
         // decide once before the loop: testing numCharts() per column would stop
         // creating charts as soon as the first addChart() call succeeded
@@ -1960,7 +1961,9 @@ void LammpsGui::runDone()
 
     if (logwindow) {
         auto log = capturer->getCapture();
-        logwindow->insertPlainText(log.c_str());
+        // at the end, as the polled chunks go: not into a selection the user made
+        logwindow->moveCursor(QTextCursor::End);
+        logwindow->insertPlainText(decodeLog(log));
         // only when the final drain stayed empty too was the output really lost
         if (!capturereport.empty() && log.empty())
             logwindow->appendPlainText(
@@ -2151,12 +2154,10 @@ int showLintDialog(QWidget *parent, const QList<LintIssue> &issues, bool askRunA
         mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         mb.setDefaultButton(QMessageBox::No);
         mb.setEscapeButton(QMessageBox::No);
-        mb.button(QMessageBox::Yes)->setIcon(QIcon(":/icons/dialog-ok.svg"));
-        mb.button(QMessageBox::No)->setIcon(QIcon(":/icons/dialog-no.svg"));
     } else {
         mb.setStandardButtons(QMessageBox::Ok);
-        mb.button(QMessageBox::Ok)->setIcon(QIcon(":/icons/dialog-ok.svg"));
     }
+    styleMessageBoxButtons(mb);
     mb.setFont(parent->font());
     return mb.exec();
 }
@@ -2246,8 +2247,7 @@ void LammpsGui::doRun(bool use_buffer, bool dryrun)
         mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         mb.setDefaultButton(QMessageBox::Yes);
         mb.setEscapeButton(QMessageBox::No);
-        mb.button(QMessageBox::Yes)->setIcon(QIcon(":/icons/dialog-ok.svg"));
-        mb.button(QMessageBox::No)->setIcon(QIcon(":/icons/dialog-no.svg"));
+        styleMessageBoxButtons(mb);
         mb.setFont(font());
         if (mb.exec() != QMessageBox::Yes) return;
     }
@@ -2277,12 +2277,8 @@ void LammpsGui::doRun(bool use_buffer, bool dryrun)
     // pre-run input check: only error findings gate the run; a dry run
     // needs no gate since it is itself the check
     if (!dryrun && settings.value(Keys::LINTCHECK, true).toBool() && !confirmLintIssues()) return;
-
-    progress->setValue(0);
-    dirstatus->hide();
-    progress->show();
-    cpuuse->show();
-    lastCpuBucket = -1; // force the cpuuse stylesheet to be applied on the first poll
+    // read once here rather than on every poll of the run's output
+    showSlides = settings.value(Keys::VIEWSLIDE, true).toBool();
 
     int numthreads = nthreads;
     int accel      = settings.value(Keys::ACCELERATOR, AcceleratorTab::OpenMP).toInt();
@@ -2290,15 +2286,15 @@ void LammpsGui::doRun(bool use_buffer, bool dryrun)
         (accel != AcceleratorTab::Kokkos) && (accel != AcceleratorTab::Gpu))
         numthreads = 1;
     if (dryrun)
-        status->setText(QString("Checking input with a dry run ..."));
+        beginRunStatus("Checking input with a dry run ...");
     else if (numthreads > 1)
-        status->setText(QString("Running LAMMPS with %1 thread(s)...").arg(numthreads));
+        beginRunStatus(QString("Running LAMMPS with %1 thread(s)...").arg(numthreads));
     else
-        status->setText(QString("Running LAMMPS ..."));
-    status->repaint();
+        beginRunStatus("Running LAMMPS ...");
     startLammps();
     if (!lammps.isOpen()) return;
     capturer->beginCapture();
+    logDecoder.resetState();
     verifyLibraryCapture();
 
     ++runCounter;
@@ -2391,15 +2387,10 @@ void LammpsGui::extendRun()
     extendSteps = nsteps;
 
     QSettings settings;
-    progress->setValue(0);
-    dirstatus->hide();
-    progress->show();
-    cpuuse->show();
-    lastCpuBucket = -1; // force the cpuuse stylesheet to be applied on the first poll
-    status->setText(QString("Extending run by %1 steps ...").arg(nsteps));
-    status->repaint();
+    beginRunStatus(QString("Extending run by %1 steps ...").arg(nsteps));
 
     capturer->beginCapture();
+    logDecoder.resetState();
     verifyLibraryCapture();
 
     // append to the windows of the extended run; create them only when missing
@@ -2444,23 +2435,13 @@ bool LammpsGui::plotFile(const QString &fileName)
     }
 
     QString error;
-    // the block-structured output of the fix ave/* styles is not a flat table
-    // and gets the import dialog that can reduce it to one
-    const PlotBlockData blocks = loadPlotBlockData(fileName);
-    PlotData data;
-    if (blocks.isEmpty()) {
-        data = loadPlotData(fileName, &error);
-        if (data.isEmpty()) {
-            critical(this, "Plot Data File",
-                     "Could not read data from file:", error.isEmpty() ? fileName : error);
-            // the file was the problem, not the user, so a caller with more of
-            // them carries on to the next
-            return true;
-        }
+    auto dialog = PlotDataDialog::fromFile(fileName, this, &error);
+    if (!dialog) {
+        critical(this, "Plot Data File", "Could not read data from file:", error);
+        // the file was the problem, not the user, so a caller with more of
+        // them carries on to the next
+        return true;
     }
-
-    auto dialog = blocks.isEmpty() ? std::make_unique<PlotDataDialog>(data, this)
-                                   : std::make_unique<PlotDataDialog>(blocks, this);
     if (dialog->exec() != QDialog::Accepted) return false;
     const QList<int> ycols = dialog->yColumns();
     if (ycols.isEmpty()) {
@@ -2624,8 +2605,8 @@ void LammpsGui::createCommandWindow()
     commandwindow = new CommandWindow(this);
     commandwindow->setWindowTitle("LAMMPS-GUI - Commands");
     commandwindow->setWindowIcon(QIcon(Cfg::MAIN_ICON));
-    // start where the input file is, which is where a run leaves its output
-    commandwindow->changeDirectory(currentDir);
+    // the shell starts in the process working directory, which follows the
+    // input file and is where a run leaves its output; no "cd" is needed
     viewlayout->place(ViewSlot::Command, commandwindow);
 }
 
@@ -2844,18 +2825,14 @@ void LammpsGui::checkUpdate()
         mb.setWindowIcon(QIcon(Cfg::MAIN_ICON));
         mb.setIconPixmap(QPixmap(":/icons/lammps-plugin.png").scaled(96, 96));
 
-        // customize button icons
-        auto *button = mb.button(QMessageBox::Yes);
-        button->setIcon(QIcon(":/icons/dialog-ok.svg"));
-        button = mb.button(QMessageBox::No);
-        button->setIcon(QIcon(":/icons/dialog-no.svg"));
+        styleMessageBoxButtons(mb);
 
         if (mb.exec() == QMessageBox::Yes) {
             if (downloader.download(dlUrl, libPath, true, true)) {
                 warning(this, "LAMMPS Shared Library Updated",
                         "The latest LAMMPS library has been downloaded successfully. "
                         "LAMMPS-GUI must be relaunched to activate it.");
-                relaunchApplication();
+                relaunchOrExit(this);
             } else {
                 critical(this, "Check for LAMMPS Update",
                          "Failed to download LAMMPS shared library.", downloader.errorString());
@@ -2914,14 +2891,13 @@ void LammpsGui::help()
         "<p>The 'About LAMMPS-GUI' dialog will show the LAMMPS version and the "
         "features included into the LAMMPS library linked to the LAMMPS-GUI. "
         "A number of settings can be adjusted in the 'Preferences' dialog (in "
-        "the 'Edit' menu or from <b>Ctrl-P</b>) which includes selecting "
+        "the 'View' menu or from <b>Ctrl-P</b>) which includes selecting "
         "accelerator packages and number of OpenMP threads. Due to its nature "
         "as a graphical application, it is <b>not</b> possible to use the "
         "LAMMPS-GUI in parallel with MPI.</p>");
     mb.setIconPixmap(QPixmap(Cfg::MAIN_ICON).scaled(64, 64));
     mb.setStandardButtons(QMessageBox::Close);
-    auto *button = mb.button(QMessageBox::Close);
-    button->setIcon(QIcon(":/icons/window-close.svg"));
+    styleMessageBoxButtons(mb);
     mb.setFont(font());
     mb.exec();
 }
@@ -3108,17 +3084,8 @@ void LammpsGui::editVariables()
     if (vars.exec() == QDialog::Accepted) {
         variables = newvars;
         textEdit->setVariableOverrides(variables);
-        if (lammps.isRunning()) {
-            stopRun();
-            runner->wait();
-            runner->deleteLater();
-            runner = nullptr;
-        }
-        {
-            StdoutSilencer guard;
-            lammps.close();
-        }
-        lammpsstatus->hide();
+        abortRun();
+        closeLammpsInstance();
     }
 }
 
@@ -3157,17 +3124,8 @@ void LammpsGui::preferences()
             (oldcite != settings.value(Keys::CITE, false).toBool()) ||
             (oldgpuneigh != settings.value(Keys::GPUNEIGH, true).toBool()) ||
             (oldgpupair != settings.value(Keys::GPUPAIRONLY, false).toBool())) {
-            if (lammps.isRunning()) {
-                stopRun();
-                runner->wait();
-                runner->deleteLater();
-                runner = nullptr;
-            }
-            {
-                StdoutSilencer guard;
-                lammps.close();
-            }
-            lammpsstatus->hide();
+            abortRun();
+            closeLammpsInstance();
             // reset nthreads if accelerator does not support threads
             if ((newaccel == AcceleratorTab::Opt) || (newaccel == AcceleratorTab::None))
                 nthreads = 1;

@@ -79,6 +79,8 @@ TEST_F(FlagWarningsTest, UpdatesSummaryLabel)
 
     FlagWarnings fw(&label, &doc);
     fw.rehighlight();
+    // the label is refreshed from the event loop, once per batch of lines
+    QApplication::processEvents();
 
     // Label should contain the warning count and line count
     QString text = label.text();

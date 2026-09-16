@@ -281,9 +281,11 @@ void WindowLayout::applySplit()
                 break;
             }
     if (rightDock)
-        mainwindow->resizeDocks({rightDock}, {int(mainwindow->width() * hsplit)}, Qt::Horizontal);
+        mainwindow->resizeDocks({rightDock}, {static_cast<int>(mainwindow->width() * hsplit)},
+                                Qt::Horizontal);
     if (bottomDock)
-        mainwindow->resizeDocks({bottomDock}, {int(mainwindow->height() * vsplit)}, Qt::Vertical);
+        mainwindow->resizeDocks({bottomDock}, {static_cast<int>(mainwindow->height() * vsplit)},
+                                Qt::Vertical);
     applying = false;
 }
 
@@ -338,10 +340,10 @@ bool WindowLayout::eventFilter(QObject *watched, QEvent *event)
             const auto slot = static_cast<ViewSlot>(i);
             if (slot == ViewSlot::Log || slot == ViewSlot::Variables || slot == ViewSlot::Command) {
                 if (d->height() > 0 && mainwindow->height() > 0)
-                    vsplit = double(d->height()) / mainwindow->height();
+                    vsplit = static_cast<double>(d->height()) / mainwindow->height();
             } else {
                 if (d->width() > 0 && mainwindow->width() > 0)
-                    hsplit = double(d->width()) / mainwindow->width();
+                    hsplit = static_cast<double>(d->width()) / mainwindow->width();
             }
             break;
         }
@@ -351,7 +353,7 @@ bool WindowLayout::eventFilter(QObject *watched, QEvent *event)
         for (const auto *d : auxdocks) {
             if ((d != watched) || d->isHidden()) continue;
             if ((d->width() > 0) && (mainwindow->width() > 0))
-                hsplit = double(d->width()) / mainwindow->width();
+                hsplit = static_cast<double>(d->width()) / mainwindow->width();
             break;
         }
     }
@@ -380,9 +382,11 @@ bool WindowLayout::eventFilter(QObject *watched, QEvent *event)
         auto *rightDock  = sizingDock({ViewSlot::Chart, ViewSlot::Image, ViewSlot::SlideShow});
         auto *bottomDock = sizingDock({ViewSlot::Log, ViewSlot::Variables, ViewSlot::Command});
         if (oldsize.width() > 0 && newsize.width() != oldsize.width() && rightDock)
-            mainwindow->resizeDocks({rightDock}, {int(newsize.width() * hsplit)}, Qt::Horizontal);
+            mainwindow->resizeDocks({rightDock}, {static_cast<int>(newsize.width() * hsplit)},
+                                    Qt::Horizontal);
         if (oldsize.height() > 0 && newsize.height() != oldsize.height() && bottomDock)
-            mainwindow->resizeDocks({bottomDock}, {int(newsize.height() * vsplit)}, Qt::Vertical);
+            mainwindow->resizeDocks({bottomDock}, {static_cast<int>(newsize.height() * vsplit)},
+                                    Qt::Vertical);
         applying = false;
     }
     return QObject::eventFilter(watched, event);
@@ -395,6 +399,15 @@ bool WindowLayout::eventFilter(QObject *watched, QEvent *event)
 void WindowLayout::addAuxiliaryView(QWidget *view, ViewSlot group, const QString &title)
 {
     if (!view) return;
+    // A transient view is closed for good, and it is the destruction of the
+    // widget that takes the dock -- the tab -- with it (see below).  Not every
+    // one of them was built to delete itself, though, and one that only hides
+    // left its dock behind: an empty tab, or an empty panel that collapses the
+    // group and takes the tabs of the views beside it out of reach.  As a
+    // window of its own it lingered instead, hidden, until the application
+    // ended.  So this is settled here, for whatever is made a transient view,
+    // rather than left to each maker to remember.
+    view->setAttribute(Qt::WA_DeleteOnClose);
     if (layoutmode != LayoutMode::Docked || !mainwindow) {
         view->show();
         return;
@@ -413,14 +426,6 @@ void WindowLayout::addAuxiliaryView(QWidget *view, ViewSlot group, const QString
 
     d->setWidget(view);
     prepareDockedView(view);
-    // A transient view is closed for good, and it is the destruction of the
-    // widget that takes the dock -- the tab -- with it (see below).  Not every
-    // one of them was built to delete itself, though, and one that only hides
-    // left its dock behind: an empty tab, or an empty panel that collapses the
-    // group and takes the tabs of the views beside it out of reach.  So this is
-    // settled here, for whatever is made a transient panel, rather than left to
-    // each maker to remember.
-    view->setAttribute(Qt::WA_DeleteOnClose);
     auxdocks << d;
     // watched and sized like the fixed panels: it shares their group, so it
     // follows the same proportions and a splitter dragged over it is recorded

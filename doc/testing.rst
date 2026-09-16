@@ -97,12 +97,14 @@ from the -N test list output. Examples:
 Current Test Coverage
 ^^^^^^^^^^^^^^^^^^^^^
 
-The unit tests cover the utility functions, the stdout capture, the log
-window warning highlighter, the dump-image command builder, the movie import
-and image cache of the Slide Show window, the plot data model with its file
-parsers and writers, the block-structured ``fix ave/*`` file parsers and
-their reduction to a plottable table, the chart axis-layout math, and the Qt-free math
-toolkit (least squares and smoothing, autocorrelation, curve fitting, the
+The unit tests cover the utility functions, the widget-scoped keyboard
+shortcuts, the stdout capture, the log window warning highlighter, the
+dump-image command builder, the movie import and image cache of the Slide
+Show window, the docked window layout, the Tab completion of the command
+window's prompt, the plot data model with its file parsers and writers, the
+block-structured ``fix ave/*`` file parsers and their reduction to a
+plottable table, the column picker dialog, the chart axis-layout math, and
+the Qt-free math toolkit (least squares and smoothing, autocorrelation, curve fitting, the
 Levenberg-Marquardt solver, the vendored LeptonMini expression parser, and
 the custom-function layer on top of them).  Command-line tests validate
 basic executable behavior, and PyAutoGUI-based tests exercise the GUI
@@ -228,6 +230,56 @@ the application.
   - Overflow in both directions clamps to the budget
   - The added scroll bar room never exceeds the budget
   - A negative budget clamps to zero
+
+test_shortcuts.cpp
+------------------
+
+Tests for the ``addShortcut()`` and ``scopeShortcut()`` helpers in
+``src/helpers.{h,cpp}``.  The output windows repeat several main window
+accelerators, which is harmless while each is a window of its own but
+becomes an ambiguous binding once they are docked into the main window, so
+both helpers scope a shortcut to its owning widget.  Test cases cover:
+
+- A shortcut added with ``addShortcut()`` firing only while its widget has
+  the focus
+- ``scopeShortcut()`` binding an action's shortcut to its widget and
+  tolerating null arguments
+- Scoped shortcuts on sibling widgets not colliding with each other
+- A standalone window keeping the shortcuts the main window also binds
+
+test_windowlayout.cpp
+---------------------
+
+Tests for the :cpp:class:`WindowLayout` mediator in
+``src/windowlayout.{h,cpp}``, which docks the output views into the main
+window in the combined layout.  Test cases cover:
+
+- Dock title bars reporting a valid size hint
+- Closing a docked view closing its dock, closing a transient view removing
+  its dock, and a floating view being left alone
+- The saved dock arrangement being keyed by the Qt version, with the legacy
+  key dropped when saving
+- Closing a panel keeping the proportions of the remaining ones
+- A transient view surviving its dock being torn down first
+- A docked view keeping its monospace document font when it inherits the
+  main window's font
+
+test_shellprompt.cpp
+--------------------
+
+Tests for the :cpp:class:`ShellPrompt` input line of the command window in
+``src/shellprompt.{h,cpp}``, driven together with its ``QCompleter`` the
+way the window manager would.  Test cases cover:
+
+- Tab keeping the focus, offering the matches, taking a single match
+  without a list, and walking the matches forward and (with Shift-Tab)
+  backward
+- Enter taking a chosen match without running it and running the line when
+  nothing is chosen or no list is up
+- The completion request being announced before matching, so the list to
+  complete from can be chosen for the line
+- Tab on an empty line, on a read-only prompt, and with a modifier held
+  offering nothing
 
 test_stdcapture.cpp
 -------------------
@@ -365,6 +417,21 @@ Tests for the parsers of the block-structured output files written by the
   reversed ranges, and blocks dropped for having a different shape
 - The per-format import defaults, including a running average being
   recognized so that its blocks are not averaged
+
+test_plotdatadialog.cpp
+-----------------------
+
+Tests for the :cpp:class:`PlotDataDialog` column picker in
+``src/plotdatadialog.{h,cpp}``, run with the ``offscreen`` platform plugin.
+Test cases cover:
+
+- Derived columns referencing columns as ``{name}``, including names with
+  brackets, and a bare name being rejected
+- Renaming a column rewriting the references in already added derived
+  columns, and unusable names being refused
+- The block reduction keeping renames and derived columns
+- ``PlotDataDialog::fromFile()`` picking the block or the flat parser for
+  a file and reporting a file that neither can read
 
 test_plotaxismath.cpp
 ---------------------
@@ -505,7 +572,7 @@ screenshooter applications
 
 This test validates the ``shooter`` wrapper script that provides a unified
 interface to various Linux screenshot utilities (ImageMagick's ``import``,
-``magick import``, ``xfce4-screenshooter``, ``gnome-screenshooter``).
+``magick import``, ``xfce4-screenshooter``, ``gnome-screenshot``).
 
 The test runs:
 
@@ -527,7 +594,7 @@ within a virtual frame buffer and validates:
   - PyAutoGUI - for screen size detection
   - Pillow (PIL) - for image file validation
   - One of: ImageMagick (``import`` or ``magick``), ``xfce4-screenshooter``,
-    or ``gnome-screenshooter``
+    or ``gnome-screenshot``
 
 **Setup/Teardown**:
   - ``setUp()``: Removes leftover ``shot.png`` from previous runs

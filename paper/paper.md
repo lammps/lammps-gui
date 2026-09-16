@@ -17,7 +17,7 @@ authors:
 affiliations:
   - name: Institute for Computational Molecular Science, Temple University, Philadelphia, PA, USA
     index: 1
-date: 27 June 2026
+date: 16 September 2026
 bibliography: paper.bib
 ---
 
@@ -43,15 +43,16 @@ interface [@frantzdale2010library], running the simulation in a
 concurrent worker thread so the interface stays responsive and the run
 can be monitored, plotted, visualized, and cleanly stopped. By mirroring
 the traditional "edit, run, observe, analyze" workflow, it lets users
-move freely to the command-line executable -- essential once a workflow
-outgrows a personal computer. Pre-compiled packages for Windows, macOS,
-and Linux let most users start instantly, without compiling anything.
+move freely between the graphical tool and the command-line executable
+-- essential once a workflow outgrows a personal computer. Pre-compiled
+packages for Windows, macOS, and Linux let most users start instantly,
+without compiling anything.
 
 # Statement of need
 
 LAMMPS-GUI grew out of teaching LAMMPS at tutorials and workshops, where
 much of the available time went not to molecular dynamics but to
-installing and operating the surrounding tool chain -- a text editor, a
+installing and operating the surrounding toolchain -- a text editor, a
 plotting program, and a molecular visualization package -- most of which
 differ between Windows, macOS, and Linux.  Earlier workarounds were
 either too complex to sustain or broke when Apple moved to the ARM
@@ -80,16 +81,16 @@ visualization programs such as OVITO [@ovito2010] and VMD [@vmd1996]
 render trajectories with a breadth and quality that LAMMPS-GUI does not
 attempt to match.  None of these, however, integrates input editing,
 live simulation, output monitoring, plotting, and visualization into one
-application that follows the same edit-run-observe loop as the
-standalone executable.  LAMMPS-GUI fills that gap.  It also imports
+application that follows the same edit, run, observe, analyze loop as
+the standalone executable.  LAMMPS-GUI fills that gap.  It also imports
 tutorial materials, such as the official LAMMPS tutorials
-[@gravelle2025lammps] on molecular soft matter, with collections on
-materials science and discrete element modeling in preparation.
-Although aimed
-primarily at beginners, features such as rapid prototyping of input
-decks, debugging failing inputs by visualizing selected components, and
-interactive construction of reproducible `dump image` commands also make
-it useful to experienced researchers.
+[@gravelle2025lammps] on molecular soft matter, with a collection on
+materials science available in beta and on discrete element modeling in
+preparation.  While it is aimed primarily at beginners, features such as
+rapid prototyping of input decks, debugging failing inputs by
+visualizing selected components, and interactive construction of
+reproducible `dump image` commands also make it useful to experienced
+researchers.
 
 # Software design and functionality
 
@@ -111,13 +112,13 @@ LAMMPS-GUI include:
   packages, and recovery from simulation errors -- reported as catchable
   exceptions -- without crashing.
 - **Output and charts.** An output window that highlights warnings and
-  errors and makes documentation URLs clickable, and a charts window that
-  plots thermodynamic data read directly from the running simulation (not
-  scraped from text) or from external files, with Savitzky-Golay smoothing
-  [@savitzkygolay1964] and post-processing such as autocorrelation
-  functions, Fourier transforms, static structure factors, and
-  polynomial, Birch-Murnaghan equation-of-state, and custom nonlinear
-  fits.
+  errors and makes documentation URLs clickable. A charts window that
+  plots thermodynamic data read directly from the running simulation
+  (not scraped from text) or from external files, with Savitzky-Golay
+  smoothing [@savitzkygolay1964]. Charts data post-processing such as
+  autocorrelation functions, Fourier transforms, static structure
+  factors, and polynomial, Birch-Murnaghan equation-of-state, and custom
+  nonlinear fits.
 - **Visualization.** A snapshot image viewer that builds high-quality
   renderings via the LAMMPS `dump image` command, with interactive
   controls and the ability to copy the generated command back into the
@@ -135,20 +136,20 @@ with their topology has never been within the scope of LAMMPS, and the
 GUI does not address it either.  The built-in lattice, region, and
 molecule template commands cover many cases; beyond those, and
 especially for the atom typing and partial charge assignment that
-molecular force fields require, force-field specific external tools are
+molecular force fields require, force-field-specific external tools are
 needed, for which the LAMMPS website maintains a curated list
 [@lammps_home_prepost].
 
 A recurring theme is the co-evolution of LAMMPS-GUI and LAMMPS:
 front-end needs drove improvements to the engine and its library
-interface -- catchable exceptions, a locked cache of live thermodynamic
-data, and greatly expanded snapshot rendering, collected into a
-dedicated GRAPHICS package [@kohlmeyer2025lammps], which brings
-functionality long provided by dedicated visualization tools directly
-to a running simulation rather than only to saved trajectory files.  In
-its default *plugin mode*, LAMMPS-GUI loads the shared library at run
-time with no link-time dependency, so one binary can pair with -- or
-download -- different LAMMPS builds.
+interface. For example: catchable exceptions, a locked cache of live
+thermodynamic data, and greatly expanded snapshot rendering, collected
+into a dedicated GRAPHICS package [@kohlmeyer2025lammps] to bring
+functionality from dedicated visualization tools directly to a running
+simulation without requiring a saved trajectory.  In its default *plugin
+mode*, LAMMPS-GUI loads the shared library at run time with no link-time
+dependency, so one binary can pair with -- or download -- different
+LAMMPS builds.
 
 # Research impact statement
 
@@ -164,10 +165,11 @@ the tutorial session of the 2025 LAMMPS Workshop and Symposium
 [@lammps_workshop2025]; recordings of both live streams are online
 [@templelammps_streams].  Its development has also fed improvements back
 into the LAMMPS engine itself, as described above.  The project is
-maintained as research software: a documentation site [@lammpsgui_home],
-releases archived on Zenodo, continuous-integration builds and automated
-tests on all three platforms, and user support through a dedicated tag
-on the LAMMPS forum.
+maintained as research software with a documentation site
+[@lammpsgui_home], releases archived on Zenodo [@lammps_gui_zenodo],
+continuous-integration builds on three platforms, an automated test
+suite, and user support through a dedicated tag on the LAMMPS forum
+[@lammps_gui_matsci].
 
 # AI usage disclosure
 
@@ -183,7 +185,7 @@ responsibility for the software and for the content of this paper.
 
 Financial support by Sandia National Laboratories under PO 2149742 and
 PO 2407526, by the US National Science Foundation via Major Research
-Infrastructure grants number 1625061 and 2216289, and by CCDC-ARL under
+Instrumentation awards 1625061 and 2216289, and by CCDC-ARL under
 Cooperative Agreement Number W911NF-21-2-0007 is gratefully
 acknowledged.  The author thanks the LAMMPS developers and the authors
 of the LAMMPS tutorials for their feedback and for motivating many of

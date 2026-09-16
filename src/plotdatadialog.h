@@ -19,7 +19,6 @@
 #include <QList>
 #include <QPair>
 #include <QStringList>
-
 #include <memory>
 
 class QButtonGroup;
@@ -81,6 +80,22 @@ public:
      */
     explicit PlotDataDialog(const PlotBlockData &blocks, QWidget *parent = nullptr);
 
+    /**
+     * @brief Read a data file and build the column dialog for it
+     *
+     * The block-structured output of the fix ave/time family is tried first,
+     * since it is not a flat table and gets the dialog that can reduce it to
+     * one; anything else goes through the flat-file parsers.
+     *
+     * @param fileName  File to read
+     * @param parent    Parent widget of the dialog
+     * @param error     Receives what the parsers reported, or the file name
+     *                  when they reported nothing; untouched on success
+     * @return The dialog, or nullptr when the file could not be read
+     */
+    static std::unique_ptr<PlotDataDialog> fromFile(const QString &fileName, QWidget *parent,
+                                                    QString *error);
+
     ~PlotDataDialog() override = default;
 
     PlotDataDialog()                                  = delete;
@@ -106,14 +121,6 @@ public:
      * @return List of column indices (all columns with a checked y checkbox)
      */
     QList<int> yColumns() const;
-
-    /**
-     * @brief The live column names (renames take effect as they are made)
-     *
-     * Each entry corresponds to a column by index in @ref buildData().
-     * @return List of column name strings, one per column
-     */
-    QStringList columnNames() const;
 
     /**
      * @brief Return the working data with renames and derived columns applied
@@ -171,6 +178,12 @@ private:
      * @return An error message, or an empty string on success
      */
     QString evaluateColumn(const QString &expr, std::vector<double> &values) const;
+    /**
+     * @brief What is wrong with a proposed column name
+     * @param name The name to check
+     * @return An error message, or an empty string when the name can be used
+     */
+    QString checkNewName(const QString &name) const;
 
     PlotData workingData;          ///< Working copy of the data; derived cols appended here
     PlotErrors workingErrors;      ///< Error bars parallel to the working data columns

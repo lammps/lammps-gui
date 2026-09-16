@@ -522,9 +522,7 @@ void PlotDataDialog::commitRename()
         return;
     }
 
-    QString error = validateColumnName(newName);
-    if (error.isEmpty() && workingData.columnNames().contains(newName))
-        error = QStringLiteral("There already is a column named '%1'.").arg(newName);
+    const QString error = checkNewName(newName);
     if (!error.isEmpty()) {
         // revert before the dialog: losing focus to it re-fires editingFinished,
         // which then takes the name-unchanged early return above
@@ -555,9 +553,7 @@ void PlotDataDialog::computeColumn()
         return;
     }
 
-    QString invalid = validateColumnName(colName);
-    if (invalid.isEmpty() && workingData.columnNames().contains(colName))
-        invalid = QStringLiteral("There already is a column named '%1'.").arg(colName);
+    const QString invalid = checkNewName(colName);
     if (!invalid.isEmpty()) {
         warning(this, "Compute Column", invalid);
         return;
@@ -583,6 +579,29 @@ void PlotDataDialog::computeColumn()
 
 /* -------------------------------------------------------------------- */
 
+std::unique_ptr<PlotDataDialog> PlotDataDialog::fromFile(const QString &fileName, QWidget *parent,
+                                                         QString *error)
+{
+    const PlotBlockData blocks = loadPlotBlockData(fileName);
+    if (!blocks.isEmpty()) return std::make_unique<PlotDataDialog>(blocks, parent);
+
+    QString why;
+    const PlotData data = loadPlotData(fileName, &why);
+    if (data.isEmpty()) {
+        if (error) *error = why.isEmpty() ? fileName : why;
+        return nullptr;
+    }
+    return std::make_unique<PlotDataDialog>(data, parent);
+}
+
+QString PlotDataDialog::checkNewName(const QString &name) const
+{
+    QString error = validateColumnName(name);
+    if (error.isEmpty() && workingData.columnNames().contains(name))
+        error = QStringLiteral("There already is a column named '%1'.").arg(name);
+    return error;
+}
+
 int PlotDataDialog::xColumn() const
 {
     const int id = xgroup->checkedId();
@@ -595,11 +614,6 @@ QList<int> PlotDataDialog::yColumns() const
     for (int i = 0; i < ychecks.size(); ++i)
         if (ychecks[i]->isChecked()) result.append(i);
     return result;
-}
-
-QStringList PlotDataDialog::columnNames() const
-{
-    return workingData.columnNames();
 }
 
 PlotData PlotDataDialog::buildData() const

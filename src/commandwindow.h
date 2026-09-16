@@ -13,10 +13,11 @@
 #define COMMANDWINDOW_H
 
 #include <QList>
-#include <QProcess>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
+
+class QProcess;
 
 class LammpsGui;
 class QCompleter;
@@ -157,12 +158,21 @@ private:
     /// the 80 columns it falls back to when there is no terminal to ask.
     void sendTerminalSize();
 
+    /// Write one line to the shell's input.
+    void sendLine(const QString &line);
+
+    /// Hand lines to the shell, or queue them until it is at a prompt again:
+    /// a line written while a command runs would be read by that command
+    /// rather than by the shell, and one written while the shell is still
+    /// swallowing its start-up chatter would be lost with it.
+    void sendWhenIdle(const QStringList &lines);
+
     /// The processes the shell started directly, asked of the operating system
     /// because without job control the shell keeps no job table.
     QList<qint64> shellChildren() const;
 
     /// Executable names found in PATH, collected once and cached.
-    QStringList pathCommands();
+    static QStringList pathCommands();
 
     /// Rebuild the completion list: the lines already typed, sorted and
     /// without repeats, followed by the commands found in PATH.
@@ -188,6 +198,8 @@ private:
     QStringListModel *filenames; ///< Model behind the argument completion
 
     QString shellprogram;     ///< The interpreter that was started
+    QString sentinel;         ///< End-of-command mark of this session, unique to it
+    QString openmark;         ///< "open" report mark of this session, unique to it
     QString filedir;          ///< Directory the argument completions were built from
     QString pending;          ///< Output received so far that is not a complete line
     QString workingdir;       ///< Where the shell last reported itself to be

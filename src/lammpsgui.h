@@ -18,6 +18,7 @@
 #include <QPair>
 #include <QPointer>
 #include <QString>
+#include <QStringDecoder>
 #include <string>
 #include <vector>
 
@@ -178,15 +179,6 @@ public:
      * stay unambiguous -- one action matches once, however many menus show it.
      */
     QList<QMenu *> sharedMenus() const;
-
-    /**
-     * @brief Put the focused view's own menu at the front of the menu bar
-     * @param focused Widget that just took the keyboard focus
-     *
-     * Combined layout only; does nothing with individual windows, where each
-     * window carries its own menu bar.
-     */
-    void updateMenuBarForFocus(QWidget *focused);
 
 protected:
     /** @brief Set the editor window title from the current file and run number
@@ -497,6 +489,34 @@ private:
     /** @brief Append any newly rendered dump image to the slideshow */
     void updateSlideShow();
 
+    /** @brief Decode the next chunk of captured output as part of one UTF-8 stream */
+    QString decodeLog(const std::string &bytes);
+
+    /** @brief End a running simulation and dispose of its runner thread */
+    void abortRun();
+
+    /** @brief Close the LAMMPS instance quietly and clear its status indicator */
+    void closeLammpsInstance();
+
+    /** @brief Delete the output windows of the current input (charts, log, slide show, image,
+     * variables) */
+    void closeOutputWindows();
+
+    /** @brief Show the run progress widgets in the status bar with the given message */
+    void beginRunStatus(const QString &message);
+
+    /** @brief The current time step, whatever the width of the library's bigint */
+    int currentStep();
+
+    /**
+     * @brief Put the focused view's own menu at the front of the menu bar
+     * @param focused Widget that just took the keyboard focus
+     *
+     * Combined layout only; does nothing with individual windows, where each
+     * window carries its own menu bar.
+     */
+    void updateMenuBarForFocus(QWidget *focused);
+
     /** @brief Append accelerator-package command-line arguments to lammpsArgs */
     void appendAcceleratorArgs(int accel, QSettings &settings);
 
@@ -670,12 +690,14 @@ private:
     QList<QString> recent;          ///< List of recently opened files
     QList<VariableEntry> variables; ///< Index-style variable definitions
 
-    LammpsWrapper lammps;                ///< Interface to LAMMPS library
-    LammpsRunner *runner;                ///< Thread for running LAMMPS simulations
-    QString docver;                      ///< LAMMPS documentation version string
-    QString pluginPath;                  ///< Path to LAMMPS shared library (plugin mode)
-    QString capturewarning;              ///< Library-side capture check result for this run
-    int runCounter;                      ///< Counter for simulation runs
+    LammpsWrapper lammps;   ///< Interface to LAMMPS library
+    LammpsRunner *runner;   ///< Thread for running LAMMPS simulations
+    QString docver;         ///< LAMMPS documentation version string
+    QString pluginPath;     ///< Path to LAMMPS shared library (plugin mode)
+    QString capturewarning; ///< Library-side capture check result for this run
+    int runCounter;         ///< Counter for simulation runs
+    bool showSlides = true; ///< Show the slide show when a run writes images
+    QStringDecoder logDecoder{QStringDecoder::Utf8}; ///< Decodes the captured output stream
     int extendSteps;                     ///< Last used step count of the Extend Run dialog
     std::vector<std::string> lammpsArgs; ///< Command-line arguments for LAMMPS
 

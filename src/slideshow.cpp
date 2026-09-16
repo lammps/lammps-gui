@@ -39,7 +39,6 @@
 #include <QPushButton>
 #include <QScreen>
 #include <QScrollArea>
-#include <QShortcut>
 #include <QShowEvent>
 #include <QSlider>
 #include <QSpacerItem>
@@ -445,10 +444,7 @@ void SlideShow::deleteImages()
     mb.setDefaultButton(QMessageBox::No);
     mb.setEscapeButton(QMessageBox::No);
 
-    auto *button = mb.button(QMessageBox::Yes);
-    button->setIcon(QIcon(":/icons/dialog-ok.svg"));
-    button = mb.button(QMessageBox::No);
-    button->setIcon(QIcon(":/icons/dialog-no.svg"));
+    styleMessageBoxButtons(mb);
 
     if (mb.exec() != QMessageBox::Yes) return;
 
@@ -580,10 +576,7 @@ void SlideShow::purgeCache()
     mb.setDefaultButton(QMessageBox::Yes);
     mb.setEscapeButton(QMessageBox::No);
 
-    auto *button = mb.button(QMessageBox::Yes);
-    button->setIcon(QIcon(":/icons/dialog-ok.svg"));
-    button = mb.button(QMessageBox::No);
-    button->setIcon(QIcon(":/icons/dialog-no.svg"));
+    styleMessageBoxButtons(mb);
 
     if (mb.exec() != QMessageBox::Yes) return;
 
@@ -664,14 +657,7 @@ void SlideShow::createMenuBar()
     scopeShortcut(this, quitAct, QKeySequence(Qt::CTRL | Qt::Key_Q));
     if (!lammpsgui) quitAct->setVisible(false); // quit == close in standalone mode
 
-    if (dockedLayout()) {
-        retireViewMenuBar(menubar);
-    } else {
-        menubar->addMenu(file);
-        if (lammpsgui)
-            for (auto *shared : lammpsgui->sharedMenus())
-                menubar->addMenu(shared);
-    }
+    installViewMenuBar(menubar, file, lammpsgui ? lammpsgui->sharedMenus() : QList<QMenu *>());
 }
 
 void SlideShow::quit()

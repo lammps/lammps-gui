@@ -51,10 +51,10 @@ LAMMPS-GUI supports the following command-line options:
    * - ``-t <file>``, ``--text <file>``
      - Open ``file`` in a standalone text viewer
    * - ``-j``, ``--joined``
-     - Selects the *Combined Window Mode* for this run, whatever the
+     - Selects the combined window mode for this run, whatever the
        preferences say
    * - ``-w``, ``--windows``
-     - Selects the *Individual Window Mode* for this run, whatever the
+     - Selects the individual window mode for this run, whatever the
        preferences say
 
 The ``-j`` and ``-w`` flags select the window layout (see the

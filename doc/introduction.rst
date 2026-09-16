@@ -147,13 +147,29 @@ Visualization Components
 
 **ChartWindow (chartviewer.h/.cpp)**
   Window for displaying thermodynamic data as charts.  Supports line plots
-  and multiple data series.  See :cpp:class:`ChartWindow`
+  and multiple data series.  It owns one ``ChartColumn`` per thermo column,
+  which holds the neutral ``PlotSeries`` data objects of that column, and a
+  single :cpp:class:`ChartViewer` that is rebound to whichever column is
+  selected.  See :cpp:class:`ChartWindow`
 
 **ChartViewer (chartviewer.h/.cpp)**
   Custom chart view widget that provides interactive features like zooming,
-  smoothing, and panning for data visualization.  ChartViewer owns neutral
-  ``PlotSeries`` data objects and renders them with :cpp:class:`PlotWidget`.
-  See :cpp:class:`ChartViewer`.
+  smoothing, and panning for data visualization.  ChartViewer is a view over
+  the active ``ChartColumn`` of its window and renders it with
+  :cpp:class:`PlotWidget`.  See :cpp:class:`ChartViewer`.
+
+**PlotDataDialog (plotdatadialog.h/.cpp)**
+  Column picker for data files opened for plotting: selects the x and the y
+  columns, renames columns, adds derived columns computed from expressions,
+  and, for block-structured files, reduces the blocks to a single one or to
+  the average of a range.  ``PlotDataDialog::fromFile()`` reads a file and
+  builds the dialog matching its format.  See :cpp:class:`PlotDataDialog`
+
+**PlotBlockData (plotblockdata.h/.cpp)**
+  Parsers for the block-structured output files of the ``fix ave/*`` styles
+  and their reduction to a flat :cpp:class:`PlotData` table.  The helpers
+  shared with the flat-file parsers of ``plotdata.cpp`` are declared in
+  ``plotdata_internal.h``.  See :cpp:class:`PlotBlockData`
 
 **PlotWidget (plotwidget.h/.cpp)**
   Native ``QWidget`` + ``QPainter`` 2D line/scatter chart renderer.  It is
@@ -212,6 +228,19 @@ Dialog and Utility Components
   viewing auxiliary files without allowing modifications.  See
   :cpp:class:`FileViewer`
 
+**CommandWindow (commandwindow.h/.cpp)**
+  Shell prompt with scrollback next to the simulation.  It runs one
+  persistent shell process without a terminal, frames each command with a
+  sentinel line that reports the exit status and the working directory,
+  and offers commands that hand files to the slide show, the editor, or a
+  plot.  See :cpp:class:`CommandWindow`.  It uses two helper classes:
+
+  - :cpp:class:`ShellPrompt` - The input line with Tab completion of
+    commands, file names, and earlier command lines.
+  - :cpp:class:`ShellAliases` - The configurable aliases, which are
+    defined in the shell at start since a non-interactive shell reads no
+    startup files.
+
 **TutorialWizard (tutorialwizard.h/.cpp)**
   Wizard dialog for interactive LAMMPS tutorials. Guides users through
   setting up tutorial directories and files, providing a structured
@@ -226,6 +255,13 @@ Dialog and Utility Components
 
 Support Components
 ------------------
+
+**WindowLayout (windowlayout.h/.cpp)**
+  Mediator between the main window and its output views that implements
+  the two window layouts: individual windows, or docked panels in a single
+  main window with their proportions kept across resizes and sessions.
+  The views themselves do not know which layout they are in.  See
+  :cpp:class:`WindowLayout`
 
 **URLDownloader (urldownloader.h/.cpp)**
   Utility class for downloading files over HTTPS.  Provides a
@@ -268,7 +304,10 @@ Helper Functions
 ----------------
 
 The :ref:`helpers module <helper_functions>` provides utility functions
-used throughout the application:
+used throughout the application.  The ``chartstyle.h/.cpp`` module next to
+it holds the palette of preset series colors and the widget builders that
+the Chart Style dialog and the charts preferences tab share, so that both
+offer the same choices.  The helper functions include:
 
 - Date comparison (``dateCompare`` for version comparisons)
 - Command-line parsing (``splitLine`` with quote handling)

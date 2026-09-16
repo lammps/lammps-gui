@@ -153,16 +153,8 @@ void StdCapture::verifyCapture()
     // at once; the loop only covers scheduling noise
     std::string got;
     for (int wait = 0; wait < 100; ++wait) {
-        int bytesRead = 0;
-#if defined(Q_OS_WIN32)
-        if (pipe_has_data(m_pipe[READ])) bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#else
-        bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#endif
-        if (bytesRead > 0) {
-            buf[bytesRead] = 0;
-            got += buf.data();
-        }
+        const int bytesRead = readPipe();
+        if (bytesRead > 0) got.append(buf.data(), bytesRead);
         if (static_cast<int>(got.size()) >= len) break;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
@@ -191,16 +183,8 @@ std::string StdCapture::probeRunEnd()
 
     std::string got;
     for (int wait = 0; wait < 100; ++wait) {
-        int bytesRead = 0;
-#if defined(Q_OS_WIN32)
-        if (pipe_has_data(m_pipe[READ])) bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#else
-        bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#endif
-        if (bytesRead > 0) {
-            buf[bytesRead] = 0;
-            got += buf.data();
-        }
+        const int bytesRead = readPipe();
+        if (bytesRead > 0) got.append(buf.data(), bytesRead);
         if (got.find(marker) != std::string::npos) break;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
@@ -225,55 +209,46 @@ bool StdCapture::endCapture()
     m_captured = m_probeleftover;
     m_probeleftover.clear();
 
+    // Whatever wrote into the pipe has returned by the time this is called, so
+    // what is in it is all there will be: the first read that would block means
+    // the pipe is drained.  Waiting for more instead cost a full second on
+    // every empty pipe.  Only a read cut short by a signal is tried again.
     int bytesRead;
-    bool fd_blocked;
-    int maxwait = 100;
+    bool interrupted;
+    int retries = 100;
 
     do {
-        bytesRead  = 0;
-        fd_blocked = false;
+        bytesRead   = 0;
+        interrupted = false;
 
-#if defined(Q_OS_WIN32)
-        if (pipe_has_data(m_pipe[READ])) {
-            bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-        }
-#else
-        bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#endif
+        bytesRead = readPipe();
         if (bytesRead > 0) {
-            buf[bytesRead] = 0;
-            m_captured += buf.data();
+            m_captured.append(buf.data(), bytesRead);
         } else if (bytesRead < 0) {
-            fd_blocked =
-                ((errno == EAGAIN) || (errno == EWOULDBLOCK) || (errno == EINTR)) && (maxwait > 0);
-
-            if (fd_blocked) std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            --maxwait;
+            interrupted = (errno == EINTR) && (--retries > 0);
         }
-    } while (fd_blocked || (bytesRead == (bufSize - 1)));
+    } while (interrupted || (bytesRead == (bufSize - 1)));
     m_capturing = false;
     return true;
+}
+
+int StdCapture::readPipe()
+{
+#if defined(Q_OS_WIN32)
+    if (!pipe_has_data(m_pipe[READ])) return 0;
+#endif
+    return read(m_pipe[READ], buf.data(), bufSize - 1);
 }
 
 std::string StdCapture::getChunk()
 {
     if (!m_capturing) return {};
-    int bytesRead = 0;
-    buf[0]        = '\0';
-
-#if defined(Q_OS_WIN32)
-    if (pipe_has_data(m_pipe[READ])) {
-        bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-    }
-#else
-    bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#endif
-    if (bytesRead > 0) {
-        buf[bytesRead] = '\0';
-        m_totalread += bytesRead;
-    }
+    const int bytesRead = readPipe();
+    if (bytesRead > 0) m_totalread += bytesRead;
     maxread = (maxread > bytesRead) ? maxread : bytesRead;
-    return {buf.data()};
+    // by length, not up to a NUL: no scan of the buffer, and a stray NUL byte
+    // in the output cannot swallow what follows it
+    return {buf.data(), static_cast<std::size_t>(bytesRead > 0 ? bytesRead : 0)};
 }
 
 double StdCapture::getBufferUse() const

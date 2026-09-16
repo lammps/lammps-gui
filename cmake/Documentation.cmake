@@ -63,9 +63,8 @@ if(BUILD_DOC OR BUILD_DOC_ONLY)
   set(DOCENV_BINARY_DIR ${CMAKE_BINARY_DIR}/docenv/bin)
   set(DOCENV_REQUIREMENTS_FILE ${SPHINX_DIR}/requirements.txt)
   set(DOCENV_DEPS ${DOCENV_REQUIREMENTS_FILE} ${SPHINX_DIR}/_templates/page.html)
-  add_custom_command(
-    OUTPUT docenv/bin
-    COMMAND ${VIRTUALENV} docenv
+  add_custom_target(create-docenv
+    COMMAND ${VIRTUALENV} docenv --clear
     COMMAND ${DOCENV_BINARY_DIR}/pip $ENV{PIP_OPTIONS} install --upgrade pip
     COMMAND ${DOCENV_BINARY_DIR}/pip $ENV{PIP_OPTIONS} install -r ${DOCENV_REQUIREMENTS_FILE} --upgrade
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -73,7 +72,7 @@ if(BUILD_DOC OR BUILD_DOC_ONLY)
   # custom target to update the python virtual environment
   add_custom_target(
     upgrade
-    DEPENDS docenv/bin ${DOCENV_REQUIREMENTS_FILE}
+    DEPENDS create-docenv ${DOCENV_REQUIREMENTS_FILE}
     COMMAND ${DOCENV_BINARY_DIR}/pip $ENV{PIP_OPTIONS} install --upgrade pip
     COMMAND ${DOCENV_BINARY_DIR}/pip $ENV{PIP_OPTIONS} install -r ${DOCENV_REQUIREMENTS_FILE} --upgrade
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -86,7 +85,7 @@ if(BUILD_DOC OR BUILD_DOC_ONLY)
 
   add_custom_target(
     html
-    DEPENDS docenv/bin ${DOC_SOURCES} ${DOCENV_DEPS} ${SPHINX_CONFIG_FILE_TEMPLATE} ${SPHINX_DIR}/_static/style.css
+    DEPENDS create-docenv ${DOC_SOURCES} ${DOCENV_DEPS} ${SPHINX_CONFIG_FILE_TEMPLATE} ${SPHINX_DIR}/_static/style.css
     COMMAND Sphinx::sphinx-build ${SPHINX_EXTRA_OPTS} -b html -c ${DOC_BUILD_DIR} -d ${DOC_BUILD_DIR}/doctrees ${CMAKE_SOURCE_DIR}/doc ${DOC_BUILD_DIR}/html ${DOC_SOURCES}
   )
   # remove virtual environment on "make clean"
@@ -100,19 +99,19 @@ if(BUILD_DOC OR BUILD_DOC_ONLY)
 
   add_custom_target(
     spelling
-    DEPENDS docenv/bin ${DOC_SOURCES} ${DOCENV_DEPS} ${SPHINX_CONFIG_FILE_TEMPLATE} ${SPHINX_DIR}/_static/style.css
+    DEPENDS create-docenv ${DOC_SOURCES} ${DOCENV_DEPS} ${SPHINX_CONFIG_FILE_TEMPLATE} ${SPHINX_DIR}/_static/style.css
     COMMAND Sphinx::sphinx-build ${SPHINX_EXTRA_OPTS} -b spelling -c ${DOC_BUILD_DIR} -d ${DOC_BUILD_DIR}/doctrees ${CMAKE_SOURCE_DIR}/doc ${DOC_BUILD_DIR}/spelling ${DOC_SOURCES}
   )
 
   add_custom_target(
     linkcheck
-    DEPENDS docenv/bin ${DOC_SOURCES} ${DOCENV_DEPS} ${SPHINX_CONFIG_FILE_TEMPLATE} ${SPHINX_DIR}/_static/style.css
+    DEPENDS create-docenv ${DOC_SOURCES} ${DOCENV_DEPS} ${SPHINX_CONFIG_FILE_TEMPLATE} ${SPHINX_DIR}/_static/style.css
     COMMAND Sphinx::sphinx-build ${SPHINX_EXTRA_OPTS} -b linkcheck -c ${DOC_BUILD_DIR} -d ${DOC_BUILD_DIR}/doctrees ${CMAKE_SOURCE_DIR}/doc ${DOC_BUILD_DIR}/linkcheck ${DOC_SOURCES}
   )
 
   add_custom_target(
     latex
-    DEPENDS docenv/bin ${DOC_SOURCES} ${DOCENV_DEPS} ${SPHINX_CONFIG_FILE_TEMPLATE} ${SPHINX_DIR}/_static/style.css
+    DEPENDS create-docenv ${DOC_SOURCES} ${DOCENV_DEPS} ${SPHINX_CONFIG_FILE_TEMPLATE} ${SPHINX_DIR}/_static/style.css
     COMMAND Sphinx::sphinx-build ${SPHINX_EXTRA_OPTS} -b latex -c ${DOC_BUILD_DIR} -d ${DOC_BUILD_DIR}/doctrees ${CMAKE_SOURCE_DIR}/doc ${DOC_BUILD_DIR}/latex ${DOC_SOURCES}
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/doc/idxlayout.sty ${DOC_BUILD_DIR}/latex/
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/doc/ellipse.sty ${DOC_BUILD_DIR}/latex/
@@ -142,7 +141,7 @@ if(BUILD_DOC OR BUILD_DOC_ONLY)
 
   add_custom_target(
     doc ALL
-    DEPENDS docenv/bin html
+    DEPENDS create-docenv html
     SOURCES ${CMAKE_SOURCE_DIR}/doc/requirements.txt ${DOC_SOURCES}
   )
 

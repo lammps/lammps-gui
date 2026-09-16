@@ -92,9 +92,12 @@ main.cpp
        ├─ ImageViewer (QDialog)        ← interactive dump-image viewer
        ├─ SlideShow (QDialog)          ← slideshow viewer for image sequences
        ├─ TutorialWizard (QWizard)     ← step-by-step tutorial setup wizard
+       ├─ CommandWindow                ← shell prompt + scrollback; ShellPrompt input line, ShellAliases
+       ├─ WindowLayout                 ← mediator: individual windows vs. docked panels in the main window
        ├─ ChartWindow                  ← thermo chart container; owns N ChartColumn data objects
        │    └─ ChartViewer             ← single rebindable view of the active ChartColumn
        │         └─ PlotWidget         ← QPainter 2D line/scatter renderer (sole chart backend)
+       ├─ PlotDataDialog               ← column picker for plotted files; PlotBlockData parses fix ave/* blocks
        └─ Preferences (QDialog)        ← settings; stored via QSettings
 ```
 
@@ -116,7 +119,7 @@ main.cpp
 
 **Dialog widget wiring.** `ImageViewer` and the `Preferences` tabs connect widgets to slots via `setObjectName("...")` + later `findChild<T>("...")` rather than stored member pointers. Preserve object names exactly when refactoring these dialogs (a wrong/renamed name fails the lookup silently, with no compile error).
 
-**Shared helpers (prefer over re-rolling).** Use the `StdoutSilencer` RAII guard (`helpers.h`) instead of manual `silenceStdout()`/`restoreStdout()` pairs; the `QtMessageSilencer` RAII guard (`helpers.h`) around a call whose Qt-internal warnings are expected and handled (note it cannot catch messages a library prints straight to stderr, such as libpng's `libpng error:` lines); `LammpsWrapper::lastErrorMessage()` instead of a hand-managed `getLastErrorMessage()` buffer; `LammpsGui::addMenuAction()` to build menu actions; `monoFontFromSettings()` for the configured fixed-width font; `styleDialogButtons()` to apply the bundled SVG icons to a `QDialogButtonBox`; `toolButtonSize()`/`styleToolButtons()` for square toolbar buttons; `applyWindowFlags()` for the shared output-window WM hints; `retireViewMenuBar()` for a docked view's own menu bar (on macOS a `QMenuBar` is a handle on the system-wide bar, so a hidden one left native inside the main window blanks the real menu bar -- hiding it is not enough).
+**Shared helpers (prefer over re-rolling).** Use the `StdoutSilencer` RAII guard (`helpers.h`) instead of manual `silenceStdout()`/`restoreStdout()` pairs; the `QtMessageSilencer` RAII guard (`helpers.h`) around a call whose Qt-internal warnings are expected and handled (note it cannot catch messages a library prints straight to stderr, such as libpng's `libpng error:` lines); `LammpsWrapper::lastErrorMessage()` instead of a hand-managed `getLastErrorMessage()` buffer; `LammpsGui::addMenuAction()` to build menu actions; `monoFontFromSettings()` for the configured fixed-width font; `styleDialogButtons()` to apply the bundled SVG icons to a `QDialogButtonBox`; `toolButtonSize()`/`styleToolButtons()` for square toolbar buttons; `applyWindowFlags()` for the shared output-window WM hints; `installViewMenuBar()`/`layoutViewMenuBar()` for an output view's own menu bar (they retire it via `retireViewMenuBar()` in the docked layout: on macOS a `QMenuBar` is a handle on the system-wide bar, so a hidden one left native inside the main window blanks the real menu bar -- hiding it is not enough); `styleMessageBoxButtons()` for a `QMessageBox`, sharing the icon table of `styleDialogButtons()`; `relaunchOrExit()` wherever a settings change needs a re-exec; the `chartstyle.h` palette and widget builders for anything that offers a series color, display mode, line width, or point size; `PlotDataDialog::fromFile()` to open a data file for plotting; inside `LammpsGui`, `abortRun()`, `closeOutputWindows()`, `closeLammpsInstance()`, `beginRunStatus()`, and `currentStep()` instead of their inlined bodies.
 
 ### String handling & modern C++ conventions
 
@@ -192,7 +195,13 @@ the file headers for specifics. What the names alone don't tell you:
   dual-handle `thirdparty/rangeslider/` (CeCILL-A license).
 - `src/imageviewersettings.cpp` holds `ImageViewer`'s dialog builders (split out
   to keep `imageviewer.cpp` manageable); shared impl-detail symbols live in
-  `src/imageviewer_internal.h`.
+  `src/imageviewer_internal.h`.  Likewise `src/plotdata_internal.h` declares
+  the field/line scanners and helpers shared by `plotdata.cpp` and
+  `plotblockdata.cpp`; both parsers walk the text with `QStringView` rather
+  than splitting it into lists (a large file's cost was those allocations).
+- `src/chartstyle.{cpp,h}` is the one home of the preset series palette and
+  of the mode/color/width/size widget builders; `chartviewer.cpp` and
+  `preferences.cpp` must not grow lists of their own again.
 - `CommandWindow` is not a terminal emulator: no PTY, `TERM=dumb`, one
   persistent `$SHELL`/`%COMSPEC%` process, cwd tracked via a sentinel;
   `ShellAliases` restores aliases lost to non-interactive shells.

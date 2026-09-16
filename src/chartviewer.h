@@ -18,21 +18,21 @@
 
 #include <QColor>
 #include <QComboBox>
+#include <QElapsedTimer>
 #include <QLabel>
 #include <QLineEdit>
 #include <QList>
 #include <QRectF>
 #include <QString>
-#include <QTime>
 #include <QWidget>
 
-class QAction;
+#include <memory>
+#include <vector>
+
 class QCheckBox;
 class QCloseEvent;
-class QEvent;
 class QMenuBar;
 class QMenu;
-class QPushButton;
 class QSpinBox;
 class RangeSlider;
 
@@ -53,7 +53,7 @@ enum class RefOrient { Vertical, Horizontal };
  */
 struct RefLine {
     RefOrient orient = RefOrient::Vertical; ///< vertical (fixed x) or horizontal (fixed y)
-    double value;                           ///< x position (vertical) or y position (horizontal)
+    double value     = 0.0;                 ///< x position (vertical) or y position (horizontal)
     QString label;                          ///< text label (in line color)
     QColor color;                           ///< line color (default: dark gray)
     RefAnchor anchor = RefAnchor::Start;    ///< where the label sits along the line
@@ -140,7 +140,7 @@ public:
      * @param data Data value
      * @param index Chart index
      */
-    void addData(int step, double data, int index);
+    void addData(int step, double value, int index);
 
     /**
      * @brief Set the units displayed for thermodynamic quantities
@@ -165,7 +165,7 @@ public:
      * @param data  Parsed column data
      * @param xcol  Index of the column to use as the shared x axis
      * @param ycols Indices of the columns to plot, one chart each
-     * @param yerrs Optional error bars, indexed like the columns of @p data;
+     * @param yerrs Optional error bars, indexed like the columns of @p table;
      *              an empty or wrongly sized entry means that column has none.
      *              Their lower half is used where it is filled in
      *
@@ -173,7 +173,7 @@ public:
      * titled by its column name, with the x axis labeled by the x column.
      * Unlike the live thermo feed this loads all rows in one shot.
      */
-    void loadData(const PlotData &data, int xcol, const QList<int> &ycols,
+    void loadData(const PlotData &table, int xcol, const QList<int> &ycols,
                   const PlotErrors &yerrs = {});
 
 signals:
@@ -250,6 +250,16 @@ private:
     /// Move both range-slider handles back to the full extent (no plot update).
     void resetRangeSliders();
 
+    /// Put a post-processing result into the processed slot of a chart: the
+    /// curve, the label the slot shows for it, the sliders matched to a range
+    /// the curve may have extended, and "Both" as the view.
+    void installCustomCurve(ChartViewer *chart, const QList<QPointF> &points,
+                            const QString &seriesName, const QString &slotLabel);
+
+    /// Enable the smoothing window and order spin boxes only while smoothing is
+    /// shown and no post-processing result occupies the processed slot.
+    void syncSmoothControls(bool enabled = true);
+
     /// Re-derive the displayed plot range from the current slider-handle window
     /// and the active column's data range (so a view-only change preserves zoom).
     void applySliderWindow();
@@ -279,9 +289,6 @@ private:
 };
 
 /* -------------------------------------------------------------------- */
-
-#include <memory>
-#include <vector>
 
 class PlotWidget;
 
@@ -317,7 +324,7 @@ struct ChartColumn {
     std::unique_ptr<PlotSeries> scatter;       ///< Raw data as points (created on demand)
     std::unique_ptr<PlotSeries> smoothScatter; ///< Processed data as points (created on demand)
     std::unique_ptr<PlotSeries> fit;           ///< Optional fit-curve overlay (created on demand)
-    QTime lastUpdate;                          ///< Time of last chart update
+    QElapsedTimer lastUpdate;                  ///< Time since the last chart update
     bool doRaw    = true;                      ///< Show raw data series
     bool doSmooth = false;                     ///< Show smoothed data series
     bool custom   = false; ///< True when a custom curve (fit/function/overlay) takes the

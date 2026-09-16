@@ -76,6 +76,22 @@ public:
      */
     static QString summaryText(int nwarnings, int nlines);
 
+    /**
+     * @brief The pattern that marks a line as an error or warning
+     *
+     * Shared with the log window's search for the next warning, so the two
+     * cannot disagree about what counts as one.
+     */
+    static const QRegularExpression &warningPattern();
+
+    /**
+     * @brief The pattern that finds an error-explanation URL in a line
+     *
+     * Shared with the log window's context menu and double-click handling.
+     * The URL is the first capture group.
+     */
+    static const QRegularExpression &errorUrlPattern();
+
 protected:
     /**
      * @brief Highlight a single block (line) of text
@@ -87,14 +103,21 @@ protected:
     void highlightBlock(const QString &text) override;
 
 private:
-    QRegularExpression isWarning;  ///< Pattern for warning/error messages
-    QRegularExpression isURL;      ///< Pattern for URLs
+    /**
+     * @brief Refresh the summary label from the counters
+     *
+     * Deferred to the event loop and coalesced, so that a batch of appended
+     * lines refreshes the label once rather than once per line.
+     */
+    void updateSummary();
+
     QTextCharFormat formatWarning; ///< Format for warnings/errors
     QTextCharFormat formatURL;     ///< Format for URLs
     QLabel *summary;               ///< Label to display warning summary
     QTextDocument *document;       ///< Document being highlighted
     int nwarnings, oldwarnings;    ///< Current and previous warning count
     int nlines, oldlines;          ///< Current and previous line count
+    bool summaryPending = false;   ///< A summary refresh is queued on the event loop
 };
 #endif
 // Local Variables:

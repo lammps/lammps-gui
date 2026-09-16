@@ -11,6 +11,7 @@
 
 #include "preferences.h"
 
+#include "chartstyle.h"
 #include "codeeditor.h"
 #include "commandwindow.h"
 #include "constants.h"
@@ -137,53 +138,53 @@ void Preferences::accept()
     // store image width, height, zoom, and rendering settings
 
     settings->beginGroup(Keys::GROUP_SNAPSHOT);
-    field = tabWidget->findChild<QLineEdit *>("xsize");
+    field = tabWidget->findChild<QLineEdit *>(Keys::XSIZE);
     if (field)
         if (field->hasAcceptableInput()) settings->setValue(Keys::XSIZE, field->text());
-    field = tabWidget->findChild<QLineEdit *>("ysize");
+    field = tabWidget->findChild<QLineEdit *>(Keys::YSIZE);
     if (field)
         if (field->hasAcceptableInput()) settings->setValue(Keys::YSIZE, field->text());
-    field = tabWidget->findChild<QLineEdit *>("zoom");
+    field = tabWidget->findChild<QLineEdit *>(Keys::ZOOM);
     if (field)
         if (field->hasAcceptableInput()) settings->setValue(Keys::ZOOM, field->text());
-    field = tabWidget->findChild<QLineEdit *>("hrot");
+    field = tabWidget->findChild<QLineEdit *>(Keys::HROT);
     if (field)
         if (field->hasAcceptableInput()) settings->setValue(Keys::HROT, field->text());
-    field = tabWidget->findChild<QLineEdit *>("vrot");
+    field = tabWidget->findChild<QLineEdit *>(Keys::VROT);
     if (field)
         if (field->hasAcceptableInput()) settings->setValue(Keys::VROT, field->text());
     box = tabWidget->findChild<QCheckBox *>("anti");
     if (box) settings->setValue(Keys::ANTIALIAS, box->isChecked());
-    box = tabWidget->findChild<QCheckBox *>("ssao");
+    box = tabWidget->findChild<QCheckBox *>(Keys::SSAO);
     if (box) settings->setValue(Keys::SSAO, box->isChecked());
     box = tabWidget->findChild<QCheckBox *>("shiny");
     if (box) settings->setValue(Keys::SHINYSTYLE, box->isChecked());
-    box = tabWidget->findChild<QCheckBox *>("box");
+    box = tabWidget->findChild<QCheckBox *>(Keys::BOX);
     if (box) settings->setValue(Keys::BOX, box->isChecked());
-    field = tabWidget->findChild<QLineEdit *>("boxdiam");
+    field = tabWidget->findChild<QLineEdit *>(Keys::BOXDIAM);
     if (field)
         if (field->hasAcceptableInput()) settings->setValue(Keys::BOXDIAM, field->text());
-    box = tabWidget->findChild<QCheckBox *>("axes");
+    box = tabWidget->findChild<QCheckBox *>(Keys::AXES);
     if (box) settings->setValue(Keys::AXES, box->isChecked());
-    field = tabWidget->findChild<QLineEdit *>("axeslen");
+    field = tabWidget->findChild<QLineEdit *>(Keys::AXESLEN);
     if (field)
         if (field->hasAcceptableInput()) settings->setValue(Keys::AXESLEN, field->text());
-    field = tabWidget->findChild<QLineEdit *>("axesdiam");
+    field = tabWidget->findChild<QLineEdit *>(Keys::AXESDIAM);
     if (field)
         if (field->hasAcceptableInput()) settings->setValue(Keys::AXESDIAM, field->text());
-    box = tabWidget->findChild<QCheckBox *>("vdwstyle");
+    box = tabWidget->findChild<QCheckBox *>(Keys::VDWSTYLE);
     if (box) settings->setValue(Keys::VDWSTYLE, box->isChecked());
-    box = tabWidget->findChild<QCheckBox *>("autobond");
+    box = tabWidget->findChild<QCheckBox *>(Keys::AUTOBOND);
     if (box) settings->setValue(Keys::AUTOBOND, box->isChecked());
-    field = tabWidget->findChild<QLineEdit *>("bondcut");
+    field = tabWidget->findChild<QLineEdit *>(Keys::BONDCUT);
     if (field) settings->setValue(Keys::BONDCUT, field->text());
-    field = tabWidget->findChild<QLineEdit *>("backcolor");
+    field = tabWidget->findChild<QLineEdit *>(Keys::BACKCOLOR);
     if (field && field->hasAcceptableInput()) settings->setValue(Keys::BACKCOLOR, field->text());
-    field = tabWidget->findChild<QLineEdit *>("backcolor2");
+    field = tabWidget->findChild<QLineEdit *>(Keys::BACKCOLOR2);
     if (field && field->hasAcceptableInput()) settings->setValue(Keys::BACKCOLOR2, field->text());
-    box = tabWidget->findChild<QCheckBox *>("usegradient");
+    box = tabWidget->findChild<QCheckBox *>(Keys::USEGRADIENT);
     if (box) settings->setValue(Keys::USEGRADIENT, box->isChecked());
-    field = tabWidget->findChild<QLineEdit *>("boxcolor");
+    field = tabWidget->findChild<QLineEdit *>(Keys::BOXCOLOR);
     if (field && field->hasAcceptableInput()) settings->setValue(Keys::BOXCOLOR, field->text());
     settings->endGroup();
 
@@ -197,7 +198,7 @@ void Preferences::accept()
         // the layout is applied when the main window is built, so a change
         // only takes effect in a fresh process
         if (radio->isChecked() != settings->value(Keys::DOCKED, false).toBool())
-            setRelaunch(QString("The window layout was changed."));
+            requestRelaunch("The window layout was changed.");
         settings->setValue(Keys::DOCKED, radio->isChecked());
     }
     box = tabWidget->findChild<QCheckBox *>("maximized");
@@ -301,7 +302,7 @@ void Preferences::accept()
         warning(this, "Relaunching LAMMPS-GUI", relaunchReasons.join(' '),
                 "LAMMPS-GUI must be relaunched to activate it.");
         settings->sync();
-        relaunchApplication();
+        relaunchOrExit(this);
     }
 
     QDialog::accept();
@@ -906,7 +907,7 @@ SnapshotTab::SnapshotTab(QSettings *_settings, QWidget *parent) :
 
     // bond cutoff has no input validator
     auto *bcut = new QLineEdit(settings->value(Keys::BONDCUT, "1.6").toString());
-    bcut->setObjectName("bondcut");
+    bcut->setObjectName(Keys::BONDCUT);
 
     settings->endGroup();
 
@@ -986,8 +987,8 @@ SnapshotTab::SnapshotTab(QSettings *_settings, QWidget *parent) :
 
 void SnapshotTab::chooseVdw()
 {
-    auto *vdw = findChild<QCheckBox *>("vdwstyle");
-    auto *bnd = findChild<QCheckBox *>("autobond");
+    auto *vdw = findChild<QCheckBox *>(Keys::VDWSTYLE);
+    auto *bnd = findChild<QCheckBox *>(Keys::AUTOBOND);
     if (vdw && bnd) {
         if (vdw->isChecked()) bnd->setChecked(false);
     }
@@ -995,8 +996,8 @@ void SnapshotTab::chooseVdw()
 
 void SnapshotTab::chooseBond()
 {
-    auto *vdw = findChild<QCheckBox *>("vdwstyle");
-    auto *bnd = findChild<QCheckBox *>("autobond");
+    auto *vdw = findChild<QCheckBox *>(Keys::VDWSTYLE);
+    auto *bnd = findChild<QCheckBox *>(Keys::AUTOBOND);
     if (vdw && bnd) {
         if (bnd->isChecked()) vdw->setChecked(false);
     }
@@ -1085,52 +1086,31 @@ ChartsTab::ChartsTab(QSettings *_settings, QWidget *parent) : QWidget(parent), s
     titletxt->setObjectName("title");
     auto *titlehlp = new QLabel("(use %f for current input file)");
 
-    // list of choices must be kept in sync with list in chartviewer
     auto *smoothlbl = new QLabel("Default plot data choice:");
-    auto *smoothval = new QComboBox;
-    smoothval->addItem("Raw");
-    smoothval->addItem("Smooth");
-    smoothval->addItem("Both");
+    auto *smoothval = makePlotChoiceCombo(settings->value(Keys::SMOOTHCHOICE, 0).toInt());
     smoothval->setObjectName("smoothchoice");
-    smoothval->setCurrentIndex(settings->value(Keys::SMOOTHCHOICE, 0).toInt());
 
     // the series style defaults, laid out like the per-chart "Chart Style"
-    // dialog they preset.  Color lists and display-mode lists must be kept in
-    // sync with mybrushes and ChartDisplayMode in chartviewer.
+    // dialog they preset and built from the same widgets (chartstyle.h), so
+    // the two cannot offer different choices
     auto colorBox = [this](const QString &name, const QString &key, int fallback) {
-        auto *combo = new QComboBox;
-        combo->addItem("Black");
-        combo->addItem("Blue");
-        combo->addItem("Red");
-        combo->addItem("Green");
-        combo->addItem("Gray");
+        auto *combo = makeChartColorCombo(settings->value(key, fallback).toInt());
         combo->setObjectName(name);
-        combo->setCurrentIndex(settings->value(key, fallback).toInt());
         return combo;
     };
     auto modeBox = [this](const QString &name, const QString &key) {
-        auto *combo = new QComboBox;
-        combo->addItem("Lines");
-        combo->addItem("Points");
-        combo->addItem("Lines + Points");
+        auto *combo = makeChartModeCombo(settings->value(key, 0).toInt());
         combo->setObjectName(name);
-        combo->setCurrentIndex(settings->value(key, 0).toInt());
         return combo;
     };
     auto widthBox = [this](const QString &name, const QString &key, double fallback) {
-        auto *spin = new QDoubleSpinBox;
-        spin->setRange(Cfg::LINE_WIDTH_MIN, Cfg::LINE_WIDTH_MAX);
-        spin->setSingleStep(0.5);
+        auto *spin = makeLineWidthSpin(settings->value(key, fallback).toDouble());
         spin->setObjectName(name);
-        spin->setValue(settings->value(key, fallback).toDouble());
         return spin;
     };
     auto pointBox = [this](const QString &name, const QString &key) {
-        auto *spin = new QDoubleSpinBox;
-        spin->setRange(Cfg::POINT_SIZE_MIN, Cfg::POINT_SIZE_MAX);
-        spin->setSingleStep(1.0);
+        auto *spin = makePointSizeSpin(settings->value(key, Cfg::POINT_SIZE_DEFAULT).toDouble());
         spin->setObjectName(name);
-        spin->setValue(settings->value(key, Cfg::POINT_SIZE_DEFAULT).toDouble());
         return spin;
     };
 

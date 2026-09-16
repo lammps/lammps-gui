@@ -81,7 +81,7 @@ public:
      * announces the relaunch, so a single visit to the preferences that
      * changes several restart-only settings explains all of them.
      */
-    void setRelaunch(const QString &reason)
+    void requestRelaunch(const QString &reason)
     {
         needRelaunch = true;
         if (!relaunchReasons.contains(reason)) relaunchReasons << reason;

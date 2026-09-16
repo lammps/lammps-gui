@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include "plotdata.h"
+#include "plotdata_internal.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -19,6 +20,7 @@
 #include <QJsonParseError>
 #include <QJsonValue>
 #include <QRegularExpression>
+#include <QStringView>
 #include <utility>
 
 void PlotData::setColumnNames(const QStringList &columnNames)
@@ -49,9 +51,6 @@ void PlotData::addColumn(const QString &name, std::vector<double> data)
 
 /* -------------------------------------------------------------------- */
 
-namespace {
-
-// Strip a single layer of matching single or double quotes from a token.
 QString unquote(QString t)
 {
     t = t.trimmed();
@@ -63,7 +62,6 @@ QString unquote(QString t)
     return t.trimmed();
 }
 
-// Return the text between the first '[' and the last ']' (empty if not found).
 QString bracketContents(const QString &s)
 {
     const int a = s.indexOf('[');
@@ -72,16 +70,70 @@ QString bracketContents(const QString &s)
     return s.mid(a + 1, b - a - 1);
 }
 
+QStringList genericColumnNames(int ncol)
+{
+    QStringList names;
+    names.reserve(ncol);
+    for (int i = 0; i < ncol; ++i)
+        names << QStringLiteral("column%1").arg(i + 1);
+    return names;
+}
+
+const QRegularExpression &whitespaceRe()
+{
+    static const QRegularExpression re("\\s+");
+    return re;
+}
+
+bool numericFields(QStringView line, std::vector<double> &row)
+{
+    row.clear();
+    const qsizetype n = line.size();
+    qsizetype i       = 0;
+    while (i < n) {
+        while ((i < n) && line[i].isSpace())
+            ++i;
+        if (i >= n) break;
+        qsizetype j = i;
+        while ((j < n) && !line[j].isSpace())
+            ++j;
+        bool good      = false;
+        const double d = line.mid(i, j - i).toDouble(&good);
+        if (!good) return false;
+        row.push_back(d);
+        i = j;
+    }
+    return !row.empty();
+}
+
+bool anyLineStartsWith(const QString &text, QLatin1String prefix)
+{
+    QStringView rest(text);
+    while (!rest.isEmpty()) {
+        const qsizetype nl     = rest.indexOf(u'\n');
+        const QStringView line = (nl < 0 ? rest : rest.left(nl)).trimmed();
+        if (line.startsWith(prefix)) return true;
+        if (nl < 0) break;
+        rest = rest.mid(nl + 1);
+    }
+    return false;
+}
+
+namespace {
+
 // Heuristic: does the text look like YAML tabular data?  We accept either the
 // LAMMPS thermo format (has a "keywords:" line) or a generic sequence of maps
 // (has a "- {key: value, ...}" line with at least one colon inside the braces).
 bool looksLikeYaml(const QString &text)
 {
-    const QStringList lines = text.split('\n');
-    for (const QString &line : lines) {
-        const QString t = line.trimmed();
-        if (t.startsWith("keywords:")) return true;
-        if (t.startsWith("- {") && t.endsWith('}') && t.contains(':')) return true;
+    QStringView rest(text);
+    while (!rest.isEmpty()) {
+        const qsizetype nl  = rest.indexOf(u'\n');
+        const QStringView t = (nl < 0 ? rest : rest.left(nl)).trimmed();
+        if (t.startsWith(QLatin1String("keywords:"))) return true;
+        if (t.startsWith(QLatin1String("- {")) && t.endsWith(u'}') && t.contains(u':')) return true;
+        if (nl < 0) break;
+        rest = rest.mid(nl + 1);
     }
     return false;
 }
@@ -110,16 +162,6 @@ bool tokensToRow(const QStringList &toks, std::vector<double> &row, bool skipEmp
         row.push_back(v);
     }
     return true;
-}
-
-// Generate placeholder column names "column1", "column2", ... for ncol columns.
-QStringList genericColumnNames(int ncol)
-{
-    QStringList names;
-    names.reserve(ncol);
-    for (int i = 0; i < ncol; ++i)
-        names << QStringLiteral("column%1").arg(i + 1);
-    return names;
 }
 
 } // namespace
@@ -184,35 +226,38 @@ PlotData parsePlotCsv(const QString &text, QString *error)
 PlotData parsePlotWhitespace(const QString &text, QString *error)
 {
     PlotData out;
-    const QStringList lines = text.split('\n');
-    static const QRegularExpression ws("\\s+");
     QString lastComment;
     QStringList names;
     int ncol = -1;
     std::vector<std::vector<double>> rows;
 
-    for (const QString &raw : lines) {
-        const QString line = raw.trimmed();
+    // The text is walked line by line rather than split into a list of lines
+    // first, and the fields of a line are read without a regular expression:
+    // for a large file, those allocations were most of the cost of reading it.
+    std::vector<double> row;
+    QStringView rest(text);
+    while (!rest.isEmpty()) {
+        const qsizetype nl     = rest.indexOf(u'\n');
+        const QStringView line = (nl < 0 ? rest : rest.left(nl)).trimmed();
+        rest                   = (nl < 0) ? QStringView() : rest.mid(nl + 1);
         if (line.isEmpty()) continue;
-        if (line.startsWith('#')) {
-            lastComment = line.mid(1).trimmed();
+        if (line.startsWith(u'#')) {
+            lastComment = line.mid(1).trimmed().toString();
             continue;
         }
 
-        const QStringList toks = line.split(ws, Qt::SkipEmptyParts);
-        std::vector<double> row;
-        if (!tokensToRow(toks, row)) continue; // skip non-numeric lines (e.g. text headers)
+        if (!numericFields(line, row)) continue; // skip non-numeric lines (e.g. text headers)
 
         if (ncol < 0) {
             ncol                    = static_cast<int>(row.size());
-            const QStringList ctoks = lastComment.split(ws, Qt::SkipEmptyParts);
+            const QStringList ctoks = lastComment.split(whitespaceRe(), Qt::SkipEmptyParts);
             if (ctoks.size() == ncol)
                 names = ctoks;
             else
                 names = genericColumnNames(ncol);
         }
         if (static_cast<int>(row.size()) != ncol) continue; // skip ragged
-        rows.push_back(std::move(row));
+        rows.push_back(row);
     }
 
     if ((ncol <= 0) || rows.empty()) {

@@ -1883,15 +1883,7 @@ void ImageViewer::createActions()
 {
     QMenu *fileMenu = new QMenu("&File", this);
     fileMenu->setObjectName(Cfg::VIEW_FILE_MENU);
-    if (dockedLayout()) {
-        // see ChartWindow: docked, the main window shows this menu for us
-        retireViewMenuBar(menuBar);
-    } else {
-        menuBar->addMenu(fileMenu);
-        if (lammpsgui)
-            for (auto *shared : lammpsgui->sharedMenus())
-                menuBar->addMenu(shared);
-    }
+    installViewMenuBar(menuBar, fileMenu, lammpsgui ? lammpsgui->sharedMenus() : QList<QMenu *>());
 
     saveAsAct = addMenuAction(fileMenu, "&Save As...", ":/icons/document-save-as.svg", this,
                               &ImageViewer::saveAs);

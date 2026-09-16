@@ -17,9 +17,12 @@
 #include <gtest/gtest.h>
 
 #include <QApplication>
+#include <QFile>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QTemporaryDir>
+#include <QTextStream>
 #include <QTimer>
 
 // The column-picker dialog's derived-column and rename behavior: columns are
@@ -227,6 +230,42 @@ TEST_F(PlotDataDialogTest, BlockReductionKeepsRenamesAndDerived)
     EXPECT_EQ(result.columnName(2), QString("half"));
     EXPECT_DOUBLE_EQ(result.column(1)[0], 10.0);
     EXPECT_DOUBLE_EQ(result.column(2)[0], 5.0);
+}
+
+// fromFile() reads a file and picks the dialog for its format: the flat table
+// parsers for a plain file, the block reduction for fix ave/* output, and no
+// dialog at all -- with a reason -- for a file that neither can read.
+TEST_F(PlotDataDialogTest, FromFilePicksTheParserForTheFormat)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    auto writeFile = [&](const QString &name, const QString &text) {
+        QFile f(dir.filePath(name));
+        EXPECT_TRUE(f.open(QIODevice::WriteOnly | QIODevice::Text));
+        QTextStream(&f) << text;
+        return f.fileName();
+    };
+
+    const QString flat = writeFile("flat.dat", "# Step Temp\n0 1.5\n10 1.6\n20 1.7\n");
+    QString error;
+    auto dialog = PlotDataDialog::fromFile(flat, nullptr, &error);
+    ASSERT_TRUE(dialog);
+    EXPECT_TRUE(error.isEmpty());
+    EXPECT_EQ(dialog->buildData().columnCount(), 2);
+    EXPECT_EQ(dialog->buildData().rowCount(), 3);
+
+    const QString blocks = writeFile("ave.dat", "# Time-averaged data for fix ave1\n"
+                                                "# TimeStep Number-of-rows\n# Row c_1[1]\n"
+                                                "0 2\n1 0.5\n2 0.6\n100 2\n1 0.7\n2 0.8\n");
+    dialog               = PlotDataDialog::fromFile(blocks, nullptr, &error);
+    ASSERT_TRUE(dialog);
+    EXPECT_TRUE(error.isEmpty());
+    // the block dialog offers the reduced table, not the raw block lines
+    EXPECT_EQ(dialog->buildData().rowCount(), 2);
+
+    dialog = PlotDataDialog::fromFile(dir.filePath("missing.dat"), nullptr, &error);
+    EXPECT_FALSE(dialog);
+    EXPECT_FALSE(error.isEmpty());
 }
 
 // Local Variables:

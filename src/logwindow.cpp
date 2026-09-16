@@ -22,7 +22,6 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QFont>
-#include <QFontInfo>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QIcon>
@@ -40,7 +39,6 @@
 
 namespace {
 constexpr auto YAML_REGEX = R"(^(keywords:.*$|data:$|---$|\.\.\.$|  - \[.*\]$))";
-constexpr auto URL_REGEX  = "^.*(https://docs.lammps.org/err[0-9]+).*$";
 QRegularExpression is_yaml(YAML_REGEX, QRegularExpression::MultilineOption);
 } // namespace
 
@@ -147,25 +145,14 @@ void LogWindow::createMenuBar()
     file->addAction(closeAct);
     file->addAction(quitAct);
 
-    if (dockedLayout()) {
-        // the main window shows this menu for us while the panel has the focus
-        retireViewMenuBar(menubar);
-        return;
-    }
-    menubar->addMenu(file);
-    if (lammpsgui)
-        for (auto *shared : lammpsgui->sharedMenus())
-            menubar->addMenu(shared);
-    setViewportMargins(0, menubar->sizeHint().height(), 0, 0);
+    if (installViewMenuBar(menubar, file, lammpsgui ? lammpsgui->sharedMenus() : QList<QMenu *>()))
+        setViewportMargins(0, menubar->sizeHint().height(), 0, 0);
 }
 
 void LogWindow::resizeEvent(QResizeEvent *event)
 {
     QPlainTextEdit::resizeEvent(event);
-    if (menubar && !menubar->isHidden()) {
-        const QRect cr = contentsRect();
-        menubar->setGeometry(cr.left(), cr.top(), cr.width(), menubar->sizeHint().height());
-    }
+    layoutViewMenuBar(this, menubar);
 }
 
 // warnings and summary are Qt-parented and cleaned up by their parents
@@ -215,7 +202,9 @@ void LogWindow::runBuffer()
 
 void LogWindow::nextWarning()
 {
-    auto regex = QRegularExpression(QStringLiteral("^(ERROR|WARNING).*$"));
+    // the highlighter's own notion of a warning, so the search finds exactly
+    // what is highlighted and counted
+    const QRegularExpression &regex = FlagWarnings::warningPattern();
 
     if (warnings->getNWarnings() > 0) {
         // wrap around search
@@ -316,7 +305,7 @@ void LogWindow::mouseDoubleClickEvent(QMouseEvent *event)
         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, end - begin - 1);
 
         auto text = cursor.selectedText();
-        auto url  = QRegularExpression(URL_REGEX).match(text);
+        auto url  = FlagWarnings::errorUrlPattern().match(text);
         if (url.hasMatch()) {
             errorurl = url.captured(1);
             if (!errorurl.isEmpty()) {
@@ -344,7 +333,7 @@ void LogWindow::contextMenuEvent(QContextMenuEvent *event)
 
     // process line of text where the cursor is
     auto text = textCursor().block().text().replace('\t', ' ').trimmed();
-    auto url  = QRegularExpression(URL_REGEX).match(text);
+    auto url  = FlagWarnings::errorUrlPattern().match(text);
     if (url.hasMatch()) {
         errorurl = url.captured(1);
         menu->addAction(urlAct);

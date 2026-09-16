@@ -22,13 +22,13 @@ changeEvent
 checkboxes
 CheckSize
 clearfirst
-cmake
 CMake
+cmake
+cn
 colormap
 colormaps
-correlator
 completers
-cn
+correlator
 cpp
 CreateScreenshot
 cryptographic
@@ -56,8 +56,8 @@ dmg
 doSmooth
 Doxygen
 dumpimage
-dylib
 dx
+dylib
 elif
 eps
 equipartition
@@ -96,9 +96,9 @@ gridline
 gridlines
 gui
 GUIEditorChecks
+Hann
 hasExe
 histo
-Hann
 Homebrew
 Hoyoung
 html
@@ -110,8 +110,8 @@ imagecache
 imagefiles
 imagename
 imageviewersettings
-isLightTheme
 isImageFile
+isLightTheme
 isMovieFile
 isOverridden
 Jacobian
@@ -160,9 +160,9 @@ num
 numParams
 Nyquist
 octahedron
-openImages
 Ok
 ok
+openImages
 parsePlotCsv
 parsePlotWhitespace
 parsePlotYaml
@@ -172,6 +172,7 @@ pixmap
 plotaxismath
 plotblockdata
 plotdata
+plotdatadialog
 PlotSeries
 plottable
 plotutils
@@ -231,6 +232,7 @@ setStyles
 setWindowFlags
 sg
 sgi
+shellprompt
 showEvent
 silenceStdout
 skiprun
@@ -251,8 +253,8 @@ stdout
 Struct
 StyleCat
 styleToolButtons
-Subclassed
 subbox
+Subclassed
 subdirectories
 subdirectory
 subfolder
@@ -284,8 +286,8 @@ txt
 ui
 unclosed
 underdetermined
-unregisters
 Unregister
+unregisters
 Validator
 varname
 vendored
@@ -300,6 +302,7 @@ wavenumbers
 webpage
 whitespace
 WidgetWithChildrenShortcut
+windowlayout
 wireframe
 www
 Xcode

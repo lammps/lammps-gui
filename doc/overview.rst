@@ -70,7 +70,7 @@ and testing simulation setups.
    A detailed discussion and explanation of all features and functionality
    are in the following pages. Here are a few highlights of LAMMPS-GUI:
 
-   - Individual windows or Combined Main window viewing mode
+   - Individual windows or combined window viewing modes
    - Text editor with line numbers, syntax highlighting, and find & replace, customized for LAMMPS
    - Text editor features command completion and indentation for known commands and styles
    - Input validation with a static pre-run check of the input script and
@@ -96,5 +96,5 @@ and testing simulation setups.
    - Inspection of binary restart files created by LAMMPS
    - View text, image, and animation/movie files
    - Integration with `LAMMPS tutorials <https://lammpstutorials.github.io>`_
-   - Command prompt window for issuing shell commands with command and filename expansion, scrollable history and aliases
+   - Command prompt window for issuing shell commands with Tab completion for commands and filenames, scrollable history and aliases
    - Update dynamically loaded LAMMPS library from LAMMPS download server

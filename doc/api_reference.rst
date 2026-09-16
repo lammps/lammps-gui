@@ -727,5 +727,8 @@ contributors distributed under the `MIT License
 Helper Functions
 ----------------
 
+.. doxygenfile:: chartstyle.h
+   :sections: func
+
 .. doxygenfile:: helpers.h
    :sections: func

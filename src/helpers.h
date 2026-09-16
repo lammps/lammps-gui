@@ -249,6 +249,18 @@ extern QString renameToBackup(const QString &file);
 extern void relaunchApplication();
 
 /**
+ * @brief Relaunch LAMMPS-GUI, or report the failure and exit
+ *
+ * Wraps `relaunchApplication()` with the handling every caller needs: when the
+ * re-exec fails, the user is told that the saved settings take effect on the
+ * next start and the application exits, since continuing in a state that no
+ * longer matches the settings is worse than stopping.
+ *
+ * @param parent  Parent widget for the error dialog
+ */
+[[noreturn]] extern void relaunchOrExit(QWidget *parent);
+
+/**
  * @brief Recursively delete all files in a directory
  * @param dir The directory to purge
  */
@@ -303,6 +315,18 @@ extern int showUnsavedChangesDialog(QWidget *parent, const QString &filename,
  * dialog button looks the same regardless of platform or desktop theme.
  */
 extern void styleDialogButtons(QDialogButtonBox *box);
+
+/**
+ * @brief Apply the bundled SVG icons to the standard buttons of a message box
+ *
+ * The `QMessageBox` counterpart of `styleDialogButtons()`: the same icons for the
+ * same buttons, so every dialog of the application looks alike.  Buttons the
+ * box does not have are skipped, so this is called once the standard buttons
+ * are set.
+ *
+ * @param mb Message box with its standard buttons already set
+ */
+extern void styleMessageBoxButtons(QMessageBox &mb);
 
 /**
  * @brief Silence stdout by redirecting it to the null device
@@ -495,6 +519,37 @@ extern void applyWindowFlags(QWidget *window);
  * @param menubar Menu bar of a docked output view (no-op if null)
  */
 extern void retireViewMenuBar(QMenuBar *menubar);
+
+/**
+ * @brief Give a view window its menu bar, or retire it in the combined layout
+ *
+ * In the individual-windows layout the bar shows the view's own menu followed
+ * by the application-wide menus of the main window, so a run can be started
+ * or stopped from the view without a second set of actions to keep in step
+ * (and without a second binding for their accelerators).  In the combined
+ * layout the main window carries one menu bar for all views and puts the
+ * view's menu at its front while the view has the focus, so the view's own bar
+ * is retired instead (see `retireViewMenuBar()`).
+ *
+ * @param menubar The view's menu bar (no-op if null)
+ * @param file    The view's own menu
+ * @param shared  The main window's application-wide menus; empty standalone
+ * @return true when the bar is in use, false when it was retired
+ */
+extern bool installViewMenuBar(QMenuBar *menubar, QMenu *file, const QList<QMenu *> &shared);
+
+/**
+ * @brief Stretch a view's menu bar across the top of the view
+ *
+ * A QPlainTextEdit has no layout slot for a menu bar, so the text views place
+ * theirs over the viewport (with the bar's height reserved as a viewport
+ * margin) and re-place it here on every resize.  Does nothing while the bar
+ * is hidden, i.e. retired in the combined layout.
+ *
+ * @param view    The view
+ * @param menubar Its menu bar
+ */
+extern void layoutViewMenuBar(QWidget *view, QMenuBar *menubar);
 
 /**
  * @brief Compute the scroll area size that shows the given content, within a budget
