@@ -18,12 +18,12 @@
 
 #include <QColor>
 #include <QComboBox>
+#include <QElapsedTimer>
 #include <QLabel>
 #include <QLineEdit>
 #include <QList>
 #include <QRectF>
 #include <QString>
-#include <QTime>
 #include <QWidget>
 
 class QAction;
@@ -317,7 +317,7 @@ struct ChartColumn {
     std::unique_ptr<PlotSeries> scatter;       ///< Raw data as points (created on demand)
     std::unique_ptr<PlotSeries> smoothScatter; ///< Processed data as points (created on demand)
     std::unique_ptr<PlotSeries> fit;           ///< Optional fit-curve overlay (created on demand)
-    QTime lastUpdate;                          ///< Time of last chart update
+    QElapsedTimer lastUpdate;                  ///< Time since the last chart update
     bool doRaw    = true;                      ///< Show raw data series
     bool doSmooth = false;                     ///< Show smoothed data series
     bool custom   = false; ///< True when a custom curve (fit/function/overlay) takes the

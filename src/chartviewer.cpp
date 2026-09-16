@@ -59,7 +59,6 @@
 #include <QSpinBox>
 #include <QStringList>
 #include <QTextStream>
-#include <QTime>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <algorithm>
@@ -547,7 +546,7 @@ void ChartWindow::addChart(const QString &title, int index)
     c->series       = std::make_unique<PlotSeries>();
     c->series->name = title;
     c->yTitle       = title;
-    c->lastUpdate   = QTime::currentTime();
+    c->lastUpdate.start();
     applyColumnStyleDefaults(*c); // the configured defaults, until the style dialog overrides them
     cols.push_back(std::move(c));
     columns->addItem(title, index);
@@ -2636,8 +2635,9 @@ void ChartViewer::addPoint(double x, double y)
 {
     if (appendColumnPoint(*col, x, y)) {
         // update the chart display only after at least updChart milliseconds have passed
-        if (col->lastUpdate.msecsTo(QTime::currentTime()) > updChart) {
-            col->lastUpdate = QTime::currentTime();
+        // a monotonic clock, so a run that crosses midnight keeps refreshing
+        if (col->lastUpdate.elapsed() > updChart) {
+            col->lastUpdate.restart();
             refreshColumn(plot, *col);
             resetColumnZoom(plot, *col);
         }
