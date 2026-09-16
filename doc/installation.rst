@@ -206,7 +206,7 @@ corresponding cryptographic signature to sign the binaries with.
    HTTPS from their official site.
 
    If you ever wish to *remove* this certificate, you can do it with
-   with the following commands.
+   the following commands.
 
    ``certutil -delstore Root "The LAMMPS Developers"``
 
@@ -399,7 +399,7 @@ LAMMPS_GUI_USE_PLUGIN=off`` (default setting is on).  This is also the
 setting for compilation within LAMMPS.  In this case, the CMake
 configuration needs to be told where to find the LAMMPS headers and the
 LAMMPS library, via ``-D LAMMPS_SOURCE_DIR=/path/to/lammps/src`` and
-``-D LAMMPS_LIBRARY=/path/to/liblammps/file``
+``-D LAMMPS_LIBRARY=/path/to/liblammps/file``.
 
 
 Platform notes

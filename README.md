@@ -39,7 +39,7 @@ archived on [Zenodo](https://zenodo.org) [![Zenodo DOI](https://zenodo.org/badge
                       Learn and Explore Molecular Dynamics with LAMMPS},
      publisher    = {Zenodo},
      doi          = {10.5281/zenodo.21035505},
-     url          = {https://doi.org/10.5281/zenodo.21035505},
+     url          = {https://doi.org/10.5281/zenodo.21035505}
    }
 ```
 

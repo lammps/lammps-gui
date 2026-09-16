@@ -9,12 +9,12 @@ Monitoring LAMMPS output
    individual window mode, where each output is displayed in a separate
    window and 2) combined window mode, where there is only one main
    window that may be split once vertically and the upper part once more
-   horizontally and then the upper left section is the editor window and
-   the upper right and bottom sections contain one or more tabs with the
-   same content as the corresponding individual window.  This viewing
-   mode can be changed in the :doc:`Preferences dialog <dialogs>` or
-   (temporarily) selected with the ``-w`` or ``-j`` :ref:`command-line
-   options <command-line-options>`.
+   horizontally. The upper left section is the editor window and the
+   upper right and bottom sections contain one or more tabs with the
+   same content as the corresponding individual windows in mode 1).
+   This viewing mode can be changed in the :doc:`Preferences dialog
+   <dialogs>` or (temporarily) selected with the ``-w`` or ``-j``
+   :ref:`command-line options <command-line-options>`.
 
    Any reference to a "window" throughout the remainder of this
    documentation thus refers to either the corresponding individual
@@ -24,7 +24,7 @@ Monitoring LAMMPS output
    The behavior for both modes is largely the same with two exceptions:
 
    1. There can be only one menu bar, so the displayed menu bar is that
-      of the section / tab that has currently the focus. If access to
+      of the section / tab that currently has the focus. If access to
       the menu bar of a specific window is needed, e.g. to open a new
       LAMMPS input file, it may be needed to first click into the
       corresponding area or use the `F6` or `Shift-F6` keyboard

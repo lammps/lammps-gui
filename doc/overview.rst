@@ -96,5 +96,5 @@ and testing simulation setups.
    - Inspection of binary restart files created by LAMMPS
    - View text, image, and animation/movie files
    - Integration with `LAMMPS tutorials <https://lammpstutorials.github.io>`_
-   - Command prompt window for issuing shell commands with command and filename expansion, scrollable history and aliases
+   - Command prompt window for issuing shell commands with Tab completion for commands and filenames, scrollable history and aliases
    - Update dynamically loaded LAMMPS library from LAMMPS download server

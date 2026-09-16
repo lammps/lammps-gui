@@ -17,8 +17,8 @@ instead of using the mouse.
 .. admonition:: LAMMPS-GUI Combined Window Mode
    :class: note
 
-   In joined window mode there can be only one menu bar, so the
-   displayed menu bar is that of the section / tab that has currently
+   In combined window mode there can be only one menu bar, so the
+   displayed menu bar is that of the section / tab that currently has
    the focus.  If access to the menu bar of a specific window is needed,
    e.g. to open a new LAMMPS input file, it may be needed to either
    first click into the corresponding area or use the `F6` or `Shift-F6`
