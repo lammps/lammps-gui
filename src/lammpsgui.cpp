@@ -1455,10 +1455,7 @@ void LammpsGui::inspectFile(const QString &fileName)
         mb.setEscapeButton(QMessageBox::No);
         mb.setFont(font());
 
-        auto *button = mb.button(QMessageBox::Yes);
-        button->setIcon(QIcon(":/icons/dialog-ok.svg"));
-        button = mb.button(QMessageBox::No);
-        button->setIcon(QIcon(":/icons/dialog-no.svg"));
+        styleMessageBoxButtons(mb);
 
         int rv = mb.exec();
         switch (rv) {
@@ -2158,12 +2155,10 @@ int showLintDialog(QWidget *parent, const QList<LintIssue> &issues, bool askRunA
         mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         mb.setDefaultButton(QMessageBox::No);
         mb.setEscapeButton(QMessageBox::No);
-        mb.button(QMessageBox::Yes)->setIcon(QIcon(":/icons/dialog-ok.svg"));
-        mb.button(QMessageBox::No)->setIcon(QIcon(":/icons/dialog-no.svg"));
     } else {
         mb.setStandardButtons(QMessageBox::Ok);
-        mb.button(QMessageBox::Ok)->setIcon(QIcon(":/icons/dialog-ok.svg"));
     }
+    styleMessageBoxButtons(mb);
     mb.setFont(parent->font());
     return mb.exec();
 }
@@ -2253,8 +2248,7 @@ void LammpsGui::doRun(bool use_buffer, bool dryrun)
         mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         mb.setDefaultButton(QMessageBox::Yes);
         mb.setEscapeButton(QMessageBox::No);
-        mb.button(QMessageBox::Yes)->setIcon(QIcon(":/icons/dialog-ok.svg"));
-        mb.button(QMessageBox::No)->setIcon(QIcon(":/icons/dialog-no.svg"));
+        styleMessageBoxButtons(mb);
         mb.setFont(font());
         if (mb.exec() != QMessageBox::Yes) return;
     }
@@ -2845,11 +2839,7 @@ void LammpsGui::checkUpdate()
         mb.setWindowIcon(QIcon(Cfg::MAIN_ICON));
         mb.setIconPixmap(QPixmap(":/icons/lammps-plugin.png").scaled(96, 96));
 
-        // customize button icons
-        auto *button = mb.button(QMessageBox::Yes);
-        button->setIcon(QIcon(":/icons/dialog-ok.svg"));
-        button = mb.button(QMessageBox::No);
-        button->setIcon(QIcon(":/icons/dialog-no.svg"));
+        styleMessageBoxButtons(mb);
 
         if (mb.exec() == QMessageBox::Yes) {
             if (downloader.download(dlUrl, libPath, true, true)) {
@@ -2921,8 +2911,7 @@ void LammpsGui::help()
         "LAMMPS-GUI in parallel with MPI.</p>");
     mb.setIconPixmap(QPixmap(Cfg::MAIN_ICON).scaled(64, 64));
     mb.setStandardButtons(QMessageBox::Close);
-    auto *button = mb.button(QMessageBox::Close);
-    button->setIcon(QIcon(":/icons/window-close.svg"));
+    styleMessageBoxButtons(mb);
     mb.setFont(font());
     mb.exec();
 }

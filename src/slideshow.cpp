@@ -444,10 +444,7 @@ void SlideShow::deleteImages()
     mb.setDefaultButton(QMessageBox::No);
     mb.setEscapeButton(QMessageBox::No);
 
-    auto *button = mb.button(QMessageBox::Yes);
-    button->setIcon(QIcon(":/icons/dialog-ok.svg"));
-    button = mb.button(QMessageBox::No);
-    button->setIcon(QIcon(":/icons/dialog-no.svg"));
+    styleMessageBoxButtons(mb);
 
     if (mb.exec() != QMessageBox::Yes) return;
 
@@ -579,10 +576,7 @@ void SlideShow::purgeCache()
     mb.setDefaultButton(QMessageBox::Yes);
     mb.setEscapeButton(QMessageBox::No);
 
-    auto *button = mb.button(QMessageBox::Yes);
-    button->setIcon(QIcon(":/icons/dialog-ok.svg"));
-    button = mb.button(QMessageBox::No);
-    button->setIcon(QIcon(":/icons/dialog-no.svg"));
+    styleMessageBoxButtons(mb);
 
     if (mb.exec() != QMessageBox::Yes) return;
 

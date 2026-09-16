@@ -317,6 +317,18 @@ extern int showUnsavedChangesDialog(QWidget *parent, const QString &filename,
 extern void styleDialogButtons(QDialogButtonBox *box);
 
 /**
+ * @brief Apply the bundled SVG icons to the standard buttons of a message box
+ *
+ * The QMessageBox counterpart of styleDialogButtons(): the same icons for the
+ * same buttons, so every dialog of the application looks alike.  Buttons the
+ * box does not have are skipped, so this is called once the standard buttons
+ * are set.
+ *
+ * @param mb Message box with its standard buttons already set
+ */
+extern void styleMessageBoxButtons(QMessageBox &mb);
+
+/**
  * @brief Silence stdout by redirecting it to the null device
  *
  * Redirects stdout to /dev/null (Unix) or NUL: (Windows) to suppress

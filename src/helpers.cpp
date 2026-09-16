@@ -260,8 +260,7 @@ void setDialogIcons(QMessageBox &mb, const QString &iconPath)
     mb.setIconPixmap(QIcon(iconPath).pixmap(QSize(extent, extent), mb.devicePixelRatioF()));
     mb.setWindowIcon(QIcon(Cfg::MAIN_ICON));
     mb.setStandardButtons(QMessageBox::Ok);
-    auto *button = mb.button(QMessageBox::Ok);
-    button->setIcon(QIcon(":/icons/dialog-ok.svg"));
+    styleMessageBoxButtons(mb);
 }
 
 // customized information dialog
@@ -555,10 +554,7 @@ bool confirmUnexpectedFile(QWidget *parent, const QString &filename, const QStri
         QIcon(":/icons/system-help.svg").pixmap(QSize(extent, extent), mb.devicePixelRatioF()));
     mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
-    auto *button = mb.button(QMessageBox::Yes);
-    button->setIcon(QIcon(":/icons/dialog-ok.svg"));
-    button = mb.button(QMessageBox::No);
-    button->setIcon(QIcon(":/icons/dialog-no.svg"));
+    styleMessageBoxButtons(mb);
 
     // the usual reason to be asked this is a name that was mistyped or a file
     // that was mis-picked, so the safe answer is the one Return and Escape give
@@ -582,12 +578,7 @@ int showUnsavedChangesDialog(QWidget *parent, const QString &filename, const QSt
         QIcon(":/icons/system-help.svg").pixmap(QSize(extent, extent), mb.devicePixelRatioF()));
     mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
-    auto *button = mb.button(QMessageBox::Yes);
-    button->setIcon(QIcon(":/icons/dialog-ok.svg"));
-    button = mb.button(QMessageBox::No);
-    button->setIcon(QIcon(":/icons/dialog-no.svg"));
-    button = mb.button(QMessageBox::Cancel);
-    button->setIcon(QIcon(":/icons/dialog-cancel.svg"));
+    styleMessageBoxButtons(mb);
 
     if (parent) mb.setFont(parent->font());
     return mb.exec();
@@ -595,22 +586,32 @@ int showUnsavedChangesDialog(QWidget *parent, const QString &filename, const QSt
 
 // apply our bundled SVG icons to a dialog button box's standard buttons (see helpers.h)
 
+// The icon for each standard button.  QMessageBox::StandardButton has the same
+// values as QDialogButtonBox::StandardButton, so one table serves both.
+static const struct {
+    QDialogButtonBox::StandardButton id;
+    const char *icon;
+} BUTTON_ICONS[] = {
+    {QDialogButtonBox::Ok, ":/icons/dialog-ok.svg"},
+    {QDialogButtonBox::Yes, ":/icons/dialog-ok.svg"},
+    {QDialogButtonBox::No, ":/icons/dialog-no.svg"},
+    {QDialogButtonBox::Cancel, ":/icons/dialog-cancel.svg"},
+    {QDialogButtonBox::Close, ":/icons/window-close.svg"},
+};
+
 void styleDialogButtons(QDialogButtonBox *box)
 {
     if (!box) return;
-
-    const struct {
-        QDialogButtonBox::StandardButton id;
-        const char *icon;
-    } iconmap[] = {
-        {QDialogButtonBox::Ok, ":/icons/dialog-ok.svg"},
-        {QDialogButtonBox::Yes, ":/icons/dialog-ok.svg"},
-        {QDialogButtonBox::No, ":/icons/dialog-no.svg"},
-        {QDialogButtonBox::Cancel, ":/icons/dialog-cancel.svg"},
-        {QDialogButtonBox::Close, ":/icons/window-close.svg"},
-    };
-    for (const auto &entry : iconmap) {
+    for (const auto &entry : BUTTON_ICONS) {
         if (auto *button = box->button(entry.id)) button->setIcon(QIcon(entry.icon));
+    }
+}
+
+void styleMessageBoxButtons(QMessageBox &mb)
+{
+    for (const auto &entry : BUTTON_ICONS) {
+        if (auto *button = mb.button(static_cast<QMessageBox::StandardButton>(entry.id)))
+            button->setIcon(QIcon(entry.icon));
     }
 }
 
