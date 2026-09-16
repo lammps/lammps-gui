@@ -26,13 +26,10 @@
 #include <QString>
 #include <QWidget>
 
-class QAction;
 class QCheckBox;
 class QCloseEvent;
-class QEvent;
 class QMenuBar;
 class QMenu;
-class QPushButton;
 class QSpinBox;
 class RangeSlider;
 

@@ -179,15 +179,6 @@ public:
      */
     QList<QMenu *> sharedMenus() const;
 
-    /**
-     * @brief Put the focused view's own menu at the front of the menu bar
-     * @param focused Widget that just took the keyboard focus
-     *
-     * Combined layout only; does nothing with individual windows, where each
-     * window carries its own menu bar.
-     */
-    void updateMenuBarForFocus(QWidget *focused);
-
 protected:
     /** @brief Set the editor window title from the current file and run number
      *
@@ -496,6 +487,15 @@ private:
 
     /** @brief Append any newly rendered dump image to the slideshow */
     void updateSlideShow();
+
+    /**
+     * @brief Put the focused view's own menu at the front of the menu bar
+     * @param focused Widget that just took the keyboard focus
+     *
+     * Combined layout only; does nothing with individual windows, where each
+     * window carries its own menu bar.
+     */
+    void updateMenuBarForFocus(QWidget *focused);
 
     /** @brief Append accelerator-package command-line arguments to lammpsArgs */
     void appendAcceleratorArgs(int accel, QSettings &settings);

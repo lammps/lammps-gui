@@ -597,11 +597,6 @@ QList<int> PlotDataDialog::yColumns() const
     return result;
 }
 
-QStringList PlotDataDialog::columnNames() const
-{
-    return workingData.columnNames();
-}
-
 PlotData PlotDataDialog::buildData() const
 {
     // renames are committed into the working copy as they are made, so the

@@ -20,8 +20,6 @@
 #include <QPair>
 #include <QStringList>
 
-#include <memory>
-
 class QButtonGroup;
 class QCheckBox;
 class QComboBox;
@@ -106,14 +104,6 @@ public:
      * @return List of column indices (all columns with a checked y checkbox)
      */
     QList<int> yColumns() const;
-
-    /**
-     * @brief The live column names (renames take effect as they are made)
-     *
-     * Each entry corresponds to a column by index in @ref buildData().
-     * @return List of column name strings, one per column
-     */
-    QStringList columnNames() const;
 
     /**
      * @brief Return the working data with renames and derived columns applied

@@ -39,7 +39,6 @@
 #include <QPushButton>
 #include <QScreen>
 #include <QScrollArea>
-#include <QShortcut>
 #include <QShowEvent>
 #include <QSlider>
 #include <QSpacerItem>

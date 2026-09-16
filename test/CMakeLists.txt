@@ -80,7 +80,6 @@ add_executable(test_helpers
 add_executable(test_shortcuts
   test_shortcuts.cpp
   ${CMAKE_SOURCE_DIR}/src/helpers.cpp
-  ${CMAKE_SOURCE_DIR}/src/stdcapture.cpp
 )
 
 target_include_directories(test_shortcuts PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -93,7 +92,6 @@ add_executable(test_windowlayout
   test_windowlayout.cpp
   ${CMAKE_SOURCE_DIR}/src/windowlayout.cpp
   ${CMAKE_SOURCE_DIR}/src/helpers.cpp
-  ${CMAKE_SOURCE_DIR}/src/stdcapture.cpp
 )
 
 set_target_properties(test_windowlayout PROPERTIES AUTOMOC ON)
@@ -315,7 +313,6 @@ add_executable(test_plotdatadialog
   ${CMAKE_SOURCE_DIR}/src/levmar.cpp
   ${CMAKE_SOURCE_DIR}/src/leastsquares.cpp
   ${CMAKE_SOURCE_DIR}/src/helpers.cpp
-  ${CMAKE_SOURCE_DIR}/src/stdcapture.cpp
 )
 
 set_target_properties(test_plotdatadialog PROPERTIES AUTOMOC ON)

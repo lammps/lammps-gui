@@ -34,7 +34,6 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QDoubleSpinBox>
-#include <QEvent>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFormLayout>
@@ -634,15 +633,12 @@ void ChartWindow::copy()
 #if QT_CONFIG(clipboard)
     auto *clip = QGuiApplication::clipboard();
     if (clip && !cols.empty()) {
-        // a single view renders the active column
-        QWidget *graph = viewer;
-        if (graph) {
-            auto image = graph->grab().toImage();
-            if (!image.isNull()) {
-                clip->setImage(image, QClipboard::Clipboard);
-                if (clip->supportsSelection()) clip->setImage(image, QClipboard::Selection);
-                return;
-            }
+        // the single view renders the active column
+        auto image = viewer->grab().toImage();
+        if (!image.isNull()) {
+            clip->setImage(image, QClipboard::Clipboard);
+            if (clip->supportsSelection()) clip->setImage(image, QClipboard::Selection);
+            return;
         }
     }
     fprintf(stderr, "Copy graph to clipboard currently not available\n");

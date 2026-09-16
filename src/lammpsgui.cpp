@@ -1436,10 +1436,7 @@ void LammpsGui::inspectFile(const QString &fileName)
     auto shortName = QFileInfo(fileName).fileName();
 
     purgeInspectList();
-    auto *ilist  = new InspectData;
-    ilist->info  = nullptr;
-    ilist->data  = nullptr;
-    ilist->image = nullptr;
+    auto *ilist = new InspectData;
     inspectList.append(ilist);
 
     if (file.size() > Cfg::INSPECT_WARN_SIZE) {

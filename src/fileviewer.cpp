@@ -19,14 +19,12 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFont>
-#include <QFontInfo>
 #include <QIcon>
 #include <QKeySequence>
 #include <QMenu>
 #include <QMenuBar>
 #include <QProcess>
 #include <QResizeEvent>
-#include <QSettings>
 #include <QString>
 #include <QStringList>
 #include <QTextCursor>
