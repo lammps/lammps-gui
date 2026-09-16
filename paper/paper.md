@@ -33,7 +33,7 @@ data, and visualizing atomic configurations *before* one can begin to
 learn MD itself.
 
 LAMMPS-GUI is a cross-platform graphical application, written in C++17
-using version 6 of the Qt framework, that combines these
+using version 6 of the Qt framework [@qt_home], that combines these
 tasks in one program: a syntax-highlighting input editor with
 auto-completion and documentation lookup, live execution with real-time
 output monitoring, interactive thermodynamic charts, a snapshot image
