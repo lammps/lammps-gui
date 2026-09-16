@@ -16,6 +16,8 @@ set(PROJECT_SOURCES
   ${CMAKE_SOURCE_DIR}/src/analysis.h
   ${CMAKE_SOURCE_DIR}/src/chartviewer.cpp
   ${CMAKE_SOURCE_DIR}/src/chartviewer.h
+  ${CMAKE_SOURCE_DIR}/src/chartstyle.cpp
+  ${CMAKE_SOURCE_DIR}/src/chartstyle.h
   ${CMAKE_SOURCE_DIR}/src/plotwidget.cpp
   ${CMAKE_SOURCE_DIR}/src/plotwidget.h
   ${CMAKE_SOURCE_DIR}/src/plotseries.h

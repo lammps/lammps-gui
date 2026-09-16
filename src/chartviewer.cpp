@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include "chartviewer.h"
+#include "chartstyle.h"
 
 #include "analysis.h"
 #include "constants.h"
@@ -112,16 +113,6 @@ void padEmptyRange(double &lo, double &hi)
         }
     }
 }
-
-// brush color index must be kept in sync with preferences
-
-const QList<QBrush> mybrushes = {
-    QBrush(QColor(0, 0, 0)),       // black
-    QBrush(QColor(100, 150, 255)), // blue
-    QBrush(QColor(255, 125, 125)), // red
-    QBrush(QColor(100, 200, 100)), // green
-    QBrush(QColor(120, 120, 120)), // grey
-};
 
 // Parse a "name=value, name=value, ..." string of nonlinear-fit parameters and
 // their initial guesses into an ordered list. Sets *ok to false on any empty or
@@ -301,14 +292,9 @@ ChartWindow::ChartWindow(const QString &_filename, LammpsGui *_lammpsgui, QWidge
     chartYlabel = new QLineEdit("");
     if (!lammpsgui) chartXlabel = new QLineEdit("");
 
-    // plot smoothing
-    // list of choices must be kept in sync with list in preferences
-    smooth = new QComboBox;
-    smooth->addItem("Raw");
-    // the processed-series slot always holds the smoothed data ("Smooth"); a
-    // post-process fit/function replaces it and overrides the label with its name
-    smooth->addItem("Smooth");
-    smooth->addItem("Both");
+    // plot smoothing; the processed-series slot always holds the smoothed data
+    // ("Smooth"), and a post-process fit/function overrides that label with its name
+    smooth = makePlotChoiceCombo(0);
     window = new QSpinBox;
     window->setRange(Cfg::SMOOTH_WINDOW_MIN, Cfg::SMOOTH_WINDOW_MAX);
     window->setToolTip("Smoothing Window Size");
@@ -691,52 +677,20 @@ void ChartWindow::changeStyle()
         return btn;
     };
 
-    // build a display-mode selector preset to the given mode
+    // the mode, width, and size widgets are the ones the Preferences dialog
+    // builds too (chartstyle.h); a display mode is preset by its enum index
     auto modeBox = [](ChartDisplayMode mode) {
-        auto *mb = new QComboBox;
-        mb->addItem("Lines", static_cast<int>(ChartDisplayMode::Lines));
-        mb->addItem("Points", static_cast<int>(ChartDisplayMode::Points));
-        mb->addItem("Lines + Points", static_cast<int>(ChartDisplayMode::LinesAndPoints));
-        mb->setCurrentIndex(static_cast<int>(mode));
-        return mb;
-    };
-
-    // build a line-width spin box preset to the given width
-    auto widthBox = [](qreal width) {
-        auto *w = new QDoubleSpinBox;
-        w->setRange(Cfg::LINE_WIDTH_MIN, Cfg::LINE_WIDTH_MAX);
-        w->setSingleStep(0.5);
-        w->setValue(width);
-        return w;
-    };
-
-    // build a point-diameter spin box preset to the given size
-    auto pointBox = [](qreal size) {
-        auto *w = new QDoubleSpinBox;
-        w->setRange(Cfg::POINT_SIZE_MIN, Cfg::POINT_SIZE_MAX);
-        w->setSingleStep(1.0);
-        w->setValue(size);
-        return w;
-    };
-
-    // a chart that has no color of its own draws in the configured one, so that
-    // is what the dialog has to start from and hand back
-    auto configuredColor = [](const QString &key, int fallback) {
-        QSettings settings;
-        settings.beginGroup(Keys::GROUP_CHARTS);
-        int idx = settings.value(key, fallback).toInt();
-        settings.endGroup();
-        if ((idx < 0) || (idx >= mybrushes.size())) idx = 0;
-        return mybrushes[idx].color();
+        return makeChartModeCombo(static_cast<int>(mode));
     };
 
     // raw data section
     QColor rawChosen = chart->displayColor();
-    if (!rawChosen.isValid()) rawChosen = configuredColor(Keys::RAWBRUSH, Cfg::RAWBRUSH_DEFAULT);
+    if (!rawChosen.isValid())
+        rawChosen = configuredChartColor(Keys::RAWBRUSH, Cfg::RAWBRUSH_DEFAULT);
     auto *rawMode      = modeBox(chart->displayMode());
     auto *rawColorBtn  = colorButton(rawChosen);
-    auto *rawWidthSpin = widthBox(chart->displayWidth());
-    auto *rawPointSpin = pointBox(chart->displayPointSize());
+    auto *rawWidthSpin = makeLineWidthSpin(chart->displayWidth());
+    auto *rawPointSpin = makePointSizeSpin(chart->displayPointSize());
     auto *rawBox       = new QGroupBox("Raw data");
     auto *rawForm      = new QFormLayout(rawBox);
     rawForm->addRow("Display:", rawMode);
@@ -748,11 +702,11 @@ void ChartWindow::changeStyle()
     // processed data section
     QColor procChosen = chart->smoothColor();
     if (!procChosen.isValid())
-        procChosen = configuredColor(Keys::SMOOTHBRUSH, Cfg::SMOOTHBRUSH_DEFAULT);
+        procChosen = configuredChartColor(Keys::SMOOTHBRUSH, Cfg::SMOOTHBRUSH_DEFAULT);
     auto *procMode      = modeBox(chart->smoothMode());
     auto *procColorBtn  = colorButton(procChosen);
-    auto *procWidthSpin = widthBox(chart->smoothWidth());
-    auto *procPointSpin = pointBox(chart->smoothPointSize());
+    auto *procWidthSpin = makeLineWidthSpin(chart->smoothWidth());
+    auto *procPointSpin = makePointSizeSpin(chart->smoothPointSize());
     auto *procBox       = new QGroupBox("Processed data");
     auto *procForm      = new QFormLayout(procBox);
     procForm->addRow("Display:", procMode);
@@ -763,9 +717,10 @@ void ChartWindow::changeStyle()
 
     // error bar section; the bars of every series of this chart share one style
     QColor errChosen = chart->errorColor();
-    if (!errChosen.isValid()) errChosen = configuredColor(Keys::ERRBRUSH, Cfg::ERRBRUSH_DEFAULT);
+    if (!errChosen.isValid())
+        errChosen = configuredChartColor(Keys::ERRBRUSH, Cfg::ERRBRUSH_DEFAULT);
     auto *errColorBtn  = colorButton(errChosen);
-    auto *errWidthSpin = widthBox(chart->errorWidth());
+    auto *errWidthSpin = makeLineWidthSpin(chart->errorWidth());
     auto *errBox       = new QGroupBox("Error bars");
     errBox->setToolTip("Applies to the error bars of every series of this chart.\n"
                        "Only imported data can carry error bars.");
@@ -2286,19 +2241,16 @@ void styleColumnErrors(ChartColumn &col, const QColor &color, qreal width)
 // Recompute and (re)draw a column's raw and smoothed series onto the plot.
 void refreshColumn(PlotWidget *plot, ChartColumn &col)
 {
-    QSettings settings;
-    settings.beginGroup(Keys::GROUP_CHARTS);
-    int rawidx    = settings.value(Keys::RAWBRUSH, Cfg::RAWBRUSH_DEFAULT).toInt();
-    int smoothidx = settings.value(Keys::SMOOTHBRUSH, Cfg::SMOOTHBRUSH_DEFAULT).toInt();
-    int erridx    = settings.value(Keys::ERRBRUSH, Cfg::ERRBRUSH_DEFAULT).toInt();
-    if ((rawidx < 0) || (rawidx >= mybrushes.size())) rawidx = 0;
-    if ((smoothidx < 0) || (smoothidx >= mybrushes.size())) smoothidx = 0;
-    if ((erridx < 0) || (erridx >= mybrushes.size())) erridx = 0;
-    settings.endGroup();
-
-    const QColor rawcol = col.rawColor.isValid() ? col.rawColor : mybrushes[rawidx].color();
-    const QColor smcol = col.smoothcolor.isValid() ? col.smoothcolor : mybrushes[smoothidx].color();
-    const QColor errcol = col.errColor.isValid() ? col.errColor : mybrushes[erridx].color();
+    // a column without a color of its own draws in the configured one
+    const QColor rawcol = col.rawColor.isValid()
+                              ? col.rawColor
+                              : configuredChartColor(Keys::RAWBRUSH, Cfg::RAWBRUSH_DEFAULT);
+    const QColor smcol  = col.smoothcolor.isValid()
+                              ? col.smoothcolor
+                              : configuredChartColor(Keys::SMOOTHBRUSH, Cfg::SMOOTHBRUSH_DEFAULT);
+    const QColor errcol = col.errColor.isValid()
+                              ? col.errColor
+                              : configuredChartColor(Keys::ERRBRUSH, Cfg::ERRBRUSH_DEFAULT);
 
     if (col.doRaw)
         renderColumnSeries(plot, col.series.get(), col.scatter, col.dispmode, rawcol, col.rawWidth,

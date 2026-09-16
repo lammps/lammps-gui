@@ -11,6 +11,7 @@
 
 #include "preferences.h"
 
+#include "chartstyle.h"
 #include "codeeditor.h"
 #include "commandwindow.h"
 #include "constants.h"
@@ -1085,52 +1086,31 @@ ChartsTab::ChartsTab(QSettings *_settings, QWidget *parent) : QWidget(parent), s
     titletxt->setObjectName("title");
     auto *titlehlp = new QLabel("(use %f for current input file)");
 
-    // list of choices must be kept in sync with list in chartviewer
     auto *smoothlbl = new QLabel("Default plot data choice:");
-    auto *smoothval = new QComboBox;
-    smoothval->addItem("Raw");
-    smoothval->addItem("Smooth");
-    smoothval->addItem("Both");
+    auto *smoothval = makePlotChoiceCombo(settings->value(Keys::SMOOTHCHOICE, 0).toInt());
     smoothval->setObjectName("smoothchoice");
-    smoothval->setCurrentIndex(settings->value(Keys::SMOOTHCHOICE, 0).toInt());
 
     // the series style defaults, laid out like the per-chart "Chart Style"
-    // dialog they preset.  Color lists and display-mode lists must be kept in
-    // sync with mybrushes and ChartDisplayMode in chartviewer.
+    // dialog they preset and built from the same widgets (chartstyle.h), so
+    // the two cannot offer different choices
     auto colorBox = [this](const QString &name, const QString &key, int fallback) {
-        auto *combo = new QComboBox;
-        combo->addItem("Black");
-        combo->addItem("Blue");
-        combo->addItem("Red");
-        combo->addItem("Green");
-        combo->addItem("Gray");
+        auto *combo = makeChartColorCombo(settings->value(key, fallback).toInt());
         combo->setObjectName(name);
-        combo->setCurrentIndex(settings->value(key, fallback).toInt());
         return combo;
     };
     auto modeBox = [this](const QString &name, const QString &key) {
-        auto *combo = new QComboBox;
-        combo->addItem("Lines");
-        combo->addItem("Points");
-        combo->addItem("Lines + Points");
+        auto *combo = makeChartModeCombo(settings->value(key, 0).toInt());
         combo->setObjectName(name);
-        combo->setCurrentIndex(settings->value(key, 0).toInt());
         return combo;
     };
     auto widthBox = [this](const QString &name, const QString &key, double fallback) {
-        auto *spin = new QDoubleSpinBox;
-        spin->setRange(Cfg::LINE_WIDTH_MIN, Cfg::LINE_WIDTH_MAX);
-        spin->setSingleStep(0.5);
+        auto *spin = makeLineWidthSpin(settings->value(key, fallback).toDouble());
         spin->setObjectName(name);
-        spin->setValue(settings->value(key, fallback).toDouble());
         return spin;
     };
     auto pointBox = [this](const QString &name, const QString &key) {
-        auto *spin = new QDoubleSpinBox;
-        spin->setRange(Cfg::POINT_SIZE_MIN, Cfg::POINT_SIZE_MAX);
-        spin->setSingleStep(1.0);
+        auto *spin = makePointSizeSpin(settings->value(key, Cfg::POINT_SIZE_DEFAULT).toDouble());
         spin->setObjectName(name);
-        spin->setValue(settings->value(key, Cfg::POINT_SIZE_DEFAULT).toDouble());
         return spin;
     };
 
