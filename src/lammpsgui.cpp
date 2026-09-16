@@ -2624,8 +2624,8 @@ void LammpsGui::createCommandWindow()
     commandwindow = new CommandWindow(this);
     commandwindow->setWindowTitle("LAMMPS-GUI - Commands");
     commandwindow->setWindowIcon(QIcon(Cfg::MAIN_ICON));
-    // start where the input file is, which is where a run leaves its output
-    commandwindow->changeDirectory(currentDir);
+    // the shell starts in the process working directory, which follows the
+    // input file and is where a run leaves its output; no "cd" is needed
     viewlayout->place(ViewSlot::Command, commandwindow);
 }
 

@@ -511,7 +511,11 @@ CommandWindow::~CommandWindow()
 
     if (shell && shell->state() != QProcess::NotRunning) {
         shell->closeWriteChannel();
-        if (!shell->waitForFinished(Cfg::COMMAND_EXIT_TIMEOUT)) shell->kill();
+        if (!shell->waitForFinished(Cfg::COMMAND_EXIT_TIMEOUT)) {
+            shell->kill();
+            // reap it, or the QProcess child is destroyed with it still running
+            shell->waitForFinished(Cfg::COMMAND_EXIT_TIMEOUT);
+        }
     }
 }
 
@@ -558,8 +562,23 @@ void CommandWindow::startShell()
     if (shell) {
         // stop it reporting its own death: we are the ones ending it
         shell->disconnect(this);
+        // and end it before it is deleted: QProcess objects to being destroyed
+        // while its process is still running, and this one is
+        shell->kill();
+        shell->waitForFinished(Cfg::COMMAND_EXIT_TIMEOUT);
         delete shell;
     }
+    // Nothing known about the old shell holds for the new one: it has to be
+    // told the panel size again, and a partial line or a file reported by a
+    // command the old shell was still running must not be taken for its own.
+    running     = false;
+    priming     = false;
+    termcols    = 0;
+    termrows    = 0;
+    sizepending = true;
+    pending.clear();
+    pendingopen.clear();
+    pendingsetup.clear();
     shell = new QProcess(this);
     // one stream, so what the command wrote to stderr appears where it happened
     shell->setProcessChannelMode(QProcess::MergedChannels);
