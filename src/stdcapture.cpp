@@ -225,13 +225,17 @@ bool StdCapture::endCapture()
     m_captured = m_probeleftover;
     m_probeleftover.clear();
 
+    // Whatever wrote into the pipe has returned by the time this is called, so
+    // what is in it is all there will be: the first read that would block means
+    // the pipe is drained.  Waiting for more instead cost a full second on
+    // every empty pipe.  Only a read cut short by a signal is tried again.
     int bytesRead;
-    bool fd_blocked;
-    int maxwait = 100;
+    bool interrupted;
+    int retries = 100;
 
     do {
-        bytesRead  = 0;
-        fd_blocked = false;
+        bytesRead   = 0;
+        interrupted = false;
 
 #if defined(Q_OS_WIN32)
         if (pipe_has_data(m_pipe[READ])) {
@@ -244,13 +248,9 @@ bool StdCapture::endCapture()
             buf[bytesRead] = 0;
             m_captured += buf.data();
         } else if (bytesRead < 0) {
-            fd_blocked =
-                ((errno == EAGAIN) || (errno == EWOULDBLOCK) || (errno == EINTR)) && (maxwait > 0);
-
-            if (fd_blocked) std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            --maxwait;
+            interrupted = (errno == EINTR) && (--retries > 0);
         }
-    } while (fd_blocked || (bytesRead == (bufSize - 1)));
+    } while (interrupted || (bytesRead == (bufSize - 1)));
     m_capturing = false;
     return true;
 }
