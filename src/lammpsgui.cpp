@@ -988,29 +988,10 @@ void LammpsGui::newDocument()
     textEdit->document()->setModified(false);
     textEdit->setStyleSheet(bannerstyle);
 
-    if (lammps.isRunning()) {
-        stopRun();
-        runner->wait();
-        runner->deleteLater();
-        runner = nullptr;
-    }
-    // close windows
-    delete chartwindow;
-    delete logwindow;
-    delete slideshow;
-    delete imagewindow;
-    delete varwindow;
-    chartwindow = nullptr;
-    logwindow   = nullptr;
-    slideshow   = nullptr;
-    imagewindow = nullptr;
-    varwindow   = nullptr;
+    abortRun();
+    closeOutputWindows();
 
-    {
-        StdoutSilencer guard;
-        lammps.close();
-    }
-    lammpsstatus->hide();
+    closeLammpsInstance();
     updateEditorTitle(QString());
     runCounter = 0;
 }
@@ -1247,27 +1228,9 @@ void LammpsGui::openFile(const QString &fileName)
         }
     }
 
-    if (lammps.isRunning()) {
-        stopRun();
-        runner->wait();
-        runner->deleteLater();
-        runner = nullptr;
-    }
-    // close windows
-    delete chartwindow;
-    delete logwindow;
-    delete slideshow;
-    delete imagewindow;
-    delete varwindow;
-    chartwindow = nullptr;
-    logwindow   = nullptr;
-    slideshow   = nullptr;
-    imagewindow = nullptr;
-    varwindow   = nullptr;
-    {
-        StdoutSilencer guard;
-        lammps.close();
-    }
+    abortRun();
+    closeOutputWindows();
+    closeLammpsInstance();
 
     purgeInspectList();
     textEdit->setStyleSheet("");
@@ -1607,12 +1570,7 @@ void LammpsGui::saveAs()
 
 void LammpsGui::quit()
 {
-    if (lammps.isRunning()) {
-        stopRun();
-        runner->wait();
-        runner->deleteLater();
-        runner = nullptr;
-    }
+    abortRun();
 
     autoSave();
     if (textEdit->document()->isModified()) {
@@ -1706,12 +1664,7 @@ void LammpsGui::logUpdate()
         }
     }
 
-    // get timestep
-    int step = 0;
-    if (lammps.extractSetting("bigint") == 4)
-        step = lammps.lastThermoAs<int>("step", 0);
-    else
-        step = static_cast<int>(lammps.lastThermoAs<int64_t>("step", 0));
+    const int step = currentStep();
 
     // extract cached thermo data when LAMMPS is executing a minimize or run command;
     // never during a dry run, where a kept chart window belongs to a previous run
@@ -1736,6 +1689,56 @@ void LammpsGui::logUpdate()
 QString LammpsGui::decodeLog(const std::string &bytes)
 {
     return logDecoder.decode(QByteArrayView(bytes.data(), static_cast<qsizetype>(bytes.size())));
+}
+
+void LammpsGui::abortRun()
+{
+    if (!lammps.isRunning()) return;
+    stopRun();
+    runner->wait();
+    runner->deleteLater();
+    runner = nullptr;
+}
+
+void LammpsGui::closeLammpsInstance()
+{
+    {
+        StdoutSilencer guard;
+        lammps.close();
+    }
+    // the file given on the command line is opened before the status bar exists
+    if (lammpsstatus) lammpsstatus->hide();
+}
+
+void LammpsGui::closeOutputWindows()
+{
+    delete chartwindow;
+    delete logwindow;
+    delete slideshow;
+    delete imagewindow;
+    delete varwindow;
+    chartwindow = nullptr;
+    logwindow   = nullptr;
+    slideshow   = nullptr;
+    imagewindow = nullptr;
+    varwindow   = nullptr;
+}
+
+void LammpsGui::beginRunStatus(const QString &message)
+{
+    progress->setValue(0);
+    dirstatus->hide();
+    progress->show();
+    cpuuse->show();
+    lastCpuBucket = -1; // force the cpuuse stylesheet to be applied on the first poll
+    status->setText(message);
+    status->repaint();
+}
+
+int LammpsGui::currentStep()
+{
+    if (lammps.extractSetting("bigint") == 4) return lammps.lastThermoAs<int>("step", 0);
+    return static_cast<int>(lammps.lastThermoAs<int64_t>("step", 0));
 }
 
 int LammpsGui::updateRunStatus()
@@ -1918,11 +1921,7 @@ void LammpsGui::warnHighBufferUsage()
 void LammpsGui::finalizeChartData()
 {
     if (chartwindow) {
-        int step = 0;
-        if (lammps.extractSetting("bigint") == 4)
-            step = lammps.lastThermoAs<int>("step", 0);
-        else
-            step = static_cast<int>(lammps.lastThermoAs<int64_t>("step", 0));
+        const int step  = currentStep();
         const int ncols = lammps.lastThermoAs<int>("num", 0);
         // decide once before the loop: testing numCharts() per column would stop
         // creating charts as soon as the first addChart() call succeeded
@@ -2281,24 +2280,17 @@ void LammpsGui::doRun(bool use_buffer, bool dryrun)
     // read once here rather than on every poll of the run's output
     showSlides = settings.value(Keys::VIEWSLIDE, true).toBool();
 
-    progress->setValue(0);
-    dirstatus->hide();
-    progress->show();
-    cpuuse->show();
-    lastCpuBucket = -1; // force the cpuuse stylesheet to be applied on the first poll
-
     int numthreads = nthreads;
     int accel      = settings.value(Keys::ACCELERATOR, AcceleratorTab::OpenMP).toInt();
     if ((accel != AcceleratorTab::OpenMP) && (accel != AcceleratorTab::Intel) &&
         (accel != AcceleratorTab::Kokkos) && (accel != AcceleratorTab::Gpu))
         numthreads = 1;
     if (dryrun)
-        status->setText(QString("Checking input with a dry run ..."));
+        beginRunStatus("Checking input with a dry run ...");
     else if (numthreads > 1)
-        status->setText(QString("Running LAMMPS with %1 thread(s)...").arg(numthreads));
+        beginRunStatus(QString("Running LAMMPS with %1 thread(s)...").arg(numthreads));
     else
-        status->setText(QString("Running LAMMPS ..."));
-    status->repaint();
+        beginRunStatus("Running LAMMPS ...");
     startLammps();
     if (!lammps.isOpen()) return;
     capturer->beginCapture();
@@ -2395,13 +2387,7 @@ void LammpsGui::extendRun()
     extendSteps = nsteps;
 
     QSettings settings;
-    progress->setValue(0);
-    dirstatus->hide();
-    progress->show();
-    cpuuse->show();
-    lastCpuBucket = -1; // force the cpuuse stylesheet to be applied on the first poll
-    status->setText(QString("Extending run by %1 steps ...").arg(nsteps));
-    status->repaint();
+    beginRunStatus(QString("Extending run by %1 steps ...").arg(nsteps));
 
     capturer->beginCapture();
     logDecoder.resetState();
@@ -3098,17 +3084,8 @@ void LammpsGui::editVariables()
     if (vars.exec() == QDialog::Accepted) {
         variables = newvars;
         textEdit->setVariableOverrides(variables);
-        if (lammps.isRunning()) {
-            stopRun();
-            runner->wait();
-            runner->deleteLater();
-            runner = nullptr;
-        }
-        {
-            StdoutSilencer guard;
-            lammps.close();
-        }
-        lammpsstatus->hide();
+        abortRun();
+        closeLammpsInstance();
     }
 }
 
@@ -3147,17 +3124,8 @@ void LammpsGui::preferences()
             (oldcite != settings.value(Keys::CITE, false).toBool()) ||
             (oldgpuneigh != settings.value(Keys::GPUNEIGH, true).toBool()) ||
             (oldgpupair != settings.value(Keys::GPUPAIRONLY, false).toBool())) {
-            if (lammps.isRunning()) {
-                stopRun();
-                runner->wait();
-                runner->deleteLater();
-                runner = nullptr;
-            }
-            {
-                StdoutSilencer guard;
-                lammps.close();
-            }
-            lammpsstatus->hide();
+            abortRun();
+            closeLammpsInstance();
             // reset nthreads if accelerator does not support threads
             if ((newaccel == AcceleratorTab::Opt) || (newaccel == AcceleratorTab::None))
                 nthreads = 1;

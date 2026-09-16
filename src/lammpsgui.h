@@ -492,6 +492,22 @@ private:
     /** @brief Decode the next chunk of captured output as part of one UTF-8 stream */
     QString decodeLog(const std::string &bytes);
 
+    /** @brief End a running simulation and dispose of its runner thread */
+    void abortRun();
+
+    /** @brief Close the LAMMPS instance quietly and clear its status indicator */
+    void closeLammpsInstance();
+
+    /** @brief Delete the output windows of the current input (charts, log, slide show, image,
+     * variables) */
+    void closeOutputWindows();
+
+    /** @brief Show the run progress widgets in the status bar with the given message */
+    void beginRunStatus(const QString &message);
+
+    /** @brief The current time step, whatever the width of the library's bigint */
+    int currentStep();
+
     /**
      * @brief Put the focused view's own menu at the front of the menu bar
      * @param focused Widget that just took the keyboard focus
