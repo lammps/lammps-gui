@@ -153,16 +153,8 @@ void StdCapture::verifyCapture()
     // at once; the loop only covers scheduling noise
     std::string got;
     for (int wait = 0; wait < 100; ++wait) {
-        int bytesRead = 0;
-#if defined(Q_OS_WIN32)
-        if (pipe_has_data(m_pipe[READ])) bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#else
-        bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#endif
-        if (bytesRead > 0) {
-            buf[bytesRead] = 0;
-            got += buf.data();
-        }
+        const int bytesRead = readPipe();
+        if (bytesRead > 0) got.append(buf.data(), bytesRead);
         if (static_cast<int>(got.size()) >= len) break;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
@@ -191,16 +183,8 @@ std::string StdCapture::probeRunEnd()
 
     std::string got;
     for (int wait = 0; wait < 100; ++wait) {
-        int bytesRead = 0;
-#if defined(Q_OS_WIN32)
-        if (pipe_has_data(m_pipe[READ])) bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#else
-        bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#endif
-        if (bytesRead > 0) {
-            buf[bytesRead] = 0;
-            got += buf.data();
-        }
+        const int bytesRead = readPipe();
+        if (bytesRead > 0) got.append(buf.data(), bytesRead);
         if (got.find(marker) != std::string::npos) break;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
@@ -237,16 +221,9 @@ bool StdCapture::endCapture()
         bytesRead   = 0;
         interrupted = false;
 
-#if defined(Q_OS_WIN32)
-        if (pipe_has_data(m_pipe[READ])) {
-            bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-        }
-#else
-        bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#endif
+        bytesRead = readPipe();
         if (bytesRead > 0) {
-            buf[bytesRead] = 0;
-            m_captured += buf.data();
+            m_captured.append(buf.data(), bytesRead);
         } else if (bytesRead < 0) {
             interrupted = (errno == EINTR) && (--retries > 0);
         }
@@ -255,23 +232,19 @@ bool StdCapture::endCapture()
     return true;
 }
 
+int StdCapture::readPipe()
+{
+#if defined(Q_OS_WIN32)
+    if (!pipe_has_data(m_pipe[READ])) return 0;
+#endif
+    return read(m_pipe[READ], buf.data(), bufSize - 1);
+}
+
 std::string StdCapture::getChunk()
 {
     if (!m_capturing) return {};
-    int bytesRead = 0;
-    buf[0]        = '\0';
-
-#if defined(Q_OS_WIN32)
-    if (pipe_has_data(m_pipe[READ])) {
-        bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-    }
-#else
-    bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#endif
-    if (bytesRead > 0) {
-        buf[bytesRead] = '\0';
-        m_totalread += bytesRead;
-    }
+    const int bytesRead = readPipe();
+    if (bytesRead > 0) m_totalread += bytesRead;
     maxread = (maxread > bytesRead) ? maxread : bytesRead;
     // by length, not up to a NUL: no scan of the buffer, and a stray NUL byte
     // in the output cannot swallow what follows it
