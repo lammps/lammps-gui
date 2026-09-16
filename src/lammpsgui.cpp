@@ -2455,23 +2455,13 @@ bool LammpsGui::plotFile(const QString &fileName)
     }
 
     QString error;
-    // the block-structured output of the fix ave/* styles is not a flat table
-    // and gets the import dialog that can reduce it to one
-    const PlotBlockData blocks = loadPlotBlockData(fileName);
-    PlotData data;
-    if (blocks.isEmpty()) {
-        data = loadPlotData(fileName, &error);
-        if (data.isEmpty()) {
-            critical(this, "Plot Data File",
-                     "Could not read data from file:", error.isEmpty() ? fileName : error);
-            // the file was the problem, not the user, so a caller with more of
-            // them carries on to the next
-            return true;
-        }
+    auto dialog = PlotDataDialog::fromFile(fileName, this, &error);
+    if (!dialog) {
+        critical(this, "Plot Data File", "Could not read data from file:", error);
+        // the file was the problem, not the user, so a caller with more of
+        // them carries on to the next
+        return true;
     }
-
-    auto dialog = blocks.isEmpty() ? std::make_unique<PlotDataDialog>(data, this)
-                                   : std::make_unique<PlotDataDialog>(blocks, this);
     if (dialog->exec() != QDialog::Accepted) return false;
     const QList<int> ycols = dialog->yColumns();
     if (ycols.isEmpty()) {

@@ -19,6 +19,7 @@
 #include <QList>
 #include <QPair>
 #include <QStringList>
+#include <memory>
 
 class QButtonGroup;
 class QCheckBox;
@@ -78,6 +79,22 @@ public:
      * "Data blocks" group then lets the user change.
      */
     explicit PlotDataDialog(const PlotBlockData &blocks, QWidget *parent = nullptr);
+
+    /**
+     * @brief Read a data file and build the column dialog for it
+     *
+     * The block-structured output of the fix ave/* styles is tried first,
+     * since it is not a flat table and gets the dialog that can reduce it to
+     * one; anything else goes through the flat-file parsers.
+     *
+     * @param fileName  File to read
+     * @param parent    Parent widget of the dialog
+     * @param error     Receives what the parsers reported, or the file name
+     *                  when they reported nothing; untouched on success
+     * @return The dialog, or nullptr when the file could not be read
+     */
+    static std::unique_ptr<PlotDataDialog> fromFile(const QString &fileName, QWidget *parent,
+                                                    QString *error);
 
     ~PlotDataDialog() override = default;
 

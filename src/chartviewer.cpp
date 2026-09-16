@@ -1620,21 +1620,11 @@ void ChartWindow::addDataFile()
     if (fileName.isEmpty()) return;
 
     QString error;
-    // fix ave/* output is block structured and gets the import dialog that can
-    // reduce it to a flat table first
-    const PlotBlockData blocks = loadPlotBlockData(fileName);
-    PlotData data;
-    if (blocks.isEmpty()) {
-        data = loadPlotData(fileName, &error);
-        if (data.isEmpty()) {
-            critical(this, "Add Data from File",
-                     "Could not read data from file:", error.isEmpty() ? fileName : error);
-            return;
-        }
+    auto dialog = PlotDataDialog::fromFile(fileName, this, &error);
+    if (!dialog) {
+        critical(this, "Add Data from File", "Could not read data from file:", error);
+        return;
     }
-
-    auto dialog = blocks.isEmpty() ? std::make_unique<PlotDataDialog>(data, this)
-                                   : std::make_unique<PlotDataDialog>(blocks, this);
     if (dialog->exec() != QDialog::Accepted) return;
     const PlotData plotData  = dialog->buildData();
     const PlotErrors plotErr = dialog->buildErrors();

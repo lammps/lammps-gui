@@ -583,6 +583,21 @@ void PlotDataDialog::computeColumn()
 
 /* -------------------------------------------------------------------- */
 
+std::unique_ptr<PlotDataDialog> PlotDataDialog::fromFile(const QString &fileName, QWidget *parent,
+                                                         QString *error)
+{
+    const PlotBlockData blocks = loadPlotBlockData(fileName);
+    if (!blocks.isEmpty()) return std::make_unique<PlotDataDialog>(blocks, parent);
+
+    QString why;
+    const PlotData data = loadPlotData(fileName, &why);
+    if (data.isEmpty()) {
+        if (error) *error = why.isEmpty() ? fileName : why;
+        return nullptr;
+    }
+    return std::make_unique<PlotDataDialog>(data, parent);
+}
+
 int PlotDataDialog::xColumn() const
 {
     const int id = xgroup->checkedId();
