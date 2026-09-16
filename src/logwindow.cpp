@@ -146,25 +146,14 @@ void LogWindow::createMenuBar()
     file->addAction(closeAct);
     file->addAction(quitAct);
 
-    if (dockedLayout()) {
-        // the main window shows this menu for us while the panel has the focus
-        retireViewMenuBar(menubar);
-        return;
-    }
-    menubar->addMenu(file);
-    if (lammpsgui)
-        for (auto *shared : lammpsgui->sharedMenus())
-            menubar->addMenu(shared);
-    setViewportMargins(0, menubar->sizeHint().height(), 0, 0);
+    if (installViewMenuBar(menubar, file, lammpsgui ? lammpsgui->sharedMenus() : QList<QMenu *>()))
+        setViewportMargins(0, menubar->sizeHint().height(), 0, 0);
 }
 
 void LogWindow::resizeEvent(QResizeEvent *event)
 {
     QPlainTextEdit::resizeEvent(event);
-    if (menubar && !menubar->isHidden()) {
-        const QRect cr = contentsRect();
-        menubar->setGeometry(cr.left(), cr.top(), cr.width(), menubar->sizeHint().height());
-    }
+    layoutViewMenuBar(this, menubar);
 }
 
 // warnings and summary are Qt-parented and cleaned up by their parents

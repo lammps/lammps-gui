@@ -124,24 +124,14 @@ void FileViewer::createMenuBar()
     // without a main window there is nothing to quit; closing is all there is
     if (!lammpsgui) quitAct->setVisible(false);
 
-    if (dockedLayout()) {
-        // the main window shows this menu for us while the panel has the focus
-        retireViewMenuBar(menubar);
-        return;
-    }
-    menubar->addMenu(file);
-    if (lammpsgui)
-        for (auto *shared : lammpsgui->sharedMenus())
-            menubar->addMenu(shared);
-    setViewportMargins(0, menubar->sizeHint().height(), 0, 0);
+    if (installViewMenuBar(menubar, file, lammpsgui ? lammpsgui->sharedMenus() : QList<QMenu *>()))
+        setViewportMargins(0, menubar->sizeHint().height(), 0, 0);
 }
 
 void FileViewer::resizeEvent(QResizeEvent *event)
 {
     QPlainTextEdit::resizeEvent(event);
-    if (!menubar || menubar->isHidden()) return;
-    const QRect cr = contentsRect();
-    menubar->setGeometry(cr.left(), cr.top(), cr.width(), menubar->sizeHint().height());
+    layoutViewMenuBar(this, menubar);
 }
 
 // Docked, this widget inherits the main window's proportional font and

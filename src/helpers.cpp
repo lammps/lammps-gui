@@ -858,6 +858,26 @@ void retireViewMenuBar(QMenuBar *menubar)
     menubar->hide();
 }
 
+bool installViewMenuBar(QMenuBar *menubar, QMenu *file, const QList<QMenu *> &shared)
+{
+    if (!menubar) return false;
+    if (dockedLayout()) {
+        retireViewMenuBar(menubar);
+        return false;
+    }
+    if (file) menubar->addMenu(file);
+    for (auto *menu : shared)
+        menubar->addMenu(menu);
+    return true;
+}
+
+void layoutViewMenuBar(QWidget *view, QMenuBar *menubar)
+{
+    if (!view || !menubar || menubar->isHidden()) return;
+    const QRect cr = view->contentsRect();
+    menubar->setGeometry(cr.left(), cr.top(), cr.width(), menubar->sizeHint().height());
+}
+
 // Local Variables:
 // c-basic-offset: 4
 // End:

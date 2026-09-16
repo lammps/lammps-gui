@@ -663,14 +663,7 @@ void SlideShow::createMenuBar()
     scopeShortcut(this, quitAct, QKeySequence(Qt::CTRL | Qt::Key_Q));
     if (!lammpsgui) quitAct->setVisible(false); // quit == close in standalone mode
 
-    if (dockedLayout()) {
-        retireViewMenuBar(menubar);
-    } else {
-        menubar->addMenu(file);
-        if (lammpsgui)
-            for (auto *shared : lammpsgui->sharedMenus())
-                menubar->addMenu(shared);
-    }
+    installViewMenuBar(menubar, file, lammpsgui ? lammpsgui->sharedMenus() : QList<QMenu *>());
 }
 
 void SlideShow::quit()

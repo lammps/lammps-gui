@@ -553,15 +553,7 @@ void CommandWindow::createMenuBar()
     scopeShortcut(this, quitAct, QKeySequence(Qt::CTRL | Qt::Key_Q));
     if (!lammpsgui) quitAct->setVisible(false);
 
-    if (dockedLayout()) {
-        // the main window shows this menu for us while the panel has the focus
-        retireViewMenuBar(menubar);
-        return;
-    }
-    menubar->addMenu(file);
-    if (lammpsgui)
-        for (auto *shared : lammpsgui->sharedMenus())
-            menubar->addMenu(shared);
+    installViewMenuBar(menubar, file, lammpsgui ? lammpsgui->sharedMenus() : QList<QMenu *>());
 }
 
 void CommandWindow::startShell()

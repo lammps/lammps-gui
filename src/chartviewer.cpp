@@ -328,19 +328,7 @@ ChartWindow::ChartWindow(const QString &_filename, LammpsGui *_lammpsgui, QWidge
     top->setSpacing(LAYOUT_SPACING);
 
     file->setObjectName(Cfg::VIEW_FILE_MENU);
-    if (dockedLayout()) {
-        // docked, the main window carries one menu bar for all panels and puts
-        // this menu at its front while the panel has the focus
-        retireViewMenuBar(menu);
-    } else {
-        menu->addMenu(file);
-        // the application-wide menus are the main window's own objects, so a run
-        // can be started or stopped from here without a second set of actions to
-        // keep in step (and without a second binding for their accelerators)
-        if (lammpsgui)
-            for (auto *shared : lammpsgui->sharedMenus())
-                menu->addMenu(shared);
-    }
+    installViewMenuBar(menu, file, lammpsgui ? lammpsgui->sharedMenus() : QList<QMenu *>());
     menu->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     // workaround for incorrect highlight bug on macOS
