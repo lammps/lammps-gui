@@ -61,15 +61,6 @@ mirrors the console workflow, LAMMPS-GUI removes this barrier, letting
 instructors teach one interface on all platforms and focus on LAMMPS and
 molecular dynamics itself.
 
-![A LAMMPS-GUI session with a simulation in flight, in the individual
-window mode (left) and the combined window mode (right). The editor
-shows syntax highlighting, line numbers, and a marker on the current
-input line; the status bar shows CPU utilization and run progress; the
-Image Viewer shows the starting geometry, the Output window the screen
-output, and the Charts window a live plot of a thermodynamic column. In
-the combined window mode these views are tabs beside and below the
-editor.\label{fig:editor}](images/lammps-gui-screen.png){ width=99% }
-
 # State of the field
 
 Other approaches to making LAMMPS more accessible exist, but they target
@@ -92,16 +83,25 @@ visualizing selected components, and interactive construction of
 reproducible `dump image` commands also make it useful to experienced
 researchers.
 
+![A LAMMPS-GUI session with a simulation in flight, in the individual
+window mode (left) and the combined window mode (right). The editor
+shows syntax highlighting, line numbers, and a marker on the current
+input line; the status bar shows CPU utilization and run progress; the
+Image Viewer shows the starting geometry, the Output window the screen
+output, and the Charts window a live plot of a thermodynamic column. In
+the combined window mode these views are tabs beside and below the
+editor.\label{fig:editor}](images/lammps-gui-screen.png){ width=99% }
+
 # Software design and functionality
 
 LAMMPS-GUI follows an object-oriented design in which a central window
 coordinates largely self-contained components, all access to LAMMPS
 being funneled through a single adapter class.  Two viewing modes are
-offered: the original individual window mode, where every component is
-a window of its own, and a recently added combined window mode, where
-the views are docked as tabbed panels beside and below the editor in
-one main window, separated by movable splitters.  Key capabilities of
-LAMMPS-GUI include:
+offered (see \autoref{fig:editor}): the original individual window mode,
+where every component is a window of its own, and a recently added
+combined window mode, where the views are docked as tabbed panels beside
+and below the editor in one main window, separated by movable splitters.
+Key capabilities of LAMMPS-GUI include:
 
 - **Editing.** A LAMMPS-aware editor with syntax highlighting,
   per-command-category auto-completion, in-place documentation lookup,
