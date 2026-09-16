@@ -512,14 +512,14 @@ There are two ways to reduce the blocks:
    Show one block as it stands, by default the last one.
 
 The error bars are the standard deviation of the blocks by default.  The
-standard error of the mean, the *min/max of the blocks*, and no error bars
-at all are the other choices.  Note that successive averaging windows are
-not strictly independent, so the standard error of the mean is a *lower
-bound* on the true uncertainty rather than the uncertainty itself.  The
-min/max choice makes no statistical claim: the bar simply spans the
-smallest to the largest value any of the averaged blocks had for that row,
-so it usually reaches further in one direction than in the other.  Error
-bars need at least two blocks to average.
+standard error of the mean, the *min/max of the blocks*, and no error
+bars at all are the other choices.  Note that successive averaging
+windows are not strictly independent, so the standard error of the mean
+is a *lower bound* on the true uncertainty rather than the uncertainty
+itself.  The min/max choice makes no statistical claim: the bar simply
+spans the smallest to the largest value any of the averaged blocks had
+for that row, so it usually reaches further in one direction than in the
+other.  Error bars need at least two blocks to average.
 
 How the bars are drawn -- their color and line width -- is set in the
 *Chart Style...* dialog of the chart window, and its defaults are in the
@@ -530,37 +530,39 @@ or a correlation function starts out averaged over the whole file, since
 its evolution over time is rarely what is wanted.  A correlator that
 accumulates over the whole run does not: for ``fix ave/correlate/long``,
 and for ``fix ave/correlate`` with ``ave running``, every block is a
-successive estimate of the same quantity rather than an independent sample
-of it, so averaging the blocks would be statistically wrong and the last
-block is the answer.  That case is recognized from a sample count that
-grows from block to block.
+successive estimate of the same quantity rather than an independent
+sample of it, so averaging the blocks would be statistically wrong and
+the last block is the answer.  That case is recognized from a sample
+count that grows from block to block.
 
 The columns that are preselected also follow from the format: the bin
 coordinate against the *normalized* bin count for a histogram (the
-per-block totals differ, so that is the column that may be averaged), the
-time delta against the correlation columns for a correlation function.
+per-block totals differ, so that is the column that may be averaged),
+the time delta against the correlation columns for a correlation
+function.
 
 A ``fix ave/chunk`` file is preselected only when its chunks form a
 *profile*, that is when they vary along a single coordinate: a chart has
 one x axis, and a two- or three-dimensional grid of chunks has no
-meaningful projection onto it.  That is decided from the coordinate values
-in the file rather than from the binning style, which the file does not
-record, so a ``bin/1d`` or ``bin/sphere`` profile always qualifies, and a
-``bin/cylinder`` or ``bin/2d`` run that used a single bin in its other
-dimension qualifies as well -- the varying coordinate becomes the x axis.
-Chunks that are a real grid, and chunks that are not bins at all (by
-molecule, by type, or from a compute), are still imported in full; they
-just get the same generic column defaults as any other block file.
+meaningful projection onto it.  That is decided from the coordinate
+values in the file rather than from the binning style, which the file
+does not record, so a ``bin/1d`` or ``bin/sphere`` profile always
+qualifies, and a ``bin/cylinder`` or ``bin/2d`` run that used a single
+bin in its other dimension qualifies as well -- the varying coordinate
+becomes the x axis.  Chunks that are a real grid, and chunks that are
+not bins at all (by molecule, by type, or from a compute), are still
+imported in full; they just get the same generic column defaults as any
+other block file.
 
 The *Format* combo shows what the file was recognized as, and can be
 corrected.  Recognition uses the file's own header comments, which the
-``title1``, ``title2`` and ``title3`` keywords let you replace, so it can
-be wrong; when the headers are missing the format is recovered from the
-block structure instead.  Correcting the format only moves the
-preselected reduction and columns.  It never reinterprets the data, which
-was read before the dialog opened, and no reduction ever discards a column
--- a misrecognized file plots just as completely, only with different
-columns preselected.
+``title1``, ``title2`` and ``title3`` keywords let you replace, so it
+can be wrong; when the headers are missing the format is recovered from
+the block structure instead.  Correcting the format only moves the
+preselected reduction and columns.  It never reinterprets the data,
+which was read before the dialog opened, and no reduction ever discards
+a column -- a misrecognized file plots just as completely, only with
+different columns preselected.
 
 Changing the reduction rebuilds the column list below it.  Column roles,
 edited names, and derived columns are kept across that: the derived
@@ -571,14 +573,9 @@ with an expression such as ``{TimeDelta}*0.001``.
 
 Error bars, once imported, behave like the rest of the chart data:
 smoothing operates on the values alone and leaves the bars on the raw
-series, the axis range covers them, and exporting the chart writes them as
-an extra ``<name>-err`` column next to the values they belong to.  Reading
-such an exported file back in simply gives one more data column.
-
-The output of `fix ave/chunk
-<https://docs.lammps.org/fix_ave_chunk.html>`_ has the same block
-structure and imports through the same path, but has no preselected
-columns or reduction of its own yet.
+series, the axis range covers them, and exporting the chart writes them
+as an extra ``<name>-err`` column next to the values they belong to.
+Reading such an exported file back in simply gives one more data column.
 
 The *Preferences* dialog has a *Charts* tab, where you can configure
 multiple chart-related settings, like the default title, colors for the
@@ -590,9 +587,9 @@ Here is a simple example for reproducing the radial distribution
 function g(r) and the Maxwell-Boltzmann distribution of the kinetic
 energy in a liquid LJ model.  This uses the following input with `fix
 ave/time <https://docs.lammps.org/fix_ave_time.html>`_ and `fix
-ave/histo <https://docs.lammps.org/fix_ave_histo.html>`_ where the
-first block of averaged data is skipped as equilibration data and
-the rest is presented as a plot of the average with standard deviation:
+ave/histo <https://docs.lammps.org/fix_ave_histo.html>`_ where the first
+block of averaged data is skipped as equilibration data and the rest is
+presented as a plot of the average with standard deviation:
 
 .. code-block:: LAMMPS
 

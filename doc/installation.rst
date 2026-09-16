@@ -113,7 +113,7 @@ with ``-p ""`` and re-download the latest version.
 
 .. versionchanged:: 3.1
 
-   The minimum LAMMPS version required by LAMMPS-GUI is now 27 August 2026
+   The minimum LAMMPS version required by LAMMPS-GUI is now 2 September 2026
 
 GPU support and MPI parallelization
 -----------------------------------
