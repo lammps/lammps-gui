@@ -676,6 +676,7 @@ private:
     QString pluginPath;                  ///< Path to LAMMPS shared library (plugin mode)
     QString capturewarning;              ///< Library-side capture check result for this run
     int runCounter;                      ///< Counter for simulation runs
+    bool showSlides = true;              ///< Show the slide show when a run writes images
     int extendSteps;                     ///< Last used step count of the Extend Run dialog
     std::vector<std::string> lammpsArgs; ///< Command-line arguments for LAMMPS
 

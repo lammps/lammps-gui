@@ -1859,15 +1859,18 @@ void LammpsGui::updateSlideShow()
     QString imagefile = lammps.lastThermoString("imagename", 0);
     if (imagefile.isEmpty()) return;
 
-    const bool showslides = QSettings().value(Keys::VIEWSLIDE, true).toBool();
     if (!slideshow) {
         slideshow = new SlideShow(currentFile, this);
         viewlayout->place(ViewSlot::SlideShow, slideshow);
-        viewlayout->setVisible(ViewSlot::SlideShow, showslides);
+        viewlayout->setVisible(ViewSlot::SlideShow, showSlides);
     } else {
         slideshow->setWindowTitle(
             QString("LAMMPS-GUI - Slide Show - %1 - Run %2").arg(currentFile).arg(runCounter));
-        if (showslides) viewlayout->show(ViewSlot::SlideShow);
+        // this runs on every poll of the run's output once an image exists, and
+        // showing a view that is visible already would still re-lay out the
+        // docked panels each time
+        if (showSlides && !viewlayout->isVisible(ViewSlot::SlideShow))
+            viewlayout->show(ViewSlot::SlideShow);
     }
     slideshow->addImage(imagefile);
 }
@@ -2277,6 +2280,8 @@ void LammpsGui::doRun(bool use_buffer, bool dryrun)
     // pre-run input check: only error findings gate the run; a dry run
     // needs no gate since it is itself the check
     if (!dryrun && settings.value(Keys::LINTCHECK, true).toBool() && !confirmLintIssues()) return;
+    // read once here rather than on every poll of the run's output
+    showSlides = settings.value(Keys::VIEWSLIDE, true).toBool();
 
     progress->setValue(0);
     dirstatus->hide();
