@@ -77,6 +77,7 @@ set(PROJECT_SOURCES
   ${CMAKE_SOURCE_DIR}/src/plotblockdata.h
   ${CMAKE_SOURCE_DIR}/src/plotdata.cpp
   ${CMAKE_SOURCE_DIR}/src/plotdata.h
+  ${CMAKE_SOURCE_DIR}/src/plotdata_internal.h
   ${CMAKE_SOURCE_DIR}/src/plotdatadialog.cpp
   ${CMAKE_SOURCE_DIR}/src/plotdatadialog.h
   ${CMAKE_SOURCE_DIR}/src/preferences.cpp

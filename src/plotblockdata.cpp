@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include "plotblockdata.h"
+#include "plotdata_internal.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -22,63 +23,6 @@
 
 namespace {
 
-// Whitespace splitter shared by the line scanners.
-const QRegularExpression &wsRe()
-{
-    static const QRegularExpression re("\\s+");
-    return re;
-}
-
-// Whitespace-separated numbers on a line, read without a regular expression
-// and without a string per field.  Returns false at the first field that is
-// not a number, which is how comment text and stray log output are told apart
-// from data, and false for a line without fields.
-bool numericFields(QStringView line, std::vector<double> &row)
-{
-    row.clear();
-    const qsizetype n = line.size();
-    qsizetype i       = 0;
-    while (i < n) {
-        while ((i < n) && line[i].isSpace())
-            ++i;
-        if (i >= n) break;
-        qsizetype j = i;
-        while ((j < n) && !line[j].isSpace())
-            ++j;
-        bool good      = false;
-        const double d = line.mid(i, j - i).toDouble(&good);
-        if (!good) return false;
-        row.push_back(d);
-        i = j;
-    }
-    return !row.empty();
-}
-
-// Whether some line of the text, less leading whitespace, starts with the
-// prefix -- without splitting the text into a list of lines first.
-bool anyLineStartsWith(const QString &text, QLatin1String prefix)
-{
-    QStringView rest(text);
-    while (!rest.isEmpty()) {
-        const qsizetype nl     = rest.indexOf(u'\n');
-        const QStringView line = (nl < 0 ? rest : rest.left(nl)).trimmed();
-        if (line.startsWith(prefix)) return true;
-        if (nl < 0) break;
-        rest = rest.mid(nl + 1);
-    }
-    return false;
-}
-
-// Placeholder names matching those of the flat parsers in plotdata.cpp.
-QStringList genericNames(int ncol)
-{
-    QStringList names;
-    names.reserve(ncol);
-    for (int i = 0; i < ncol; ++i)
-        names << QStringLiteral("column%1").arg(i + 1);
-    return names;
-}
-
 // From a run of comment lines (the leading '#' already stripped), return the
 // fields of the last one that has exactly @p count of them.
 //
@@ -89,7 +33,7 @@ QStringList genericNames(int ncol)
 QStringList commentWithFields(const QStringList &comments, int count)
 {
     for (auto it = comments.crbegin(); it != comments.crend(); ++it) {
-        const QStringList fields = it->split(wsRe(), Qt::SkipEmptyParts);
+        const QStringList fields = it->split(whitespaceRe(), Qt::SkipEmptyParts);
         if (fields.size() == count) return fields;
     }
     return {};
@@ -170,27 +114,6 @@ QString detectFixId(const QString &firstComment)
     return match.hasMatch() ? match.captured(1) : QString();
 }
 
-// Strip a single layer of matching quotes from a YAML token.
-QString unquote(QString t)
-{
-    t = t.trimmed();
-    if (t.size() >= 2) {
-        const QChar f = t.front();
-        const QChar l = t.back();
-        if ((f == l) && ((f == '\'') || (f == '"'))) t = t.mid(1, t.size() - 2);
-    }
-    return t.trimmed();
-}
-
-// Text between the first '[' and the last ']' (empty if not found).
-QString bracketContents(const QString &s)
-{
-    const int a = s.indexOf('[');
-    const int b = s.lastIndexOf(']');
-    if ((a < 0) || (b < 0) || (b <= a)) return {};
-    return s.mid(a + 1, b - a - 1);
-}
-
 } // namespace
 
 /* -------------------------------------------------------------------- */
@@ -247,7 +170,7 @@ PlotBlockData parseAveBlocks(const QString &text, QString *error)
     // is as wide as its rows.
     auto startRows = [&](int width) {
         QStringList names = commentWithFields(sectionComments, width);
-        if (names.isEmpty()) names = genericNames(width);
+        if (names.isEmpty()) names = genericColumnNames(width);
         cur.rows.setColumnNames(names);
         rowWidth = width;
     };
