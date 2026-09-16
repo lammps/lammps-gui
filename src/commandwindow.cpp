@@ -34,6 +34,7 @@
 #include <QPlainTextEdit>
 #include <QProcessEnvironment>
 #include <QPushButton>
+#include <QRandomGenerator>
 #include <QSet>
 #include <QSettings>
 #include <QStandardPaths>
@@ -55,6 +56,11 @@ namespace {
 // the working directory as well, which is how the prompt learns about cd,
 // pushd/popd, or a directory change made inside a sourced script -- parsing the
 // typed line would miss all of those.
+//
+// This is only the start of the mark: startShell() completes it with a suffix
+// unique to the session.  A fixed string could be printed by a command -- a
+// grep over this very source file, say -- and would pass for the real thing,
+// which frees the prompt while the command is still running.
 constexpr auto SENTINEL = "__LGUI_DONE_";
 
 // The commands the panel adds are the shell's half of a viewer: each prints one
@@ -64,7 +70,8 @@ constexpr auto SENTINEL = "__LGUI_DONE_";
 // for any other command, and they work in a pipeline or a loop like any other.
 //
 // The line reads "<mark><what>_<file>", and what follows the first underscore is
-// the file, spaces and all, exactly as with the sentinel.
+// the file, spaces and all, exactly as with the sentinel -- whose session suffix
+// this start of a mark is completed with as well.
 constexpr auto OPENMARK = "__LGUI_OPEN_";
 
 // The commands themselves, and the word each puts in its marker.  None of them
@@ -199,7 +206,7 @@ QString aliasCommand(const QString &program, const ShellAlias &alias)
 // plotutils installs a "plot", so this is not a formality -- where the name is
 // taken the command that was there keeps working and only the prefixed name is
 // added, which is defined either way.
-QStringList viewerCommands(const QString &program, const Viewer &viewer)
+QStringList viewerCommands(const QString &program, const Viewer &viewer, const QString &mark)
 {
     const QString name     = QString::fromLatin1(viewer.name);
     const QString what     = QString::fromLatin1(viewer.what);
@@ -213,7 +220,7 @@ QStringList viewerCommands(const QString &program, const Viewer &viewer)
             // line, so there is no loop to be had here -- but none is needed:
             // printf repeats its format until the arguments run out.  \!* is
             // how a csh alias passes them on, and "which" is its "command -v".
-            const QString body = QStringLiteral("'printf \"%1%2_%s\\n\" \\!*'").arg(OPENMARK, what);
+            const QString body = QStringLiteral("'printf \"%1%2_%s\\n\" \\!*'").arg(mark, what);
             return {QStringLiteral("alias %1 %2").arg(prefixed, body),
                     QStringLiteral("which %1 >& /dev/null || alias %1 %2").arg(name, body)};
         }
@@ -227,7 +234,7 @@ QStringList viewerCommands(const QString &program, const Viewer &viewer)
             const QString helper = QStringLiteral("__lgui_") + what;
             return {QStringLiteral("%1() { if [ \"$#\" -gt 0 ]; then "
                                    "printf '%2%3_%s\\n' \"$@\"; fi; }")
-                        .arg(helper, OPENMARK, what),
+                        .arg(helper, mark, what),
                     QStringLiteral("alias %1='%2'").arg(prefixed, helper),
                     QStringLiteral("command -v %1 >/dev/null 2>&1 || %1() { %2 \"$@\"; }")
                         .arg(name, helper)};
@@ -235,22 +242,22 @@ QStringList viewerCommands(const QString &program, const Viewer &viewer)
     }
 }
 
-QString sentinelCommand(const QString &program)
+QString sentinelCommand(const QString &program, const QString &mark)
 {
     switch (shellKind(program)) {
         case ShellKind::Cmd:
-            return QStringLiteral("echo %1%%errorlevel%%_%%CD%%").arg(SENTINEL);
+            return QStringLiteral("echo %1%%errorlevel%%_%%CD%%").arg(mark);
         case ShellKind::Csh:
             // echo is a builtin and sets a status of its own, so the one being
             // reported has to be put aside before the first of them runs
             return QStringLiteral("set _lgstatus = $status ; echo \"\" ;"
                                   " echo \"%1${_lgstatus}_${cwd}\"")
-                .arg(SENTINEL);
+                .arg(mark);
         default:
             // the leading newline puts the sentinel on a line of its own even
             // when the command's output did not end with one; PWD last so a
             // path with spaces in it survives being read to the end of the line
-            return QStringLiteral("printf '\\n%1%s_%s\\n' \"$?\" \"$PWD\"").arg(SENTINEL);
+            return QStringLiteral("printf '\\n%1%s_%s\\n' \"$?\" \"$PWD\"").arg(mark);
     }
 }
 
@@ -605,6 +612,11 @@ void CommandWindow::startShell()
     // the guard most rc files open with would bail out even if it did not.
     shellprogram          = preferredShell();
     const QString program = shellprogram;
+    // marks of this session's own, so that no output can pass for one
+    const QString nonce = QString::number(QRandomGenerator::global()->generate(), 16)
+                              .rightJustified(8, QLatin1Char('0'));
+    sentinel = QLatin1String(SENTINEL) + nonce + QLatin1Char('_');
+    openmark = QLatin1String(OPENMARK) + nonce + QLatin1Char('_');
 #if !defined(Q_OS_WIN32)
     // put the shell in a session of its own, so a signal can be sent to it and
     // to whatever it is running rather than to this application
@@ -637,12 +649,12 @@ void CommandWindow::startShell()
     // than no command at all
     if (lammpsgui) {
         for (const auto &viewer : VIEWERS) {
-            for (const auto &command : viewerCommands(program, viewer))
+            for (const auto &command : viewerCommands(program, viewer, openmark))
                 shell->write(qPrintable(command + "\n"));
         }
     }
     // ask where we are, so the prompt is right before anything is typed
-    shell->write(qPrintable(sentinelCommand(program) + "\n"));
+    shell->write(qPrintable(sentinelCommand(program, sentinel) + "\n"));
 }
 
 void CommandWindow::editAliases()
@@ -724,11 +736,11 @@ void CommandWindow::changeDirectory(const QString &dir)
     // a line written now would be read by the running command, not the shell;
     // the queue is flushed when the sentinel says the shell is at a prompt
     if (running) {
-        pendingsetup << command << sentinelCommand(shellprogram);
+        pendingsetup << command << sentinelCommand(shellprogram, sentinel);
         return;
     }
     shell->write(qPrintable(command + "\n"));
-    shell->write(qPrintable(sentinelCommand(shellprogram) + "\n"));
+    shell->write(qPrintable(sentinelCommand(shellprogram, sentinel) + "\n"));
 }
 
 // The shell starts where the input file is and stays independent afterwards: a
@@ -772,7 +784,7 @@ void CommandWindow::submit()
     running = true;
     updatePrompt();
     shell->write(qPrintable(line + "\n"));
-    shell->write(qPrintable(sentinelCommand(shellprogram) + "\n"));
+    shell->write(qPrintable(sentinelCommand(shellprogram, sentinel) + "\n"));
 }
 
 void CommandWindow::readOutput()
@@ -794,18 +806,18 @@ void CommandWindow::consume(const QString &chunk)
         // "open" reports one file per line; collect them and show them once the
         // command that produced them is done, so that a single "open *.png"
         // becomes one slide show rather than one per file
-        const int want = line.indexOf(OPENMARK);
+        const int want = line.indexOf(openmark);
         if (want >= 0) {
-            pendingopen << line.mid(want + int(qstrlen(OPENMARK)));
+            pendingopen << line.mid(want + openmark.size());
             nl = pending.indexOf('\n');
             continue;
         }
 
-        const int mark = line.indexOf(SENTINEL);
+        const int mark = line.indexOf(sentinel);
         if (mark >= 0) {
             // "<status>_<directory>"; the status has no underscore in it, so the
             // first one separates them and the rest is the path, spaces and all
-            const QString tail  = line.mid(mark + int(qstrlen(SENTINEL)));
+            const QString tail  = line.mid(mark + sentinel.size());
             const int sep       = tail.indexOf('_');
             const bool wasabout = running;
             // clear the state before the prompt is redrawn from it
@@ -1043,7 +1055,7 @@ void CommandWindow::resynchronize()
 {
     QTimer::singleShot(Cfg::COMMAND_RESYNC_DELAY, this, [this]() {
         if (shell && (shell->state() == QProcess::Running))
-            shell->write(qPrintable(sentinelCommand(shellprogram) + "\n"));
+            shell->write(qPrintable(sentinelCommand(shellprogram, sentinel) + "\n"));
     });
 }
 

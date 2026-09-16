@@ -188,6 +188,8 @@ private:
     QStringListModel *filenames; ///< Model behind the argument completion
 
     QString shellprogram;     ///< The interpreter that was started
+    QString sentinel;         ///< End-of-command mark of this session, unique to it
+    QString openmark;         ///< "open" report mark of this session, unique to it
     QString filedir;          ///< Directory the argument completions were built from
     QString pending;          ///< Output received so far that is not a complete line
     QString workingdir;       ///< Where the shell last reported itself to be
