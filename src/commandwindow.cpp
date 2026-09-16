@@ -715,7 +715,12 @@ void CommandWindow::sendTerminalSize()
 void CommandWindow::changeDirectory(const QString &dir)
 {
     if (dir.isEmpty() || !shell || shell->state() != QProcess::Running) return;
-    const QString command = QString("cd \"%1\"").arg(dir);
+    // quoted the way the shell reads it: cmd.exe takes double quotes and needs
+    // /d to follow the path onto another drive; everywhere else single quotes
+    // are what keep a "$", a backtick, or a backslash in the path literal
+    const QString command = (shellKind(shellprogram) == ShellKind::Cmd)
+                                ? QStringLiteral("cd /d \"%1\"").arg(QDir::toNativeSeparators(dir))
+                                : QStringLiteral("cd ") + singleQuoted(dir);
     // a line written now would be read by the running command, not the shell;
     // the queue is flushed when the sentinel says the shell is at a prompt
     if (running) {
