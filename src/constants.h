@@ -100,6 +100,8 @@ constexpr double ERR_WIDTH_DEFAULT  = 1.5;  ///< Default error bar line width
 constexpr double POINT_SIZE_MIN     = 1.0;  ///< Min configurable marker diameter
 constexpr double POINT_SIZE_MAX     = 40.0; ///< Max configurable marker diameter
 constexpr double POINT_SIZE_DEFAULT = 8.0;  ///< Default marker diameter
+constexpr int PROC_LABEL_MAXLEN =
+    12; ///< Longest post-process name shown as the processed-slot label as is
 
 // ---- Chart post-processing dialog ----------------------------------------
 constexpr int POSTPROCESS_EXPR_WIDTH  = 260; ///< Min width of the custom-function expression field

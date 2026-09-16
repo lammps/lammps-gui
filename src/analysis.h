@@ -18,6 +18,10 @@
 
 #include <vector>
 
+/// Pi, spelled out: M_PI needs feature-test macros on some of the platforms
+/// the packaging cross-compiles for
+constexpr double MY_PI_CONST = 3.14159265358979323846;
+
 /**
  * @brief Normalized autocorrelation function (ACF) of a data series
  * @param y      Input samples (assumed equally spaced)

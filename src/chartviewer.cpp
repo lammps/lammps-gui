@@ -192,6 +192,50 @@ void columnErrors(const PlotErrors &errors, int column, int nrow, QList<double> 
     const std::vector<double> &lo = errors.lower[col];
     if (lo.size() == static_cast<std::size_t>(nrow)) yerrLo = QList<double>(lo.cbegin(), lo.cend());
 }
+
+// The points of one y column against the x column, with the error bars of the
+// y column.
+void columnSeries(const PlotData &data, const PlotErrors &errors, int xcol, int ycol,
+                  QList<QPointF> &points, QList<double> &yerr, QList<double> &yerrLo)
+{
+    const int nrow                   = data.rowCount();
+    const std::vector<double> &xvals = data.column(xcol);
+    const std::vector<double> &yvals = data.column(ycol);
+    points.clear();
+    points.reserve(nrow);
+    for (int r = 0; r < nrow; ++r)
+        points.append(QPointF(xvals[r], yvals[r]));
+    columnErrors(errors, ycol, nrow, yerr, yerrLo);
+}
+
+// The processed-slot label for a post-processing result: its name when that
+// fits the combo box, a generic label otherwise.
+QString slotLabel(const QString &name, const QString &fallback)
+{
+    return (name.length() > Cfg::PROC_LABEL_MAXLEN) ? fallback : name;
+}
+
+// A push button showing a color by name on that color; a click opens the color
+// dialog and writes the choice back to the referenced color, which must outlive
+// the dialog the button belongs to.
+QPushButton *makeColorButton(QColor &target, QDialog *dialog, const QString &title)
+{
+    auto *btn = new QPushButton;
+    auto show = [btn](const QColor &c) {
+        btn->setText(c.name());
+        btn->setStyleSheet(QString("background-color: %1; color: %2;")
+                               .arg(c.name(), (c.lightness() < 128) ? "white" : "black"));
+    };
+    show(target);
+    QObject::connect(btn, &QPushButton::clicked, dialog, [&target, btn, show, title]() {
+        const QColor c = QColorDialog::getColor(target, btn, title);
+        if (c.isValid()) {
+            target = c;
+            show(c);
+        }
+    });
+    return btn;
+}
 } // namespace
 
 /* -------------------------------------------------------------------- */
@@ -227,6 +271,24 @@ void ChartWindow::presentResultWindow(ChartWindow *win, const QString &title)
         emit resultWindowCreated(win, title);
     else
         win->show();
+}
+
+void ChartWindow::installCustomCurve(ChartViewer *chart, const QList<QPointF> &points,
+                                     const QString &seriesName, const QString &slotLabel)
+{
+    chart->setFitCurve(points, seriesName);
+    setProcessedLabel(slotLabel);
+    resetRangeSliders();        // the result may extend the data range
+    smooth->setCurrentIndex(2); // "Both" = raw data + the result
+}
+
+void ChartWindow::syncSmoothControls(bool enabled)
+{
+    // the SG parameters are irrelevant while a fit occupies the processed slot
+    const bool hasCustom = currentChart() && currentChart()->hasCustom();
+    const bool sg        = enabled && doSmooth && !hasCustom;
+    window->setEnabled(sg);
+    order->setEnabled(sg);
 }
 
 void ChartWindow::resetRangeSliders()
@@ -485,8 +547,7 @@ void ChartWindow::applyChartSettings()
         window->setValue(settings.value(Keys::SMOOTHWINDOW, Cfg::SMOOTH_WINDOW_DEFAULT).toInt());
         order->setValue(settings.value(Keys::SMOOTHORDER, Cfg::SMOOTH_ORDER_DEFAULT).toInt());
     }
-    window->setEnabled(doSmooth);
-    order->setEnabled(doSmooth);
+    syncSmoothControls();
 
     legendPos       = static_cast<LegendPos>(settings.value(Keys::LEGEND, 0).toInt());
     double defRefPt = font().pointSizeF();
@@ -573,8 +634,7 @@ void ChartWindow::setRangeEnabled(bool enabled)
     xrange->setEnabled(enabled);
     yrange->setEnabled(enabled);
     smooth->setEnabled(enabled);
-    window->setEnabled(enabled && doSmooth);
-    order->setEnabled(enabled && doSmooth);
+    syncSmoothControls(enabled);
 }
 
 void ChartWindow::loadData(const PlotData &data, int xcol, const QList<int> &ycols,
@@ -584,21 +644,15 @@ void ChartWindow::loadData(const PlotData &data, int xcol, const QList<int> &yco
     if (data.isEmpty() || ycols.isEmpty()) return;
     if ((xcol < 0) || (xcol >= data.columnCount())) return;
 
-    const std::vector<double> &xvals = data.column(xcol);
-    const int nrow                   = data.rowCount();
-    const QString xlabel             = data.columnName(xcol);
+    const QString xlabel = data.columnName(xcol);
 
     int idx = 0;
     for (int ycol : ycols) {
         if ((ycol < 0) || (ycol >= data.columnCount())) continue;
         addChart(data.columnName(ycol), idx); // the first one binds the view
-        const std::vector<double> &yvals = data.column(ycol);
         QList<QPointF> points;
-        points.reserve(nrow);
-        for (int r = 0; r < nrow; ++r)
-            points.append(QPointF(xvals[r], yvals[r]));
         QList<double> errs, errsLo;
-        columnErrors(yerrs, ycol, nrow, errs, errsLo);
+        columnSeries(data, yerrs, xcol, ycol, points, errs, errsLo);
         // data only; the active one is drawn below
         setColumnData(*cols.back(), points, errs, errsLo);
         ++idx;
@@ -658,23 +712,9 @@ void ChartWindow::changeStyle()
     dialog.setWindowTitle("Chart Style");
     auto *layout = new QVBoxLayout(&dialog);
 
-    // build a colored push button that edits the referenced color in place
+    // a colored push button that edits the referenced color in place
     auto colorButton = [&dialog](QColor &chosen) {
-        auto *btn        = new QPushButton;
-        auto setBtnColor = [btn](const QColor &c) {
-            btn->setText(c.name());
-            btn->setStyleSheet(QString("background-color: %1; color: %2;")
-                                   .arg(c.name(), (c.lightness() < 128) ? "white" : "black"));
-        };
-        setBtnColor(chosen);
-        QObject::connect(btn, &QPushButton::clicked, &dialog, [&chosen, btn, setBtnColor]() {
-            const QColor c = QColorDialog::getColor(chosen, btn, "Series Color");
-            if (c.isValid()) {
-                chosen = c;
-                setBtnColor(c);
-            }
-        });
-        return btn;
+        return makeColorButton(chosen, &dialog, "Series Color");
     };
 
     // the mode, width, and size widgets are the ones the Preferences dialog
@@ -766,10 +806,6 @@ void ChartWindow::changeStyle()
         applySliderWindow();
     }
 }
-
-// for the Nyquist default of the Fourier output grid (M_PI needs feature-test
-// macros on some of the platforms the packaging cross-compiles for)
-static constexpr double pi_const = 3.14159265358979323846;
 
 // Identifiers of the post-processing analyses, stored as the item data of the
 // analysis combo.  The Overlay entry exists only when the window has more than
@@ -920,7 +956,7 @@ void ChartWindow::postProcess()
     auto *gridToSpin = new QDoubleSpinBox;
     gridToSpin->setDecimals(6);
     gridToSpin->setRange(0.0, 1e15);
-    gridToSpin->setValue((meanDx > 0.0) ? (pi_const / meanDx) : 1.0);
+    gridToSpin->setValue((meanDx > 0.0) ? (MY_PI_CONST / meanDx) : 1.0);
     auto *gridPointsSpin = new QSpinBox;
     gridPointsSpin->setRange(2, 100000);
     gridPointsSpin->setValue(Cfg::POSTPROCESS_GRID_POINTS);
@@ -1087,10 +1123,8 @@ void ChartWindow::postProcess()
         // a copy, deliberately: the overlay is a snapshot for comparison and
         // does not follow the source column afterwards
         const QString title = columns->itemText(src);
-        chart->setFitCurve(series->points, title);
-        setProcessedLabel(title.length() > 12 ? QStringLiteral("Overlay") : title);
-        resetRangeSliders();        // the overlay may extend the data range
-        smooth->setCurrentIndex(2); // "Both" = raw data + overlay
+        installCustomCurve(chart, series->points, title,
+                           slotLabel(title, QStringLiteral("Overlay")));
         return;
     }
 
@@ -1235,10 +1269,7 @@ void ChartWindow::postProcess()
                     "The expression did not produce a usable curve over the data range.");
             return;
         }
-        chart->setFitCurve(result.points, expr);
-        setProcessedLabel("Custom f(x)");
-        resetRangeSliders();        // a fit re-fits to the whole data set; match the sliders
-        smooth->setCurrentIndex(2); // "Both" = raw data + function overlay
+        installCustomCurve(chart, result.points, expr, "Custom f(x)");
         information(this, "Custom Function",
                     QString("Plotted f(x) = %1\nover x in [%2, %3].")
                         .arg(expr)
@@ -1264,10 +1295,7 @@ void ChartWindow::postProcess()
         }
         const QString label   = fitLabelEdit->text().trimmed();
         const QString fitName = label.isEmpty() ? expr : label;
-        chart->setFitCurve(fit.curve, fitName);
-        setProcessedLabel(fitName.length() > 12 ? "Custom fit" : fitName);
-        resetRangeSliders();        // a fit re-fits to the whole data set; match the sliders
-        smooth->setCurrentIndex(2); // "Both" = raw data + fit overlay
+        installCustomCurve(chart, fit.curve, fitName, slotLabel(fitName, "Custom fit"));
 
         QString report = QString("Custom fit of f(x) = %1\n").arg(expr);
         if (!label.isEmpty()) report += QString("(%1)\n").arg(label);
@@ -1382,10 +1410,7 @@ void ChartWindow::postProcess()
             if (p.name == QLatin1String("A")) amp = p.value;
         }
         const QString fitName = QStringLiteral("Maxwell-Boltzmann");
-        chart->setFitCurve(fit.curve, fitName);
-        setProcessedLabel("M-B fit");
-        resetRangeSliders();        // a fit re-fits to the whole data set; match the sliders
-        smooth->setCurrentIndex(2); // "Both" = raw data + fit overlay
+        installCustomCurve(chart, fit.curve, fitName, "M-B fit");
 
         // Equipartition fixes <E> = (d/2) kT whatever the shape of the
         // distribution, so the measured mean is a second, model-free estimate
@@ -1445,10 +1470,7 @@ void ChartWindow::postProcess()
             curve.append(QPointF(x, evalPolynomial(f.coeffs, x)));
         }
         const QString polyName = QString("Poly deg %1").arg(static_cast<int>(f.coeffs.size()) - 1);
-        chart->setFitCurve(curve, polyName);
-        setProcessedLabel(polyName);
-        resetRangeSliders();        // a fit re-fits to the whole data set; match the sliders
-        smooth->setCurrentIndex(2); // "Both" = raw data + fit overlay
+        installCustomCurve(chart, curve, polyName, polyName);
 
         QString report =
             QString("Polynomial fit of degree %1\n\n").arg(static_cast<int>(f.coeffs.size()) - 1);
@@ -1510,12 +1532,9 @@ void ChartWindow::postProcess()
             if (x > 0.0) curve.append(QPointF(x, evalBirchMurnaghan(f, x)));
         }
         // EOS fit: hide in Raw mode, visible in EOS-fit/Both modes; raw data as points
-        chart->setFitCurve(curve, "EOS fit");
+        installCustomCurve(chart, curve, "EOS fit", "EOS fit");
         chart->setDisplayStyle(ChartDisplayMode::Points, chart->displayColor(),
                                chart->displayWidth(), chart->displayPointSize());
-        setProcessedLabel("EOS fit");
-        resetRangeSliders();        // a fit re-fits to the whole data set; match the sliders
-        smooth->setCurrentIndex(2); // "Both" = raw points + EOS fit line
 
         // derive lattice constant: a0 = cbrt(N * V0)
         const double a0 = std::cbrt(static_cast<double>(natoms) * f.v0);
@@ -1590,9 +1609,6 @@ void ChartWindow::addDataFile()
     ChartViewer *chart = currentChart();
     if (!chart) return;
 
-    const std::vector<double> &xvals = plotData.column(xcol);
-    const int nrow                   = plotData.rowCount();
-
     // auto-color palette for overlay series (avoids primary raw/smooth colors)
     static const QList<QColor> palette = {
         QColor(220, 80, 40),  // red-orange
@@ -1606,12 +1622,8 @@ void ChartWindow::addDataFile()
     for (int ycol : ycols) {
         if (ycol < 0 || ycol >= plotData.columnCount()) continue;
         QList<QPointF> pts;
-        pts.reserve(nrow);
-        const std::vector<double> &yvals = plotData.column(ycol);
-        for (int r = 0; r < nrow; ++r)
-            pts.append(QPointF(xvals[r], yvals[r]));
         QList<double> errs, errsLo;
-        columnErrors(plotErr, ycol, nrow, errs, errsLo);
+        columnSeries(plotData, plotErr, xcol, ycol, pts, errs, errsLo);
         chart->addOverlaySeries(pts, plotData.columnName(ycol), palette[colorIdx % palette.size()],
                                 errs, errsLo);
         ++colorIdx;
@@ -1695,20 +1707,7 @@ void ChartWindow::referenceLines()
         updateAnchor(rd->orientCombo->currentIndex());
         QObject::connect(rd->orientCombo, &QComboBox::currentIndexChanged, &dialog, updateAnchor);
 
-        auto *colorBtn = new QPushButton;
-        auto updateBtn = [colorBtn](const QColor &c) {
-            colorBtn->setText(c.name());
-            colorBtn->setStyleSheet(QString("background-color: %1; color: %2;")
-                                        .arg(c.name(), c.lightness() < 128 ? "white" : "black"));
-        };
-        updateBtn(rd->color);
-        QObject::connect(colorBtn, &QPushButton::clicked, &dialog, [rd, colorBtn, updateBtn]() {
-            const QColor c = QColorDialog::getColor(rd->color, colorBtn, "Line Color");
-            if (c.isValid()) {
-                rd->color = c;
-                updateBtn(c);
-            }
-        });
+        auto *colorBtn = makeColorButton(rd->color, &dialog, "Line Color");
 
         auto *delBtn = new QPushButton("×");
         delBtn->setFixedWidth(24);
@@ -1817,11 +1816,7 @@ void ChartWindow::selectSmooth(int)
     // the processed-slot label does not depend on the Raw/Smooth/Both choice; it
     // is "Smooth" unless a post-process fit overrode it (set in postProcess and
     // restored on column switch in changeChart)
-    const bool hasCustom = currentChart() && currentChart()->hasCustom();
-    // SG smooth parameters are only relevant when smoothing without a fit overlay
-    const bool sgEnabled = doSmooth && !hasCustom;
-    window->setEnabled(sgEnabled);
-    order->setEnabled(sgEnabled);
+    syncSmoothControls();
     updateSmooth();
     // toggling Raw/Smooth/Both is a view-only change: keep the current slider
     // window, just re-derive the displayed range from it (the data range may have
@@ -2053,11 +2048,7 @@ void ChartWindow::changeChart(int)
         smooth->setItemText(1, cols[active]->procLabel);
     }
 
-    // sync the SG parameter spinbox state (irrelevant while a fit overrides the slot)
-    const bool hasCustom = currentChart() && currentChart()->hasCustom();
-    const bool sgEnabled = doSmooth && !hasCustom;
-    window->setEnabled(sgEnabled);
-    order->setEnabled(sgEnabled);
+    syncSmoothControls();
 
     // a chart switch shows the new column at full range (setColumn re-fit it)
     resetRangeSliders();

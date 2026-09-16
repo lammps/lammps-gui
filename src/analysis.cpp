@@ -14,10 +14,6 @@
 #include <cmath>
 #include <cstddef>
 
-// not using M_PI, which needs feature-test macros on some of the platforms
-// the packaging cross-compiles for
-static constexpr double pi_const = 3.14159265358979323846;
-
 std::vector<double> autocorrelation(const std::vector<double> &y, int maxlag)
 {
     const int n = static_cast<int>(y.size());
@@ -56,7 +52,7 @@ static double taper(FourierWindow window, const std::vector<double> &x, std::siz
     if (window != FourierWindow::Hann) return 1.0;
     const double span = x.back() - x.front();
     if (span <= 0.0) return 1.0;
-    return 0.5 * (1.0 + std::cos(pi_const * (x[i] - x.front()) / span));
+    return 0.5 * (1.0 + std::cos(MY_PI_CONST * (x[i] - x.front()) / span));
 }
 
 std::vector<double> fourierTransform(const std::vector<double> &x, const std::vector<double> &y,
@@ -120,7 +116,7 @@ std::vector<double> structureFactor(const std::vector<double> &r, const std::vec
             sum += 0.5 * (prev + cur) * (r[i] - r[i - 1]);
             prev = cur;
         }
-        result.push_back(1.0 + 4.0 * pi_const * rho * sum);
+        result.push_back(1.0 + 4.0 * MY_PI_CONST * rho * sum);
     }
     return result;
 }

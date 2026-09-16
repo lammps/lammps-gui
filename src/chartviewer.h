@@ -247,6 +247,16 @@ private:
     /// Move both range-slider handles back to the full extent (no plot update).
     void resetRangeSliders();
 
+    /// Put a post-processing result into the processed slot of a chart: the
+    /// curve, the label the slot shows for it, the sliders matched to a range
+    /// the curve may have extended, and "Both" as the view.
+    void installCustomCurve(ChartViewer *chart, const QList<QPointF> &points,
+                            const QString &seriesName, const QString &slotLabel);
+
+    /// Enable the smoothing window and order spin boxes only while smoothing is
+    /// shown and no post-processing result occupies the processed slot.
+    void syncSmoothControls(bool enabled = true);
+
     /// Re-derive the displayed plot range from the current slider-handle window
     /// and the active column's data range (so a view-only change preserves zoom).
     void applySliderWindow();
