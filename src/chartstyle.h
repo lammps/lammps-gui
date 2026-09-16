@@ -33,7 +33,7 @@ QColor chartPaletteColor(int index);
 
 /**
  * @brief The configured default color of a series kind
- * @param key      Settings key of the color index in the charts group (e.g. Keys::RAWBRUSH)
+ * @param key      Settings key of the color index in the charts group (e.g. `Keys::RAWBRUSH`)
  * @param fallback Index to use when the key is not set
  * @return The palette color for the configured index
  */
@@ -42,7 +42,7 @@ QColor configuredChartColor(const QString &key, int fallback);
 /**
  * @brief Combo box offering the palette colors by name
  * @param current Index of the preselected color
- * @return The new widget, unparented
+ * @return The new widget, without a parent
  */
 QComboBox *makeChartColorCombo(int current);
 
@@ -50,31 +50,31 @@ QComboBox *makeChartColorCombo(int current);
  * @brief Combo box offering the display modes in ChartDisplayMode order
  *
  * Each item carries its mode as integer item data, so a choice can be read
- * back through currentData() as well as through currentIndex().
+ * back through `currentData()` as well as through `currentIndex()`.
  *
  * @param current Index of the preselected mode
- * @return The new widget, unparented
+ * @return The new widget, without a parent
  */
 QComboBox *makeChartModeCombo(int current);
 
 /**
  * @brief Combo box offering the plot data choices Raw, Smooth, and Both
  * @param current Index of the preselected choice
- * @return The new widget, unparented
+ * @return The new widget, without a parent
  */
 QComboBox *makePlotChoiceCombo(int current);
 
 /**
  * @brief Spin box for a series line width within the configured limits
  * @param value Preset width
- * @return The new widget, unparented
+ * @return The new widget, without a parent
  */
 QDoubleSpinBox *makeLineWidthSpin(double value);
 
 /**
  * @brief Spin box for a marker diameter within the configured limits
  * @param value Preset diameter
- * @return The new widget, unparented
+ * @return The new widget, without a parent
  */
 QDoubleSpinBox *makePointSizeSpin(double value);
 

@@ -251,7 +251,7 @@ extern void relaunchApplication();
 /**
  * @brief Relaunch LAMMPS-GUI, or report the failure and exit
  *
- * Wraps relaunchApplication() with the handling every caller needs: when the
+ * Wraps `relaunchApplication()` with the handling every caller needs: when the
  * re-exec fails, the user is told that the saved settings take effect on the
  * next start and the application exits, since continuing in a state that no
  * longer matches the settings is worse than stopping.
@@ -319,7 +319,7 @@ extern void styleDialogButtons(QDialogButtonBox *box);
 /**
  * @brief Apply the bundled SVG icons to the standard buttons of a message box
  *
- * The QMessageBox counterpart of styleDialogButtons(): the same icons for the
+ * The `QMessageBox` counterpart of `styleDialogButtons()`: the same icons for the
  * same buttons, so every dialog of the application looks alike.  Buttons the
  * box does not have are skipped, so this is called once the standard buttons
  * are set.
@@ -529,7 +529,7 @@ extern void retireViewMenuBar(QMenuBar *menubar);
  * (and without a second binding for their accelerators).  In the combined
  * layout the main window carries one menu bar for all views and puts the
  * view's menu at its front while the view has the focus, so the view's own bar
- * is retired instead (see retireViewMenuBar()).
+ * is retired instead (see `retireViewMenuBar()`).
  *
  * @param menubar The view's menu bar (no-op if null)
  * @param file    The view's own menu

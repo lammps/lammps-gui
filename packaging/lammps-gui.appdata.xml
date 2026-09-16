@@ -86,6 +86,13 @@
           <li>Fix LAMMPS screen output capture on Windows, which only worked when launched from a console; the capture now verifies itself and reports into the Output window when the library's output cannot reach it</li>
           <li>Remember the LAMMPS shared library path per compiler toolchain, so differently built versions of LAMMPS-GUI on one machine no longer silently use each other's library</li>
           <li>Remember separate main window sizes for the two layout styles, and report the selected layout in the About dialog</li>
+          <li>Offer ten instead of five preset colors for chart data series</li>
+          <li>Ask about unsaved changes before a running simulation is stopped when opening another file</li>
+          <li>Show non-ASCII characters in captured LAMMPS output correctly</li>
+          <li>Remove a one second delay at the end of every run</li>
+          <li>Fix several Command window issues: the state after a shell restart, directory names with special characters, and output that contains the internal end-of-command mark</li>
+          <li>Fix chart updates stopping when a run crosses midnight, and closed text viewers lingering in the individual windows layout</li>
+          <li>Import large data files for plotting several times faster, and reduce the overhead of updating the Output, Charts, and Command windows during a run</li>
           <li>Require LAMMPS version 2 September 2026 or newer</li>
         </ul>
       </description>
