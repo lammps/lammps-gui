@@ -13,10 +13,11 @@
 #define COMMANDWINDOW_H
 
 #include <QList>
-#include <QProcess>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
+
+class QProcess;
 
 class LammpsGui;
 class QCompleter;
@@ -171,7 +172,7 @@ private:
     QList<qint64> shellChildren() const;
 
     /// Executable names found in PATH, collected once and cached.
-    QStringList pathCommands();
+    static QStringList pathCommands();
 
     /// Rebuild the completion list: the lines already typed, sorted and
     /// without repeats, followed by the commands found in PATH.

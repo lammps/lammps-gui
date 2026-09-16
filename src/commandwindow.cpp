@@ -32,6 +32,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QPlainTextEdit>
+#include <QProcess>
 #include <QProcessEnvironment>
 #include <QPushButton>
 #include <QRandomGenerator>
@@ -665,19 +666,19 @@ void CommandWindow::editAliases()
     // the same thing whether it was edited before the window was opened or
     // after.  Only what the table itself gave the shell is withdrawn again; an
     // alias that came from the start-up file is left alone.
-    QStringList commands;
+    QStringList updates;
     for (const auto &alias : before) {
         const auto same = [&alias](const ShellAlias &other) {
             return other.first == alias.first;
         };
         if (std::none_of(after.begin(), after.end(), same))
-            commands << QStringLiteral("unalias %1 2>/dev/null").arg(alias.first);
+            updates << QStringLiteral("unalias %1 2>/dev/null").arg(alias.first);
     }
     for (const auto &alias : after) {
         const QString command = aliasCommand(shellprogram, alias);
-        if (!command.isEmpty()) commands << command;
+        if (!command.isEmpty()) updates << command;
     }
-    if (!commands.isEmpty()) sendWhenIdle(commands);
+    if (!updates.isEmpty()) sendWhenIdle(updates);
 }
 
 void CommandWindow::sendLine(const QString &line)

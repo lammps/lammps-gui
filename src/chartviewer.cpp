@@ -595,14 +595,14 @@ void ChartWindow::addChart(const QString &title, int index)
     selectSmooth(0);
 }
 
-void ChartWindow::addData(int step, double data, int index)
+void ChartWindow::addData(int step, double value, int index)
 {
     for (std::size_t i = 0; i < cols.size(); ++i) {
         if (cols[i]->index != index) continue;
         if (static_cast<int>(i) == active)
-            viewer->addPoint(step, data); // appends + throttled redraw of the active column
+            viewer->addPoint(step, value); // appends + throttled redraw of the active column
         else
-            appendColumnPoint(*cols[i], step, data); // accumulate only; drawn when selected
+            appendColumnPoint(*cols[i], step, value); // accumulate only; drawn when selected
         return;
     }
 }
@@ -625,30 +625,30 @@ void ChartWindow::setRangeEnabled(bool enabled)
     syncSmoothControls(enabled);
 }
 
-void ChartWindow::loadData(const PlotData &data, int xcol, const QList<int> &ycols,
+void ChartWindow::loadData(const PlotData &table, int xcol, const QList<int> &ycols,
                            const PlotErrors &yerrs)
 {
     resetCharts();
-    if (data.isEmpty() || ycols.isEmpty()) return;
-    if ((xcol < 0) || (xcol >= data.columnCount())) return;
+    if (table.isEmpty() || ycols.isEmpty()) return;
+    if ((xcol < 0) || (xcol >= table.columnCount())) return;
 
-    const QString xlabel = data.columnName(xcol);
+    const QString xlabel = table.columnName(xcol);
 
     int idx = 0;
     for (int ycol : ycols) {
-        if ((ycol < 0) || (ycol >= data.columnCount())) continue;
-        addChart(data.columnName(ycol), idx); // the first one binds the view
+        if ((ycol < 0) || (ycol >= table.columnCount())) continue;
+        addChart(table.columnName(ycol), idx); // the first one binds the view
         QList<QPointF> points;
         QList<double> errs, errsLo;
-        columnSeries(data, yerrs, xcol, ycol, points, errs, errsLo);
-        // data only; the active one is drawn below
+        columnSeries(table, yerrs, xcol, ycol, points, errs, errsLo);
+        // table only; the active one is drawn below
         setColumnData(*cols.back(), points, errs, errsLo);
         ++idx;
     }
     // shared X-axis labeling on the single plot (standalone uses %.6g)
     viewer->setXLabel(xlabel);
     viewer->setXLabelFormat("%.6g");
-    // now that data is loaded, (re)render the active column
+    // now that table is loaded, (re)render the active column
     if (!cols.empty()) viewer->setColumn(cols[active >= 0 ? active : 0].get());
     // pre-fill the X-axis label field in standalone plot mode
     if (chartXlabel) chartXlabel->setText(xlabel);
@@ -1881,22 +1881,22 @@ void ChartWindow::saveAs()
 
 PlotData ChartWindow::chartsToPlotData() const
 {
-    PlotData data;
-    if (cols.empty()) return data;
+    PlotData table;
+    if (cols.empty()) return table;
 
     // A flat table has one x column, so every exported series has to live on
     // one grid: the x values of the first chart.  The raw values are always
-    // written -- they are the data, and losing them to a display setting would
+    // written -- they are the table, and losing them to a display setting would
     // be a poor trade -- and the results of the post-processing follow.
     const PlotSeries &ref = *cols.front()->series;
     const int nrow        = ref.count();
-    if (nrow < 1) return data;
+    if (nrow < 1) return table;
 
     std::vector<double> xs;
     xs.reserve(nrow);
     for (int i = 0; i < nrow; ++i)
         xs.push_back(ref.at(i).x());
-    data.addColumn(QStringLiteral("Step"), xs);
+    table.addColumn(QStringLiteral("Step"), xs);
 
     // whether a series can be written against those x values as they stand
     auto sameGrid = [&xs, nrow](const PlotSeries *s) {
@@ -1925,10 +1925,10 @@ PlotData ChartWindow::chartsToPlotData() const
         // charts of a window are filled from the same x values
         if (!sameGrid(s)) continue;
         const QString name = exportName(s->name);
-        data.addColumn(name, yValues(s));
+        table.addColumn(name, yValues(s));
 
         // error bars go next to the values they belong to; re-importing the
-        // file simply yields one more data column.  Bars that reach up and
+        // file simply yields one more table column.  Bars that reach up and
         // down by different amounts need two.
         if (s->hasAsymErrors()) {
             std::vector<double> lo, hi;
@@ -1938,14 +1938,14 @@ PlotData ChartWindow::chartsToPlotData() const
                 lo.push_back(s->errLow(i));
                 hi.push_back(s->errHigh(i));
             }
-            data.addColumn(name + "-errlo", std::move(lo));
-            data.addColumn(name + "-errhi", std::move(hi));
+            table.addColumn(name + "-errlo", std::move(lo));
+            table.addColumn(name + "-errhi", std::move(hi));
         } else if (s->hasErrors()) {
             std::vector<double> err;
             err.reserve(nrow);
             for (int i = 0; i < nrow; ++i)
                 err.push_back(s->errHigh(i));
-            data.addColumn(name + "-err", std::move(err));
+            table.addColumn(name + "-err", std::move(err));
         }
 
         // The smoothed curve shares the raw x values by construction.  It is
@@ -1959,30 +1959,30 @@ PlotData ChartWindow::chartsToPlotData() const
                 ys.reserve(nrow);
                 for (const QPointF &p : sm)
                     ys.push_back(p.y());
-                data.addColumn(name + "-smooth", std::move(ys));
+                table.addColumn(name + "-smooth", std::move(ys));
             }
         }
 
-        // A fit curve is sampled on a dense grid of its own over the data
-        // range, so it is written as the fitted function evaluated at each data
+        // A fit curve is sampled on a dense grid of its own over the table
+        // range, so it is written as the fitted function evaluated at each table
         // x -- which is also what makes it comparable to the values beside it.
         if (c->fit && c->fit->isVisible() && (c->fit->count() > 1)) {
             std::vector<double> fit;
             fit.reserve(nrow);
             for (int i = 0; i < nrow; ++i)
                 fit.push_back(interpolateCurve(c->fit->points, xs[static_cast<std::size_t>(i)]));
-            data.addColumn(exportName(c->fit->name.isEmpty() ? name + "-fit" : c->fit->name),
-                           std::move(fit));
+            table.addColumn(exportName(c->fit->name.isEmpty() ? name + "-fit" : c->fit->name),
+                            std::move(fit));
         }
 
-        // overlay series carry their own x values, and resampling data that was
+        // overlay series carry their own x values, and resampling table that was
         // measured elsewhere would be inventing it, so only one that already
         // sits on this grid can join the table
         for (const auto &o : c->overlaySeries)
             if (o && o->isVisible() && sameGrid(o.get()))
-                data.addColumn(exportName(o->name) + "-added", yValues(o.get()));
+                table.addColumn(exportName(o->name) + "-added", yValues(o.get()));
     }
-    return data;
+    return table;
 }
 
 // write the already formatted chart data to a file

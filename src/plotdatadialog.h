@@ -83,7 +83,7 @@ public:
     /**
      * @brief Read a data file and build the column dialog for it
      *
-     * The block-structured output of the fix ave/* styles is tried first,
+     * The block-structured output of the fix ave/time family is tried first,
      * since it is not a flat table and gets the dialog that can reduce it to
      * one; anything else goes through the flat-file parsers.
      *
