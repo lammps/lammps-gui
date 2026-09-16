@@ -178,6 +178,12 @@ private:
      * @return An error message, or an empty string on success
      */
     QString evaluateColumn(const QString &expr, std::vector<double> &values) const;
+    /**
+     * @brief What is wrong with a proposed column name
+     * @param name The name to check
+     * @return An error message, or an empty string when the name can be used
+     */
+    QString checkNewName(const QString &name) const;
 
     PlotData workingData;          ///< Working copy of the data; derived cols appended here
     PlotErrors workingErrors;      ///< Error bars parallel to the working data columns

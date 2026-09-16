@@ -522,9 +522,7 @@ void PlotDataDialog::commitRename()
         return;
     }
 
-    QString error = validateColumnName(newName);
-    if (error.isEmpty() && workingData.columnNames().contains(newName))
-        error = QStringLiteral("There already is a column named '%1'.").arg(newName);
+    const QString error = checkNewName(newName);
     if (!error.isEmpty()) {
         // revert before the dialog: losing focus to it re-fires editingFinished,
         // which then takes the name-unchanged early return above
@@ -555,9 +553,7 @@ void PlotDataDialog::computeColumn()
         return;
     }
 
-    QString invalid = validateColumnName(colName);
-    if (invalid.isEmpty() && workingData.columnNames().contains(colName))
-        invalid = QStringLiteral("There already is a column named '%1'.").arg(colName);
+    const QString invalid = checkNewName(colName);
     if (!invalid.isEmpty()) {
         warning(this, "Compute Column", invalid);
         return;
@@ -596,6 +592,14 @@ std::unique_ptr<PlotDataDialog> PlotDataDialog::fromFile(const QString &fileName
         return nullptr;
     }
     return std::make_unique<PlotDataDialog>(data, parent);
+}
+
+QString PlotDataDialog::checkNewName(const QString &name) const
+{
+    QString error = validateColumnName(name);
+    if (error.isEmpty() && workingData.columnNames().contains(name))
+        error = QStringLiteral("There already is a column named '%1'.").arg(name);
+    return error;
 }
 
 int PlotDataDialog::xColumn() const
