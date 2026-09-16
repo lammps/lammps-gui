@@ -795,13 +795,18 @@ void CommandWindow::readOutput()
 void CommandWindow::consume(const QString &chunk)
 {
     pending += chunk;
-    pending.replace("\r\n", "\n");
+    pending.replace(QLatin1String("\r\n"), QLatin1String("\n"));
 
-    // only whole lines can be examined for the sentinel
-    int nl = pending.indexOf('\n');
-    while (nl >= 0) {
-        const QString line = pending.left(nl);
-        pending.remove(0, nl + 1);
+    // Only whole lines can be examined for the marks.  The lines that are
+    // output are gathered and appended in one go: a chunk of short lines would
+    // otherwise cost a block insertion, a scroll, and a trim of the scrollback
+    // for each of them.  A sentinel appends what was gathered before it is
+    // acted on, so that its exit status line keeps its place.
+    QString output;
+    int start = 0;
+    for (int nl = pending.indexOf(u'\n'); nl >= 0; nl = pending.indexOf(u'\n', start)) {
+        const QString line = pending.mid(start, nl - start);
+        start              = nl + 1;
 
         // "open" reports one file per line; collect them and show them once the
         // command that produced them is done, so that a single "open *.png"
@@ -809,16 +814,19 @@ void CommandWindow::consume(const QString &chunk)
         const int want = line.indexOf(openmark);
         if (want >= 0) {
             pendingopen << line.mid(want + openmark.size());
-            nl = pending.indexOf('\n');
             continue;
         }
 
         const int mark = line.indexOf(sentinel);
         if (mark >= 0) {
+            if (!output.isEmpty()) {
+                appendOutput(output);
+                output.clear();
+            }
             // "<status>_<directory>"; the status has no underscore in it, so the
             // first one separates them and the rest is the path, spaces and all
             const QString tail  = line.mid(mark + sentinel.size());
-            const int sep       = tail.indexOf('_');
+            const int sep       = tail.indexOf(u'_');
             const bool wasabout = running;
             // clear the state before the prompt is redrawn from it
             running = false;
@@ -840,10 +848,13 @@ void CommandWindow::consume(const QString &chunk)
             pendingsetup.clear();
             if (sizepending) sendTerminalSize();
         } else if (!priming && !isShellJobControlNoise(line)) {
-            appendOutput(line + "\n");
+            output += line;
+            output += u'\n';
         }
-        nl = pending.indexOf('\n');
     }
+    // what is left is the start of a line that is not complete yet
+    pending.remove(0, start);
+    if (!output.isEmpty()) appendOutput(output);
 }
 
 void CommandWindow::appendOutput(const QString &text)
