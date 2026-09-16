@@ -15,6 +15,7 @@
 #include <QFont>
 #include <QLabel>
 #include <QTextDocument>
+#include <QTimer>
 
 FlagWarnings::FlagWarnings(QLabel *label, QTextDocument *parent) :
     QSyntaxHighlighter(parent), isWarning(QStringLiteral("^(ERROR|WARNING).*$")),
@@ -54,24 +55,33 @@ void FlagWarnings::highlightBlock(const QString &text)
         setFormat(match.capturedStart(0), match.capturedLength(0), formatWarning);
     }
 
-    // highlight ErrorURL links
-    match = isURL.match(text);
-    if (match.hasMatch()) {
-        setFormat(match.capturedStart(1), match.capturedLength(1), formatURL);
+    // highlight ErrorURL links; the cheap test first, since this runs on every
+    // line of the log and the pattern has to scan the whole line to fail
+    if (text.contains(QLatin1String("docs.lammps.org/err"))) {
+        match = isURL.match(text);
+        if (match.hasMatch()) {
+            setFormat(match.capturedStart(1), match.capturedLength(1), formatURL);
+        }
     }
 
-    // update error summary label when its content has changed
-    if (document && summary) {
-        nlines = document->lineCount();
-        if ((nwarnings > oldwarnings) || (nlines > oldlines)) {
-            oldwarnings = nwarnings;
-            oldlines    = nlines;
-            summary->setText(summaryText(nwarnings, nlines));
-            // setText() already schedules a paint; let Qt coalesce it via update()
-            // rather than forcing a synchronous repaint() from inside highlighting,
-            // which fires on essentially every log line appended during a run
-            summary->update();
-        }
+    // A run appends its output in chunks of many lines at a time, and every
+    // one of them lands here.  The summary label is refreshed once per chunk,
+    // after the event loop gets control back, rather than once per line.
+    if (document && summary && !summaryPending) {
+        summaryPending = true;
+        QTimer::singleShot(0, this, &FlagWarnings::updateSummary);
+    }
+}
+
+void FlagWarnings::updateSummary()
+{
+    summaryPending = false;
+    if (!document || !summary) return;
+    nlines = document->lineCount();
+    if ((nwarnings != oldwarnings) || (nlines != oldlines)) {
+        oldwarnings = nwarnings;
+        oldlines    = nlines;
+        summary->setText(summaryText(nwarnings, nlines));
     }
 }
 

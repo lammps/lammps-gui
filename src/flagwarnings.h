@@ -87,6 +87,14 @@ protected:
     void highlightBlock(const QString &text) override;
 
 private:
+    /**
+     * @brief Refresh the summary label from the counters
+     *
+     * Deferred to the event loop and coalesced, so that a batch of appended
+     * lines refreshes the label once rather than once per line.
+     */
+    void updateSummary();
+
     QRegularExpression isWarning;  ///< Pattern for warning/error messages
     QRegularExpression isURL;      ///< Pattern for URLs
     QTextCharFormat formatWarning; ///< Format for warnings/errors
@@ -95,6 +103,7 @@ private:
     QTextDocument *document;       ///< Document being highlighted
     int nwarnings, oldwarnings;    ///< Current and previous warning count
     int nlines, oldlines;          ///< Current and previous line count
+    bool summaryPending = false;   ///< A summary refresh is queued on the event loop
 };
 #endif
 // Local Variables:
