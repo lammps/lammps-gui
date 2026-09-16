@@ -17,7 +17,7 @@ authors:
 affiliations:
   - name: Institute for Computational Molecular Science, Temple University, Philadelphia, PA, USA
     index: 1
-date: 27 June 2026
+date: 16 September 2026
 bibliography: paper.bib
 ---
 
@@ -43,9 +43,10 @@ interface [@frantzdale2010library], running the simulation in a
 concurrent worker thread so the interface stays responsive and the run
 can be monitored, plotted, visualized, and cleanly stopped. By mirroring
 the traditional "edit, run, observe, analyze" workflow, it lets users
-move freely to the command-line executable -- essential once a workflow
-outgrows a personal computer. Pre-compiled packages for Windows, macOS,
-and Linux let most users start instantly, without compiling anything.
+move freely between the graphical tool and the command-line executable
+-- essential once a workflow outgrows a personal computer. Pre-compiled
+packages for Windows, macOS, and Linux let most users start instantly,
+without compiling anything.
 
 # Statement of need
 
@@ -83,13 +84,13 @@ live simulation, output monitoring, plotting, and visualization into one
 application that follows the same edit-run-observe loop as the
 standalone executable.  LAMMPS-GUI fills that gap.  It also imports
 tutorial materials, such as the official LAMMPS tutorials
-[@gravelle2025lammps] on molecular soft matter, with collections on
-materials science and discrete element modeling in preparation.
-Although aimed
-primarily at beginners, features such as rapid prototyping of input
-decks, debugging failing inputs by visualizing selected components, and
-interactive construction of reproducible `dump image` commands also make
-it useful to experienced researchers.
+[@gravelle2025lammps] on molecular soft matter, with a collection on
+materials science available in beta and on discrete element modeling in
+preparation.  Although aimed primarily at beginners, features such as
+rapid prototyping of input decks, debugging failing inputs by
+visualizing selected components, and interactive construction of
+reproducible `dump image` commands also make it useful to experienced
+researchers.
 
 # Software design and functionality
 
@@ -165,9 +166,9 @@ the tutorial session of the 2025 LAMMPS Workshop and Symposium
 [@templelammps_streams].  Its development has also fed improvements back
 into the LAMMPS engine itself, as described above.  The project is
 maintained as research software: a documentation site [@lammpsgui_home],
-releases archived on Zenodo, continuous-integration builds and automated
-tests on all three platforms, and user support through a dedicated tag
-on the LAMMPS forum.
+releases archived on Zenodo, continuous-integration builds on all three
+platforms and runs an automated test suite, and user support is
+available through a dedicated tag on the LAMMPS forum.
 
 # AI usage disclosure
 
@@ -183,7 +184,7 @@ responsibility for the software and for the content of this paper.
 
 Financial support by Sandia National Laboratories under PO 2149742 and
 PO 2407526, by the US National Science Foundation via Major Research
-Infrastructure grants number 1625061 and 2216289, and by CCDC-ARL under
+Instrumentation awards 1625061 and 2216289, and by CCDC-ARL under
 Cooperative Agreement Number W911NF-21-2-0007 is gratefully
 acknowledged.  The author thanks the LAMMPS developers and the authors
 of the LAMMPS tutorials for their feedback and for motivating many of
