@@ -1229,6 +1229,24 @@ void LammpsGui::openFile(const QString &fileName)
         !confirmUnexpectedFile(this, fileName, "text"))
         return;
 
+    // The same goes for unsaved edits: a "Cancel" here must leave the run and
+    // the output windows as they were.
+    if (textEdit->document()->isModified()) {
+        int rv = showUnsavedChangesDialog(
+            this, currentFile, "Do you want to save the file before opening a new file?");
+        switch (rv) {
+            case QMessageBox::Yes:
+                save();
+                break;
+            case QMessageBox::Cancel:
+                return;
+            case QMessageBox::No: // fallthrough
+            default:
+                // do nothing
+                break;
+        }
+    }
+
     if (lammps.isRunning()) {
         stopRun();
         runner->wait();
@@ -1253,21 +1271,6 @@ void LammpsGui::openFile(const QString &fileName)
 
     purgeInspectList();
     textEdit->setStyleSheet("");
-    if (textEdit->document()->isModified()) {
-        int rv = showUnsavedChangesDialog(
-            this, currentFile, "Do you want to save the file before opening a new file?");
-        switch (rv) {
-            case QMessageBox::Yes:
-                save();
-                break;
-            case QMessageBox::Cancel:
-                return;
-            case QMessageBox::No: // fallthrough
-            default:
-                // do nothing
-                break;
-        }
-    }
     textEdit->setHighlight(CodeEditor::NO_HIGHLIGHT, false);
 
     QFileInfo path(fileName);
