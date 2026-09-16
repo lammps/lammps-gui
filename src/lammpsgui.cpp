@@ -1792,7 +1792,9 @@ int LammpsGui::updateRunStatus()
     void *ptr = lammps.lastThermo("line", 0);
     if (ptr) textEdit->setHighlight(*static_cast<int *>(ptr), false);
 
-    if (varwindow) {
+    // only when it can be seen: this runs on every poll of the run, and each
+    // refresh asks the library for every variable
+    if (varwindow && viewlayout->isVisible(ViewSlot::Variables)) {
         int nvar = lammps.idCount("variable");
         QString varinfo("\n");
         for (int i = 0; i < nvar; ++i)
