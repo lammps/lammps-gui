@@ -446,10 +446,10 @@ CommandWindow::CommandWindow(LammpsGui *_lammpsgui, QWidget *parent) :
     // set on the widget, not only on the document: docked, this becomes a child
     // of the main window and would otherwise inherit its proportional font,
     // which QPlainTextEdit then adopts for the document as well
-    scrollback->setFont(monoFontFromSettings());
+    const QFont mono = monoFontFromSettings();
+    scrollback->setFont(mono);
 
-    prompt->setFont(monoFontFromSettings());
-    prompt->setPlaceholderText("enter a command");
+    prompt->setFont(mono);
     prompt->setToolTip("Commands run in the foreground and hold the prompt until they\n"
                        "finish, as they would in a terminal.  Start a graphical or\n"
                        "long-running program with a trailing \"&\" to keep the prompt\n"
@@ -474,7 +474,7 @@ CommandWindow::CommandWindow(LammpsGui *_lammpsgui, QWidget *parent) :
     completer->setModel(commands);
     prompt->setCompleter(completer);
 
-    cwdlabel->setFont(monoFontFromSettings());
+    cwdlabel->setFont(mono);
     cwdlabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     // the directory gives way to the input line rather than the other way round;
     // what bounds it is the elision in updatePrompt(), so its size hint stays
@@ -505,6 +505,9 @@ CommandWindow::CommandWindow(LammpsGui *_lammpsgui, QWidget *parent) :
 
     applyWindowFlags(this);
     resize(Cfg::COMMAND_DEFAULT_WIDTH, Cfg::COMMAND_DEFAULT_HEIGHT);
+    // the prompt row as it is before the shell has answered: the directory it
+    // starts in, and the placeholder of an idle input line
+    updatePrompt();
     startShell();
 }
 
@@ -628,12 +631,12 @@ void CommandWindow::startShell()
     // noise -- the prompt it prints because it is interactive, and its complaint
     // about having no terminal to put a job in the foreground of.
     priming = true;
-    shell->write(qPrintable(shellInit(program) + "\n"));
+    sendLine(shellInit(program));
     // define what the start-up file could not, because it is guarded by a test
     // for a terminal, and what a program only formats that way for one
     for (const auto &alias : ShellAliases::aliases()) {
         const QString command = aliasCommand(program, alias);
-        if (!command.isEmpty()) shell->write(qPrintable(command + "\n"));
+        if (!command.isEmpty()) sendLine(command);
     }
     // give the shell the commands that show a file in this application -- but
     // only when there is an application to show it in; standalone there is
@@ -642,11 +645,11 @@ void CommandWindow::startShell()
     if (lammpsgui) {
         for (const auto &viewer : VIEWERS) {
             for (const auto &command : viewerCommands(program, viewer, openmark))
-                shell->write(qPrintable(command + "\n"));
+                sendLine(command);
         }
     }
     // ask where we are, so the prompt is right before anything is typed
-    shell->write(qPrintable(sentinelCommand(program, sentinel) + "\n"));
+    sendLine(sentinelCommand(program, sentinel));
 }
 
 void CommandWindow::editAliases()
@@ -674,15 +677,22 @@ void CommandWindow::editAliases()
         const QString command = aliasCommand(shellprogram, alias);
         if (!command.isEmpty()) commands << command;
     }
-    if (commands.isEmpty()) return;
+    if (!commands.isEmpty()) sendWhenIdle(commands);
+}
 
-    // a line written now would be read by whatever is running, not by the shell
+void CommandWindow::sendLine(const QString &line)
+{
+    shell->write(line.toLocal8Bit() + '\n');
+}
+
+void CommandWindow::sendWhenIdle(const QStringList &lines)
+{
     if (running || priming) {
-        pendingsetup += commands;
+        pendingsetup << lines;
         return;
     }
-    for (const auto &command : commands)
-        shell->write(qPrintable(command + "\n"));
+    for (const auto &line : lines)
+        sendLine(line);
 }
 
 void CommandWindow::sendTerminalSize()
@@ -713,7 +723,7 @@ void CommandWindow::sendTerminalSize()
     sizepending           = false;
     const QString command = sizeCommand(shellprogram, cols, rows);
     if (command.isEmpty()) return;
-    shell->write(qPrintable(command + "\n"));
+    sendLine(command);
 }
 
 void CommandWindow::changeDirectory(const QString &dir)
@@ -725,14 +735,7 @@ void CommandWindow::changeDirectory(const QString &dir)
     const QString command = (shellKind(shellprogram) == ShellKind::Cmd)
                                 ? QStringLiteral("cd /d \"%1\"").arg(QDir::toNativeSeparators(dir))
                                 : QStringLiteral("cd ") + singleQuoted(dir);
-    // a line written now would be read by the running command, not the shell;
-    // the queue is flushed when the sentinel says the shell is at a prompt
-    if (running) {
-        pendingsetup << command << sentinelCommand(shellprogram, sentinel);
-        return;
-    }
-    shell->write(qPrintable(command + "\n"));
-    shell->write(qPrintable(sentinelCommand(shellprogram, sentinel) + "\n"));
+    sendWhenIdle({command, sentinelCommand(shellprogram, sentinel)});
 }
 
 // The shell starts where the input file is and stays independent afterwards: a
@@ -775,8 +778,8 @@ void CommandWindow::submit()
 
     running = true;
     updatePrompt();
-    shell->write(qPrintable(line + "\n"));
-    shell->write(qPrintable(sentinelCommand(shellprogram, sentinel) + "\n"));
+    sendLine(line);
+    sendLine(sentinelCommand(shellprogram, sentinel));
 }
 
 void CommandWindow::readOutput()
@@ -836,7 +839,7 @@ void CommandWindow::consume(const QString &chunk)
             // the shell is at a prompt again, so anything that had to wait for
             // it -- a resize, an edited alias -- can be passed on now
             for (const auto &command : pendingsetup)
-                shell->write(qPrintable(command + "\n"));
+                sendLine(command);
             pendingsetup.clear();
             if (sizepending) sendTerminalSize();
         } else if (!priming && !isShellJobControlNoise(line)) {
@@ -1058,7 +1061,7 @@ void CommandWindow::resynchronize()
 {
     QTimer::singleShot(Cfg::COMMAND_RESYNC_DELAY, this, [this]() {
         if (shell && (shell->state() == QProcess::Running))
-            shell->write(qPrintable(sentinelCommand(shellprogram, sentinel) + "\n"));
+            sendLine(sentinelCommand(shellprogram, sentinel));
     });
 }
 

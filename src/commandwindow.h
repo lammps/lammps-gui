@@ -157,6 +157,15 @@ private:
     /// the 80 columns it falls back to when there is no terminal to ask.
     void sendTerminalSize();
 
+    /// Write one line to the shell's input.
+    void sendLine(const QString &line);
+
+    /// Hand lines to the shell, or queue them until it is at a prompt again:
+    /// a line written while a command runs would be read by that command
+    /// rather than by the shell, and one written while the shell is still
+    /// swallowing its start-up chatter would be lost with it.
+    void sendWhenIdle(const QStringList &lines);
+
     /// The processes the shell started directly, asked of the operating system
     /// because without job control the shell keeps no job table.
     QList<qint64> shellChildren() const;
