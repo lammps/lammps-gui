@@ -395,6 +395,15 @@ bool WindowLayout::eventFilter(QObject *watched, QEvent *event)
 void WindowLayout::addAuxiliaryView(QWidget *view, ViewSlot group, const QString &title)
 {
     if (!view) return;
+    // A transient view is closed for good, and it is the destruction of the
+    // widget that takes the dock -- the tab -- with it (see below).  Not every
+    // one of them was built to delete itself, though, and one that only hides
+    // left its dock behind: an empty tab, or an empty panel that collapses the
+    // group and takes the tabs of the views beside it out of reach.  As a
+    // window of its own it lingered instead, hidden, until the application
+    // ended.  So this is settled here, for whatever is made a transient view,
+    // rather than left to each maker to remember.
+    view->setAttribute(Qt::WA_DeleteOnClose);
     if (layoutmode != LayoutMode::Docked || !mainwindow) {
         view->show();
         return;
@@ -413,14 +422,6 @@ void WindowLayout::addAuxiliaryView(QWidget *view, ViewSlot group, const QString
 
     d->setWidget(view);
     prepareDockedView(view);
-    // A transient view is closed for good, and it is the destruction of the
-    // widget that takes the dock -- the tab -- with it (see below).  Not every
-    // one of them was built to delete itself, though, and one that only hides
-    // left its dock behind: an empty tab, or an empty panel that collapses the
-    // group and takes the tabs of the views beside it out of reach.  So this is
-    // settled here, for whatever is made a transient panel, rather than left to
-    // each maker to remember.
-    view->setAttribute(Qt::WA_DeleteOnClose);
     auxdocks << d;
     // watched and sized like the fixed panels: it shares their group, so it
     // follows the same proportions and a splitter dragged over it is recorded
