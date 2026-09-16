@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build:
     name: LAMMPS-GUI flatpak build
-    if: ${{ github.repository == 'akohlmey/lammps-gui' }}
+    if: ${{ github.repository == 'lammps/lammps-gui' }}
     runs-on: ubuntu-latest
 
     steps:

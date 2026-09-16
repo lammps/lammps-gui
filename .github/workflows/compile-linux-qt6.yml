@@ -18,7 +18,7 @@ concurrency:
 jobs:
   build:
     name: Build with Qt 6.x support enabled
-    if: ${{ github.repository == 'akohlmey/lammps-gui' }}
+    if: ${{ github.repository == 'lammps/lammps-gui' }}
     runs-on: ubuntu-latest
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache

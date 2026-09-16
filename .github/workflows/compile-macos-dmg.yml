@@ -18,7 +18,7 @@ concurrency:
 jobs:
   build:
     name: Build on macOS and create DMG
-    if: ${{ github.repository == 'akohlmey/lammps-gui' }}
+    if: ${{ github.repository == 'lammps/lammps-gui' }}
     runs-on: macos-latest
 
     steps:

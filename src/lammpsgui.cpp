@@ -1896,6 +1896,9 @@ void LammpsGui::warnHighBufferUsage()
             QSettings().value(Keys::UPDFREQ, Cfg::DATA_UPDATE_INTERVAL_DEFAULT).toInt();
         int update_suggest = std::max(1, update_val / 5);
 
+        // already at minimum. Don't warn.
+        if (update_suggest == update_val) return;
+
         QString mesg1("<p align=\"justify\">The I/O buffer for capturing the LAMMPS screen "
                       "output was used by up to %1%.</p>"
                       "<p align=\"justify\"><b>This can slow down the simulation.</b></p>");
