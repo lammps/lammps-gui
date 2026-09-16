@@ -1956,6 +1956,8 @@ void LammpsGui::runDone()
 
     if (logwindow) {
         auto log = capturer->getCapture();
+        // at the end, as the polled chunks go: not into a selection the user made
+        logwindow->moveCursor(QTextCursor::End);
         logwindow->insertPlainText(log.c_str());
         // only when the final drain stayed empty too was the output really lost
         if (!capturereport.empty() && log.empty())
@@ -2912,7 +2914,7 @@ void LammpsGui::help()
         "<p>The 'About LAMMPS-GUI' dialog will show the LAMMPS version and the "
         "features included into the LAMMPS library linked to the LAMMPS-GUI. "
         "A number of settings can be adjusted in the 'Preferences' dialog (in "
-        "the 'Edit' menu or from <b>Ctrl-P</b>) which includes selecting "
+        "the 'View' menu or from <b>Ctrl-P</b>) which includes selecting "
         "accelerator packages and number of OpenMP threads. Due to its nature "
         "as a graphical application, it is <b>not</b> possible to use the "
         "LAMMPS-GUI in parallel with MPI.</p>");
