@@ -273,7 +273,9 @@ std::string StdCapture::getChunk()
         m_totalread += bytesRead;
     }
     maxread = (maxread > bytesRead) ? maxread : bytesRead;
-    return {buf.data()};
+    // by length, not up to a NUL: no scan of the buffer, and a stray NUL byte
+    // in the output cannot swallow what follows it
+    return {buf.data(), static_cast<std::size_t>(bytesRead > 0 ? bytesRead : 0)};
 }
 
 double StdCapture::getBufferUse() const

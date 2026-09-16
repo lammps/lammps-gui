@@ -1704,7 +1704,7 @@ void LammpsGui::logUpdate()
         const auto text = capturer->getChunk();
         if (!text.empty()) {
             logwindow->moveCursor(QTextCursor::End);
-            logwindow->insertPlainText(text.c_str());
+            logwindow->insertPlainText(decodeLog(text));
             logwindow->moveCursor(QTextCursor::End);
         }
     }
@@ -1729,6 +1729,16 @@ void LammpsGui::logUpdate()
     }
 
     updateSlideShow();
+}
+
+// The captured output is a byte stream that reaches the log window in chunks
+// cut wherever the poll timer found them, so a multi-byte character can be
+// split between two chunks.  A decoder that keeps its state between calls
+// joins it again; decoding each chunk on its own put a replacement character
+// in its place.
+QString LammpsGui::decodeLog(const std::string &bytes)
+{
+    return logDecoder.decode(QByteArrayView(bytes.data(), static_cast<qsizetype>(bytes.size())));
 }
 
 int LammpsGui::updateRunStatus()
@@ -1957,7 +1967,7 @@ void LammpsGui::runDone()
         auto log = capturer->getCapture();
         // at the end, as the polled chunks go: not into a selection the user made
         logwindow->moveCursor(QTextCursor::End);
-        logwindow->insertPlainText(log.c_str());
+        logwindow->insertPlainText(decodeLog(log));
         // only when the final drain stayed empty too was the output really lost
         if (!capturereport.empty() && log.empty())
             logwindow->appendPlainText(
@@ -2298,6 +2308,7 @@ void LammpsGui::doRun(bool use_buffer, bool dryrun)
     startLammps();
     if (!lammps.isOpen()) return;
     capturer->beginCapture();
+    logDecoder.resetState();
     verifyLibraryCapture();
 
     ++runCounter;
@@ -2399,6 +2410,7 @@ void LammpsGui::extendRun()
     status->repaint();
 
     capturer->beginCapture();
+    logDecoder.resetState();
     verifyLibraryCapture();
 
     // append to the windows of the extended run; create them only when missing

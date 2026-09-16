@@ -18,6 +18,7 @@
 #include <QPair>
 #include <QPointer>
 #include <QString>
+#include <QStringDecoder>
 #include <string>
 #include <vector>
 
@@ -488,6 +489,9 @@ private:
     /** @brief Append any newly rendered dump image to the slideshow */
     void updateSlideShow();
 
+    /** @brief Decode the next chunk of captured output as part of one UTF-8 stream */
+    QString decodeLog(const std::string &bytes);
+
     /**
      * @brief Put the focused view's own menu at the front of the menu bar
      * @param focused Widget that just took the keyboard focus
@@ -670,13 +674,14 @@ private:
     QList<QString> recent;          ///< List of recently opened files
     QList<VariableEntry> variables; ///< Index-style variable definitions
 
-    LammpsWrapper lammps;                ///< Interface to LAMMPS library
-    LammpsRunner *runner;                ///< Thread for running LAMMPS simulations
-    QString docver;                      ///< LAMMPS documentation version string
-    QString pluginPath;                  ///< Path to LAMMPS shared library (plugin mode)
-    QString capturewarning;              ///< Library-side capture check result for this run
-    int runCounter;                      ///< Counter for simulation runs
-    bool showSlides = true;              ///< Show the slide show when a run writes images
+    LammpsWrapper lammps;   ///< Interface to LAMMPS library
+    LammpsRunner *runner;   ///< Thread for running LAMMPS simulations
+    QString docver;         ///< LAMMPS documentation version string
+    QString pluginPath;     ///< Path to LAMMPS shared library (plugin mode)
+    QString capturewarning; ///< Library-side capture check result for this run
+    int runCounter;         ///< Counter for simulation runs
+    bool showSlides = true; ///< Show the slide show when a run writes images
+    QStringDecoder logDecoder{QStringDecoder::Utf8}; ///< Decodes the captured output stream
     int extendSteps;                     ///< Last used step count of the Extend Run dialog
     std::vector<std::string> lammpsArgs; ///< Command-line arguments for LAMMPS
 
