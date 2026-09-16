@@ -42,8 +42,8 @@ File
      desired) and saves the buffer to it.  Writing the buffer to a different folder
      will also switch the current working directory to that folder.
    - *View Text File* opens a dialog to select a file for viewing in a *separate*
-     window (read-only) with support for on-the-fly decompression as explained
-     above.  If the selected file appears to be an image, a movie, or a binary file,
+     window (read-only) with support for on-the-fly decompression.
+     If the selected file appears to be an image, a movie, or a binary file,
      a warning is shown instead; use *View Image or Movie File(s)...* for those.
    - *View Image or Movie File(s)...* opens a dialog to select one or more image files
      and shows them together in a standalone :ref:`slide show <slideshow>` window.  This is

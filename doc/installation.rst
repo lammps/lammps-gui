@@ -483,13 +483,13 @@ Linux
 *Binary tarball package*
 
 Version 6.2 or later of the Qt library is required. Those are provided
-by, e.g., Ubuntu 22.04LTS or later.  Thus older Linux distributions are
-not likely to be supported, while more recent ones will work, even for
-pre-compiled executables (see above).  After compiling with
-``cmake --build <build folder>``, use ``cmake --build <build
-folder> --target tgz`` or ``make tgz`` to build a
-``LAMMPS-Linux-amd64.tar.gz`` file with the executables and their
-support libraries.
+by, e.g., Ubuntu 22.04LTS or later or RHEL 9.x or later.  Thus older
+Linux distributions are not likely to be supported, while more recent
+ones will work, even for pre-compiled executables (see above).  After
+compiling with ``cmake --build <build folder>``, use ``cmake --build
+<build folder> --target tgz`` or ``make tgz`` to build a
+``LAMMPS-GUI-Linux-x86_64-<version>.tar.gz`` file with the executables
+and their support libraries.
 
 *Flatpak bundle*
 

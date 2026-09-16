@@ -191,6 +191,12 @@ last change of output fields or timestep setting, while the export from
 the log will contain *all* YAML output but *segmented* into individual
 runs.
 
+The *Preferences* dialog has a *Charts Settings* tab, where you can
+configure multiple chart-related settings, like the default title,
+colors for the graphs, default choice of the raw / smooth graph
+selection, whether the grid for the major and minor ticks is drawn, and
+the default chart graph size.
+
 .. admonition:: Slowdown of Simulations from Charts Data Processing
    :class: warning
 
@@ -222,7 +228,7 @@ The *Chart Style...* entry in the chart window's *File* menu, or the
 chart-style quick-access button at the far left of the second toolbar
 row, opens a dialog to change how the data is drawn.  The *Raw data* and
 *Processed data* series each have independent settings for the display
-style (*Lines*, *Points*, or *Lines and Points*), the color, the line
+style (*Lines*, *Points*, or *Lines + Points*), the color, the line
 width, and the point size.  This makes it possible, for example, to show
 the raw data as faint points and the smoothed curve as a bold line.  The
 *Error bars* group sets the color and line width of the error bars of
@@ -576,12 +582,6 @@ smoothing operates on the values alone and leaves the bars on the raw
 series, the axis range covers them, and exporting the chart writes them
 as an extra ``<name>-err`` column next to the values they belong to.
 Reading such an exported file back in simply gives one more data column.
-
-The *Preferences* dialog has a *Charts* tab, where you can configure
-multiple chart-related settings, like the default title, colors for the
-graphs, default choice of the raw / smooth graph selection, whether the
-grid for the major and minor ticks is drawn, and the default chart graph
-size.
 
 Here is a simple example for reproducing the radial distribution
 function g(r) and the Maxwell-Boltzmann distribution of the kinetic
