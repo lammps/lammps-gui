@@ -14,6 +14,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QRegularExpression>
+#include <QStringView>
 
 #include <cmath>
 
@@ -28,20 +29,44 @@ const QRegularExpression &wsRe()
     return re;
 }
 
-// Convert whitespace-separated tokens to numbers.  Returns false on the first
-// token that is not a number, which is how comment text and stray log output
-// are told apart from data.
-bool numericTokens(const QStringList &toks, std::vector<double> &row)
+// Whitespace-separated numbers on a line, read without a regular expression
+// and without a string per field.  Returns false at the first field that is
+// not a number, which is how comment text and stray log output are told apart
+// from data, and false for a line without fields.
+bool numericFields(QStringView line, std::vector<double> &row)
 {
     row.clear();
-    row.reserve(toks.size());
-    for (const QString &t : toks) {
+    const qsizetype n = line.size();
+    qsizetype i       = 0;
+    while (i < n) {
+        while ((i < n) && line[i].isSpace())
+            ++i;
+        if (i >= n) break;
+        qsizetype j = i;
+        while ((j < n) && !line[j].isSpace())
+            ++j;
         bool good      = false;
-        const double v = t.toDouble(&good);
+        const double d = line.mid(i, j - i).toDouble(&good);
         if (!good) return false;
-        row.push_back(v);
+        row.push_back(d);
+        i = j;
     }
     return !row.empty();
+}
+
+// Whether some line of the text, less leading whitespace, starts with the
+// prefix -- without splitting the text into a list of lines first.
+bool anyLineStartsWith(const QString &text, QLatin1String prefix)
+{
+    QStringView rest(text);
+    while (!rest.isEmpty()) {
+        const qsizetype nl     = rest.indexOf(u'\n');
+        const QStringView line = (nl < 0 ? rest : rest.left(nl)).trimmed();
+        if (line.startsWith(prefix)) return true;
+        if (nl < 0) break;
+        rest = rest.mid(nl + 1);
+    }
+    return false;
 }
 
 // Placeholder names matching those of the flat parsers in plotdata.cpp.
@@ -194,7 +219,6 @@ QString aveFileKindName(AveFileKind kind)
 PlotBlockData parseAveBlocks(const QString &text, QString *error)
 {
     PlotBlockData out;
-    const QStringList lines = text.split('\n');
     static const QRegularExpression timestepRe("^#\\s*Timestep:\\s*(-?\\d+)");
 
     QStringList commentRun;      // comment lines seen since the last data line
@@ -206,6 +230,7 @@ PlotBlockData parseAveBlocks(const QString &text, QString *error)
 
     PlotDataBlock cur;
     bool haveBlock       = false;
+    bool indexBroken     = false;
     int expectedRows     = 0;
     int rowWidth         = -1;
     int headerWidth      = -1;
@@ -243,27 +268,44 @@ PlotBlockData parseAveBlocks(const QString &text, QString *error)
         }
     };
 
-    for (const QString &raw : lines) {
-        const QString line = raw.trimmed();
+    // Column 0 of a block row is its 1-based index (see hasRowIndexColumns),
+    // and a row that breaks the count settles that this is not a block file:
+    // the result would be rejected as a whole, so there is no point in reading
+    // the rest of what may be a large plain data table.
+    auto appendRow = [&](const std::vector<double> &v) {
+        if (std::fabs(v[0] - static_cast<double>(cur.rows.rowCount() + 1)) > 1.0e-9) {
+            indexBroken = true;
+            return;
+        }
+        cur.rows.appendRow(v);
+    };
+
+    // The text is walked line by line rather than split into a list of lines
+    // first, and the fields of a line are read without a regular expression:
+    // for a large file, those allocations were most of the cost of reading it.
+    std::vector<double> v;
+    QStringView rest(text);
+    while (!rest.isEmpty() && !indexBroken) {
+        const qsizetype nl     = rest.indexOf(u'\n');
+        const QStringView line = (nl < 0 ? rest : rest.left(nl)).trimmed();
+        rest                   = (nl < 0) ? QStringView() : rest.mid(nl + 1);
         if (line.isEmpty()) continue;
 
-        if (line.startsWith('#')) {
-            if (firstComment.isEmpty()) firstComment = line;
+        if (line.startsWith(u'#')) {
+            if (firstComment.isEmpty()) firstComment = line.toString();
             // any comment terminates the block being read
             closeBlock();
-            const auto match = timestepRe.match(line);
+            const auto match = timestepRe.match(line.toString());
             if (match.hasMatch()) {
                 commentDelimited = true;
                 pendingStep      = match.captured(1).toLongLong();
             } else {
-                commentRun << line.mid(1).trimmed();
+                commentRun << line.mid(1).trimmed().toString();
             }
             continue;
         }
 
-        const QStringList toks = line.split(wsRe(), Qt::SkipEmptyParts);
-        std::vector<double> v;
-        if (!numericTokens(toks, v)) {
+        if (!numericFields(line, v)) {
             // non-numeric, non-comment text (e.g. log output the file was
             // appended to) ends the current block and the current header run
             closeBlock();
@@ -295,17 +337,21 @@ PlotBlockData parseAveBlocks(const QString &text, QString *error)
         }
         if (rowWidth < 0) {
             startRows(static_cast<int>(v.size()));
-            cur.rows.appendRow(v);
+            appendRow(v);
             continue;
         }
         if ((static_cast<int>(v.size()) == rowWidth) && (cur.rows.rowCount() < expectedRows)) {
-            cur.rows.appendRow(v);
+            appendRow(v);
             continue;
         }
         // the block is complete (or was cut short by an interrupted run): this
         // line is the header of the next one
         closeBlock();
         openHeader(v);
+    }
+    if (indexBroken) {
+        if (error) *error = QStringLiteral("not block-structured data");
+        return {};
     }
     closeBlock();
 
@@ -438,13 +484,7 @@ PlotBlockData loadPlotBlockData(const QString &filename, QString *error)
 
     const QString suffix = QFileInfo(filename).suffix().toLower();
     bool yaml            = (suffix == "yaml") || (suffix == "yml");
-    if (!yaml) {
-        for (const QString &line : text.split('\n'))
-            if (line.trimmed().startsWith("keywords:")) {
-                yaml = true;
-                break;
-            }
-    }
+    if (!yaml) yaml = anyLineStartsWith(text, QLatin1String("keywords:"));
     if (yaml) return parseAveBlocksYaml(text, error);
 
     PlotBlockData data = parseAveBlocks(text, error);
