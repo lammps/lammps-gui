@@ -2,9 +2,6 @@
 
 Please see the online documentation at https://lammps-gui.lammps.org/
 
-[![status](https://joss.theoj.org/papers/59eed23e3cdee45c6585356fb7c23ca8/status.svg)](https://joss.theoj.org/papers/59eed23e3cdee45c6585356fb7c23ca8)
-
-
 ## Test Status of the development branch
 
 [![Compile and run tests on Linux with Qt 6.x](https://github.com/lammps/lammps-gui/actions/workflows/compile-linux-qt6.yml/badge.svg)](https://github.com/lammps/lammps-gui/actions/workflows/compile-linux-qt6.yml)
