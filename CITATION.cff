@@ -6,7 +6,7 @@ title: "LAMMPS-GUI"
 abstract: >-
   LAMMPS-GUI is a cross-platform Qt-based graphical application for the
   LAMMPS molecular dynamics simulation software. It integrates an
-  input-script editor, live simulation execution via the LAMMPS C-library
+  input-script editor, live simulation execution via the LAMMPS library
   interface, log and thermodynamic-data viewing, interactive plotting, and
   snapshot/slide-show visualization into a single tool aimed at learning and
   exploring molecular dynamics with LAMMPS.
@@ -17,7 +17,7 @@ authors:
     orcid: "https://orcid.org/0000-0001-6204-6475"
     affiliation: "Institute for Computational Molecular Science, Temple University, Philadelphia, PA, USA"
 version: "3.1.0"
-date-released: "2026-09-16"
+date-released: "2026-09-18"
 license: GPL-2.0-or-later
 repository-code: "https://github.com/lammps/lammps-gui"
 url: "https://lammps-gui.lammps.org/"

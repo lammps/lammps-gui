@@ -40,7 +40,7 @@ codesign --force -s - Frameworks/Qt*.framework/Versions/A/Qt*
 echo "Codesign LAMMPS-GUI executable"
 codesign --force -s - MacOS/lammps-gui
 
-echo "Attach icons to LAMMPS console and GUI executables and lib"
+echo "Attach icons to LAMMPS-GUI executable and LAMMPS lib"
 echo "read 'icns' (-16455) \"Resources/lammps-gui.icns\";" > icon.rsrc
 Rez -a icon.rsrc -o MacOS/lammps-gui
 SetFile -a C MacOS/lammps-gui
