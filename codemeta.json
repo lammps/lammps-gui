@@ -15,7 +15,7 @@
   ],
   "codeRepository": "https://github.com/lammps/lammps-gui",
   "dateCreated": "2023",
-  "datePublished": "2026-09-18",
+  "datePublished": "2026-10-18",
   "description": "LAMMPS-GUI is a cross-platform Qt-based graphical application for the LAMMPS molecular dynamics simulation software. It integrates an input-script editor, live simulation execution via the LAMMPS library interface, log and thermodynamic-data viewing, interactive plotting, and snapshot/slide-show visualization into a single tool aimed at learning and exploring molecular dynamics with LAMMPS.",
   "developmentStatus": "active",
   "issueTracker": "https://github.com/lammps/lammps-gui/issues",
@@ -39,5 +39,5 @@
     "Qt >= 6.2 (Gui, Widgets, Network, Svg)"
   ],
   "url": "https://lammps-gui.lammps.org/",
-  "version": "3.1.0"
+  "version": "3.1.1"
 }
