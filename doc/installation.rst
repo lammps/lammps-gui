@@ -217,21 +217,35 @@ MacOS 12 and later
 
 .. index:: macOS installation
 
-After downloading the ``LAMMPS-macOS-multiarch-GUI-<LAMMPS version>.dmg``
-or ``LAMMPS-GUI-multiarch-<LAMMPS-GUI version>.dmg`` application bundle disk
-image, you need to double-click it and then -- in the window that opens --
-drag the app bundle as indicated into the "Applications" folder.  Afterwards,
-the disk image can be unmounted or ejected.  Then follow the instructions in
-the "README.txt" file to get access to the other included command-line
-executables, if desired.
+After downloading the ``LAMMPS-macOS-multiarch-GUI-<LAMMPS
+version>.dmg`` or ``LAMMPS-GUI-multiarch-<LAMMPS-GUI version>.dmg``
+application bundle disk image, you need to double-click it and then --
+in the window that opens -- drag the app bundle as indicated into the
+"Applications" folder (see left image below).  Afterwards, the disk
+image can be unmounted or ejected.  For the
+``LAMMPS-macOS-multiarch-GUI-<LAMMPS version>.dmg`` bundle, follow
+instructions in the "README.txt" file to get access to the other
+included command-line executables, if desired.
 
 .. |macos1| image:: JPG/macos-install.png
-   :width: 33%
+   :width: 38%
 
-.. |macos2| image:: JPG/macos-privacy.png
-   :width: 33%
+.. |macos2| image:: JPG/macos-deny.png
+   :width: 21%
 
-|macos1| |macos2|
+.. |macos3| image:: JPG/macos-security.png
+   :width: 40%
+
+|macos1|  |macos2|  |macos3|
+
+Because the executables are currently not cryptographically signed with
+a digital key provided by Apple, macOS will likely refuse to launch LAMMPS-GUI
+as shown in the the center image above.  After this, the executable will
+be listed under ``System Preferences -> Security & Privacy`` where you
+can click on "Open Anyway" to override this (see right image).  The details
+of this can change between different macOS versions (the screenshot images
+were created on macOS 12 Monterey), so you may need to look around or
+search the web to find the equivalent settings for your version.
 
 Linux on x86\_64
 """"""""""""""""

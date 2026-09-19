@@ -90,9 +90,9 @@ echo '
           set sidebar width to 0
           set statusbar visible to false
           set toolbar visible to false
-          set the bounds to { 0, 40, 768, 360 }
-          set position of item "'LAMMPS-GUI'.app" to { 190, 216 }
-          set position of item "Applications" to { 576, 216 }
+          set the bounds to { 0, 0, 508, 360 }
+          set position of item "'LAMMPS-GUI'.app" to { 0, 216 }
+          set position of item "Applications" to { 326, 216 }
         end tell
         update without registering applications
         delay 5
