@@ -151,14 +151,6 @@ Platform notes
 Windows 10 and later
 """"""""""""""""""""
 
-.. image:: JPG/windows-download-keep2.png
-   :align: right
-   :width: 25%
-
-.. image:: JPG/windows-download-keep1.png
-   :align: right
-   :width: 25%
-
 After downloading either the ``LAMMPS-Win10-64bit-GUI-<LAMMPS
 version>.exe`` or the ``LAMMPS-GUI-Win10-x86_64-<LAMMPS-GUI
 version>.exe`` installer package, you need to execute it, and start the
@@ -168,6 +160,21 @@ then confirm **twice** to *keep the downloaded file* despite the claims
 that it may be dangerous and insecure.  The main reason for that is that
 one needs to pay for being a registered developer and obtain a
 corresponding cryptographic signature to sign the binaries with.
+
+.. |windows1| image:: JPG/windows-download-keep2.png
+   :width: 33%
+
+.. |windows2| image:: JPG/windows-download-keep1.png
+   :width: 55%
+
+|windows1|  |windows2|
+
+Since this check is performed by the web browser, you can avoid it by
+opening a command prompt terminal window, change to the Downloads folder
+and then download the installer from the command line with:
+
+``curl -OL https://github.com/lammps/lammps-gui/releases/download/<version>/LAMMPS-GUI-Win10-x86_64-<version>.exe`` where you replace ``<version>>`` with the version tag of
+the release, e.g. v3.1.0.
 
 .. admonition:: Managing Microsoft Defender SmartScreen protection
    :class: hint
@@ -199,7 +206,7 @@ corresponding cryptographic signature to sign the binaries with.
 
    ``certutil -addstore Root LAMMPS-GUI.cer``
 
-   ``certutil -addstore TrustedPublisher LAMMPS-GUI.cer``
+   ``certutil -addstore TrustedPublisher LAMMPS-GUI.cer`` (if this step fails, it can be ignored)
 
    **Security note:** Adding a certificate to the Root store means your
    computer will trust *anything* signed with the matching private key.
@@ -247,6 +254,12 @@ can click on "Open Anyway" to override this (see right image).  The details
 of this can change between different macOS versions (the screenshot images
 were created on macOS 12 Monterey), so you may need to look around or
 search the web to find the equivalent settings for your version.
+
+A way to avoid this issue (verified with macOS 12 Monterey and macOS 26
+Tahoe) is to download the disk image from a terminal window with
+``curl -OL
+https://github.com/lammps/lammps-gui/releases/download/<version>/LAMMPS-GUI-macOS-multiarch-<version>.dmg``
+where you replace ``<version>`` with the version tag, e.g. v3.1.0.
 
 Linux on x86\_64
 """"""""""""""""
