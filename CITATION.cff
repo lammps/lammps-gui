@@ -2,7 +2,7 @@
 # ./update-codemeta.sh and commit the regenerated file as well.
 cff-version: 1.2.0
 message: "If you use this software, please cite it using these metadata."
-title: "LAMMPS-GUI"
+title: "LAMMPS-GUI: A Cross-Platform Graphical Tool to Learn and Explore Molecular Dynamics with LAMMPS"
 abstract: >-
   LAMMPS-GUI is a cross-platform Qt-based graphical application for the
   LAMMPS molecular dynamics simulation software. It integrates an

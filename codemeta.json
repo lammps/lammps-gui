@@ -28,7 +28,7 @@
     "research software"
   ],
   "license": "https://spdx.org/licenses/GPL-2.0-or-later",
-  "name": "LAMMPS-GUI",
+  "name": "LAMMPS-GUI: A Cross-Platform Graphical Tool to Learn and Explore Molecular Dynamics with LAMMPS",
   "operatingSystem": [
     "Linux",
     "macOS",
