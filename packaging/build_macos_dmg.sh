@@ -90,7 +90,7 @@ echo '
           set sidebar width to 0
           set statusbar visible to false
           set toolbar visible to false
-          set the bounds to { 100, 40, 868, 350 }
+          set the bounds to { 0, 40, 768, 360 }
           set position of item "'LAMMPS-GUI'.app" to { 190, 216 }
           set position of item "Applications" to { 576, 216 }
         end tell
