@@ -41,7 +41,6 @@ if (LAMMPS_GUI_USE_PLUGIN AND NOT BUILD_DOC_ONLY)
       ${CMAKE_COMMAND} -E make_directory ${APP_CONTENTS}/bin
       COMMAND ${CMAKE_COMMAND} -E create_symlink ../MacOS/lammps-gui ${APP_CONTENTS}/bin/lammps-gui
       COMMAND ${CMAKE_COMMAND} -E make_directory ${APP_CONTENTS}/Resources
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_README_FILE} ${APP_CONTENTS}/Resources/README.txt
       COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_ICON_FILE} ${APP_CONTENTS}/Resources
       COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_BACKGROUND_FILE} ${APP_CONTENTS}/Resources
       DEPENDS lammps-gui
