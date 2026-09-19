@@ -24,11 +24,10 @@ DEVICE=$(hdiutil attach -readwrite -noverify ${APP_NAME}-rw.dmg | grep '^/dev/' 
 VOLUME=$(df | grep ${DEVICE} | sed -e 's/^.*\(\/Volumes\/\)/\1/')
 sleep 2
 
-echo "Create link to Application folder and move README and background image files"
+echo "Create link to Application folder and move background image files"
 
 pushd "${VOLUME}"
 ln -s /Applications .
-mv ${APP_NAME}.app/Contents/Resources/README.txt .
 mkdir  .background
 mv ${APP_NAME}.app/Contents/Resources/LAMMPS_DMG_Background.png .background/background.png
 mv ${APP_NAME}.app LAMMPS-GUI.app
@@ -91,10 +90,9 @@ echo '
           set sidebar width to 0
           set statusbar visible to false
           set toolbar visible to false
-          set the bounds to { 100, 40, 868, 640 }
+          set the bounds to { 100, 40, 868, 350 }
           set position of item "'LAMMPS-GUI'.app" to { 190, 216 }
           set position of item "Applications" to { 576, 216 }
-          set position of item "README.txt" to { 190, 400 }
         end tell
         update without registering applications
         delay 5
