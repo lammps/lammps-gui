@@ -38,16 +38,17 @@ source requires CMake version 3.20 or later and a suitable C++ compiler.
 
 .. admonition:: LAMMPS-GUI |version| has been successfully compiled and tested on:
 
-   - Ubuntu Linux 22.04LTS x86\_64 using GCC 11, Qt version 6.2
-   - Ubuntu Linux 24.04LTS x86\_64 using GCC 13, Qt version 6.4
-   - AlmaLinux 9.8 x86\_64 using GCC 11, Qt version 6.6
-   - Fedora Linux 43 x86\_64 using Clang 21, Qt version 6.10
-   - Fedora Linux 43 x86\_64 using GCC 15, Qt version 6.10
+   - Ubuntu Linux 22.04LTS x86\_64 using GCC 11 and Qt version 6.2
+   - Ubuntu Linux 24.04LTS x86\_64 using GCC 13 and Qt version 6.4
+   - AlmaLinux 9.8 x86\_64 using GCC 11 and Qt version 6.6
+   - Fedora Linux 43 x86\_64 using Clang 21 and Qt version 6.10
+   - Fedora Linux 43 x86\_64 using GCC 15 and Qt version 6.10
    - Apple macOS 12 (Monterey) with Xcode 14.2 / AppleClang 14 on arm64 and x86\_64, Qt version 6.5
    - Apple macOS 14 (Sonoma) with Xcode 16.4 / AppleClang 17 on arm64, Qt version 6.8
-   - Windows Server 2025 x86\_64 with Visual Studio 2022 and Visual C++ 14.40, Qt version 6.8
-   - Windows 11 x86\_64 with Visual Studio 2026 and Visual C++ 14.50, Qt version 6.10
-   - Windows 11 x86\_64 with MinGW / GCC 15.2 cross-compiler on Fedora 43, Qt version 6.10
+   - Microsoft Windows Server 2025 x86\_64 with Visual Studio 2022 and Visual C++ 14.40, Qt version 6.8
+   - Microsoft Windows 11 x86\_64 with Visual Studio 2026 and Visual C++ 14.50, Qt version 6.10
+   - Microsoft Windows 11 x86\_64 with MinGW / GCC 15.2 cross-compiler on Fedora 43, Qt version 6.10
+   - FreeBSD 15.1 x86\_64 with Clang 19.1 and Qt version 6.11.1
 
 Pre-compiled executables
 ^^^^^^^^^^^^^^^^^^^^^^^^
