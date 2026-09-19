@@ -116,7 +116,7 @@ archived on `Zenodo <https://zenodo.org>`_:
    @software{lammps_gui_zenodo,
      author       = {Kohlmeyer, Axel},
      title        = {{LAMMPS-GUI}: A Cross-Platform Graphical Tool to
-                      Learn and Explore Molecular Dynamics with LAMMPS},
+                      Learn and Explore Molecular Dynamics with {LAMMPS}},
      publisher    = {Zenodo},
      doi          = {10.5281/zenodo.21035505},
      url          = {https://doi.org/10.5281/zenodo.21035505},
