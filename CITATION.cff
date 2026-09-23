@@ -1,7 +1,7 @@
 # codemeta.json is generated from this file: after changing it, run
 # ./update-codemeta.sh and commit the regenerated file as well.
 cff-version: 1.2.0
-message: "If you use this software, please cite it using these metadata."
+message: "If you use this software, please cite the article from preferred-citation (https://doi.org/10.21105/joss.11185)."
 title: "LAMMPS-GUI: A Cross-Platform Graphical Tool to Learn and Explore Molecular Dynamics with LAMMPS"
 abstract: >-
   LAMMPS-GUI is a cross-platform Qt-based graphical application for the
@@ -28,6 +28,20 @@ keywords:
   - scientific visualization
   - simulation
   - research software
-# After the JOSS paper is accepted, add a `preferred-citation:` block of
-# type `article` here with the published JOSS DOI so that citing tools
-# prefer the paper over this software record.
+preferred-citation:
+  type: article
+  title: "LAMMPS-GUI: A Cross-Platform Graphical Tool to Learn and Explore Molecular Dynamics with LAMMPS"
+  authors:
+    - family-names: Kohlmeyer
+      given-names: Axel
+      orcid: "https://orcid.org/0000-0001-6204-6475"
+      affiliation: "Institute for Computational Molecular Science, Temple University, Philadelphia, PA, USA"
+  journal: "Journal of Open Source Software"
+  publisher:
+    name: "The Open Journal"
+  year: 2026
+  volume: 11
+  issue: 125
+  start: 11185
+  doi: "10.21105/joss.11185"
+  url: "https://doi.org/10.21105/joss.11185"

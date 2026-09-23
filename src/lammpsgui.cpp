@@ -130,7 +130,7 @@ void purgeLibraryLeftovers()
 }
 
 const QString citeme("# When using LAMMPS-GUI in your project, please cite: "
-                     "https://doi.org/10.33011/livecoms.6.1.3037\n");
+                     "https://doi.org/10.21105/joss.11185\n");
 const QString bannerstyle("CodeEditor {background-position: center center; "
                           "padding: 0px; "
                           "background-repeat: no-repeat; "

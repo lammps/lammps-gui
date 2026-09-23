@@ -106,8 +106,31 @@ This document describes LAMMPS-GUI version |version|.
 Citing LAMMPS-GUI
 *****************
 
-There is currently no citation specifically describing LAMMPS-GUI but a
-manuscript has been submitted to `JOSS <https://joss.theoj.org/>`_.
+If you use LAMMPS-GUI in your work, please cite the following paper in
+the `Journal of Open Source Software <https://joss.theoj.org/>`_:
+
+   Kohlmeyer, A. (2026). LAMMPS-GUI: A Cross-Platform Graphical Tool to
+   Learn and Explore Molecular Dynamics with LAMMPS. Journal of Open
+   Source Software, 11(125), 11185. https://doi.org/10.21105/joss.11185
+
+or in BibTeX format:
+
+.. code-block:: bibtex
+
+   @article{lammps_gui_joss,
+     author       = {Kohlmeyer, Axel},
+     title        = {{LAMMPS-GUI}: A Cross-Platform Graphical Tool to
+                      Learn and Explore Molecular Dynamics with {LAMMPS}},
+     journal      = {Journal of Open Source Software},
+     publisher    = {The Open Journal},
+     year         = {2026},
+     volume       = {11},
+     number       = {125},
+     pages        = {11185},
+     doi          = {10.21105/joss.11185},
+     url          = {https://doi.org/10.21105/joss.11185},
+   }
+
 Also, starting with version 3.0.0 LAMMPS-GUI releases are automatically
 archived on `Zenodo <https://zenodo.org>`_:
 
@@ -124,12 +147,13 @@ archived on `Zenodo <https://zenodo.org>`_:
 
 .. raw:: html
 
-   <a href="https://joss.theoj.org/papers/59eed23e3cdee45c6585356fb7c23ca8"><img src="https://joss.theoj.org/papers/59eed23e3cdee45c6585356fb7c23ca8/status.svg"></a>
+   <a href="https://doi.org/10.21105/joss.11185"><img src="https://joss.theoj.org/papers/10.21105/joss.11185/status.svg" alt="DOI"></a>
    <a href="https://doi.org/10.5281/zenodo.21035505"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21035505.svg" alt="DOI"></a>
 
-An introduction to LAMMPS-GUI is included in the following publication
-in LiveCoMS for the LAMMPS tutorials that are linked from LAMMPS-GUI, so
-the suggestion is to cite that publication for now:
+The *Soft Matter* collection of tutorials in the :ref:`Tutorials menu
+<tutorials>` is published in LiveCoMS.  Those tutorials teach how to use
+LAMMPS-GUI as much as how to use LAMMPS, so this publication is a
+suitable secondary citation:
 
    Gravelle, S., Alvares, C. M. S., Gissinger, J. R., &
    Kohlmeyer, A. (2025). A Set of Tutorials for the LAMMPS Simulation
