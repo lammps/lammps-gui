@@ -34,7 +34,7 @@ the `Qt GUI framework <https://www.qt.io/development/qt-framework>`_.  As
 of LAMMPS-GUI version 2.0.0 Qt version 6.2 or later is required.
 LAMMPS-GUI can switch between a "light" and a "dark" theme according to
 the settings of the desktop environment.  Building LAMMPS-GUI from
-source requires CMake version 3.20 or later and a suitable C++ compiler.
+source requires CMake version 3.20 or later.
 
 .. admonition:: LAMMPS-GUI |version| has been successfully compiled and tested on:
 
