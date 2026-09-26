@@ -411,7 +411,12 @@ macOS
 When building on macOS, the build procedure will try to create a
 drag-n-drop installer, ``LAMMPS-GUI-macOS-multiarch-<version>.dmg``,
 when using the 'dmg' target (i.e. ``cmake --build <build dir> --target
-dmg`` or ``make dmg``).
+dmg`` or ``make dmg``).  This requires the `dmgbuild
+<https://pypi.org/project/dmgbuild/>`_ Python package, which can be
+installed with ``python3 -m pip install --user dmgbuild`` or ``pipx
+install dmgbuild``.  Since dmgbuild sets up the Finder window layout of
+the disk image directly, no GUI session is needed, i.e. the installer
+can also be created when logged in remotely via ssh.
 
 To build multi-arch executables on macOS that will run on both, arm64
 and x86_64 architectures natively, it is necessary to set the CMake
