@@ -20,7 +20,7 @@ fi
 echo "Delete old files, if they exist"
 rm -f ${APP_NAME}.dmg ${APP_NAME}-rw.dmg LAMMPS-GUI-macOS-multiarch*.dmg \
    ${APP_NAME}.app/Contents/Frameworks/liblammps.0.dylib
-rm -rf "${STAGE_DIR}"
+rm -rf "${STAGE_DIR}" "${APP_NAME}.app"
 
 # download pre-compiled LAMMPS shared library if plugin-mode LAMMPS-GUI binary
 if $(./${APP_NAME}.app/Contents/MacOS/lammps-gui -h | grep -q pluginpath); then

@@ -23,8 +23,6 @@ files = [_app]
 symlinks = {"Applications": "/Applications"}
 background = defines["background"]
 
-# Same window geometry as the former AppleScript 'bounds {100, 40, 868, 640}',
-# with sidebar, toolbar and status bar hidden.
 window_rect = ((0, 0), (508, 360))
 default_view = "icon-view"
 show_status_bar = False
