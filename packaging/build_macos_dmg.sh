@@ -53,7 +53,7 @@ rm -f ${APP_NAME}.dmg ${APP_NAME}-rw.dmg LAMMPS-GUI-macOS-multiarch*.dmg \
 rm -rf "${STAGE_DIR}"
 
 # download pre-compiled LAMMPS shared library if plugin-mode LAMMPS-GUI binary
-if $(./${APP_NAME}.app/Contents/MacOS/lammps-gui -h | grep -q pluginpath); then
+if eval ./${APP_NAME}.app/Contents/MacOS/lammps-gui -h | grep -q pluginpath; then
     mkdir -p ${APP_NAME}.app/Contents/Frameworks
     curl -L -o ${APP_NAME}.app/Contents/Frameworks/liblammps.0.dylib https://download.lammps.org/lammps-gui/liblammps.0.dylib
     chmod 0755 ${APP_NAME}.app/Contents/Frameworks/liblammps.0.dylib
@@ -65,9 +65,9 @@ macdeployqt ${APP_NAME}.app
 echo "Stage a copy of the app bundle and the background image"
 mkdir -p "${STAGE_DIR}"
 ditto ${APP_NAME}.app "${STAGE_DIR}/LAMMPS-GUI.app"
-pushd "${STAGE_DIR}"
+pushd "${STAGE_DIR}" || exit 1
 mv LAMMPS-GUI.app/Contents/Resources/LAMMPS_DMG_Background.png background.png
-cd LAMMPS-GUI.app/Contents
+cd LAMMPS-GUI.app/Contents || exit 2
 echo "Codesign bundled plugins"
 codesign --force -s - PlugIns/*/*.dylib
 echo "Codesign bundled frameworks"
@@ -85,19 +85,22 @@ if [ -f Frameworks/liblammps.0.dylib ]; then
     SetFile -a C Frameworks/liblammps.0.dylib
 fi
 rm icon.rsrc
-popd
+popd || exit 3
+
+# add volume icon
+cp "${PACKAGING_DIR}/lammps-gui.icns" "${STAGE_DIR}/.VolumeIcon.icns"
 
 echo "Create compressed disk image using dmgbuild"
 run_dmgbuild -s "${PACKAGING_DIR}/dmg_settings.py" \
     -D app="${STAGE_DIR}/LAMMPS-GUI.app" \
     -D background="${STAGE_DIR}/background.png" \
     -D icon="${BUILD_DIR}/${APP_NAME}.app/Contents/Resources/lammps-gui.icns" \
-    "${APP_NAME}" "${DMG_FILE}"
+    "LAMMPS-GUI" "${DMG_FILE}"
 
 echo "Attach icon to .dmg file"
 echo "read 'icns' (-16455) \"${APP_NAME}.app/Contents/Resources/lammps-gui.icns\";" > icon.rsrc
-Rez -a icon.rsrc -o ${DMG_FILE}
-SetFile -a C ${DMG_FILE}
+Rez -a icon.rsrc -o "${DMG_FILE}"
+SetFile -a C "${DMG_FILE}"
 rm icon.rsrc
 
 echo "Delete staging directory"
