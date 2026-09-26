@@ -60,7 +60,7 @@ if eval ./${APP_NAME}.app/Contents/MacOS/lammps-gui -h | grep -q pluginpath; the
 fi
 
 echo "Bundle Qt frameworks and plugins with macdeployqt"
-macdeployqt ${APP_NAME}.app
+macdeployqt ${APP_NAME}.app -always-overwrite
 
 echo "Stage a copy of the app bundle and the background image"
 mkdir -p "${STAGE_DIR}"
