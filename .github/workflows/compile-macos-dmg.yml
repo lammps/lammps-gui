@@ -49,8 +49,7 @@ jobs:
     - name: Install dmgbuild
       shell: bash
       run: |
-        pipx install dmgbuild
-        echo "$(pipx environment --value PIPX_BIN_DIR)" >> "$GITHUB_PATH"
+        python3 -m pip install --user --break-system-packages dmgbuild
 
     - name: Create DMG installer
       shell: bash
