@@ -7,15 +7,12 @@ PACKAGING_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STAGE_DIR="${BUILD_DIR}/dmg-staging"
 DMG_FILE="LAMMPS-GUI-macOS-multiarch-v${VERSION}.dmg"
 
-# dmgbuild creates the disk image and its Finder window layout without
-# scripting the Finder, so it also works over ssh or without a GUI session
-if command -v dmgbuild > /dev/null 2>&1
+# install/upgrade dmgbuild helper script
+python3 -m pip install --upgrade --user pip
+python3 -m pip install --upgrade --user dmgbuild
+
+if ! python3 -c 'import dmgbuild' > /dev/null 2>&1
 then
-    DMGBUILD=(dmgbuild)
-elif python3 -c 'import dmgbuild' > /dev/null 2>&1
-then
-    DMGBUILD=(python3 -m dmgbuild)
-else
     echo "ERROR: dmgbuild is required. Install with: python3 -m pip install --user dmgbuild"
     exit 1
 fi
@@ -60,7 +57,7 @@ rm icon.rsrc
 popd
 
 echo "Create compressed disk image using dmgbuild"
-"${DMGBUILD[@]}" -s "${PACKAGING_DIR}/dmg_settings.py" \
+python3 -m dmgbuild -s "${PACKAGING_DIR}/dmg_settings.py" \
     -D app="${STAGE_DIR}/LAMMPS-GUI.app" \
     -D readme="${STAGE_DIR}/README.txt" \
     -D background="${STAGE_DIR}/background.png" \
