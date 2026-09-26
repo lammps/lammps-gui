@@ -41,7 +41,6 @@ if (LAMMPS_GUI_USE_PLUGIN AND NOT BUILD_DOC_ONLY)
       ${CMAKE_COMMAND} -E make_directory ${APP_CONTENTS}/bin
       COMMAND ${CMAKE_COMMAND} -E create_symlink ../MacOS/lammps-gui ${APP_CONTENTS}/bin/lammps-gui
       COMMAND ${CMAKE_COMMAND} -E make_directory ${APP_CONTENTS}/Resources
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_README_FILE} ${APP_CONTENTS}/Resources/README.txt
       COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_ICON_FILE} ${APP_CONTENTS}/Resources
       COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_BACKGROUND_FILE} ${APP_CONTENTS}/Resources
       DEPENDS lammps-gui
@@ -52,7 +51,7 @@ if (LAMMPS_GUI_USE_PLUGIN AND NOT BUILD_DOC_ONLY)
       COMMAND ${CMAKE_SOURCE_DIR}/packaging/build_macos_dmg.sh ${PROJECT_VERSION}
       DEPENDS complete-bundle
       COMMENT "Create Drag-n-Drop installer disk image from app bundle"
-      BYPRODUCTS LAMMPS-GUI-macOS-multiarch-${PROJECT_VERSION}.dmg
+      BYPRODUCTS LAMMPS-GUI-macOS-multiarch-v${PROJECT_VERSION}.dmg
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
   # settings for packaging Windows NSIS installer on Linux with MinGW cross-compiler.
@@ -64,7 +63,7 @@ if (LAMMPS_GUI_USE_PLUGIN AND NOT BUILD_DOC_ONLY)
       COMMAND ${CMAKE_SOURCE_DIR}/packaging/build_windows_cross_nsis.sh ${CMAKE_INSTALL_PREFIX} ${PROJECT_VERSION} ${CMAKE_SOURCE_DIR}
       DEPENDS lammps-gui html pdf
       COMMENT "Create nsis installer with windows binaries"
-      BYPRODUCTS LAMMPS-GUI-Win10-x86_64-${PROJECT_VERSION}.exe
+      BYPRODUCTS LAMMPS-GUI-Win10-x86_64-v${PROJECT_VERSION}.exe
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
   # LAMMPS_GUI_USE_PLUGIN is already required by the enclosing if() block
   elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -97,7 +96,7 @@ if (LAMMPS_GUI_USE_PLUGIN AND NOT BUILD_DOC_ONLY)
       COMMAND ${CMAKE_SOURCE_DIR}/packaging/build_linux_tgz.sh ${PROJECT_VERSION}
       DEPENDS lammps-gui
       COMMENT "Create compressed tar file of LAMMPS-GUI with dependent libraries and wrapper"
-      BYPRODUCTS LAMMPS-GUI-Linux-x86_64-${PROJECT_VERSION}.tar.gz
+      BYPRODUCTS LAMMPS-GUI-Linux-x86_64-v${PROJECT_VERSION}.tar.gz
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
   endif()
