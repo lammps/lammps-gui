@@ -46,6 +46,12 @@ jobs:
       run: |
         build/lammps-gui.app/Contents/MacOS/lammps-gui --platform offscreen -v
 
+    - name: Install dmgbuild
+      shell: bash
+      run: |
+        pipx install dmgbuild
+        echo "$(pipx environment --value PIPX_BIN_DIR)" >> "$GITHUB_PATH"
+
     - name: Create DMG installer
       shell: bash
       run: |
