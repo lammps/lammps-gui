@@ -1,28 +1,25 @@
 # dmgbuild settings for the LAMMPS-GUI drag-and-drop installer disk image.
 #
-# Used by build_macos_dmg.sh. Replaces the former Finder AppleScript, so the
-# image can be built without scripting the Finder (e.g. over ssh or in CI).
+# Used by build_macos_dmg.sh.
 # dmgbuild writes the window layout directly into the image's .DS_Store.
 #
 # Paths are passed from the build script with -D:
 #   app=...         staged LAMMPS-GUI.app bundle
-#   readme=...      README.txt to place next to the app
 #   background=...  background image (1024x768 px at 96 dpi = 768x576 pt)
 
 import os.path
 
-for _key in ("app", "readme", "background"):
+for _key in ("app", "background"):
     if _key not in defines:
         raise ValueError(f"dmg_settings.py: missing -D {_key}=<path>")
 
 _app = defines["app"]
-_readme = defines["readme"]
 
 # compressed read-only image, same as the former 'hdiutil convert -format UDZO'
 format = "UDZO"
 filesystem = "HFS+"
 
-files = [_app, _readme]
+files = [_app]
 symlinks = {"Applications": "/Applications"}
 background = defines["background"]
 
