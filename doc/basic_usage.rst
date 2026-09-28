@@ -64,6 +64,18 @@ is not changed, so the next start without a flag is back to what the
 *Preferences* dialog shows, and so is a relaunch (which passes no
 arguments on).  Giving both at once is an error.
 
+On Linux and other Unix-like systems except macOS, LAMMPS-GUI checks at
+startup whether a graphical display is available, i.e. whether either of
+the ``DISPLAY`` or ``WAYLAND_DISPLAY`` environment variables is set.
+Without one, the ``-h``, ``--help-all``, and ``-v`` flags still print
+their text (``--help-all`` then lists only the generic Qt options that
+do not need a display) and ``-p`` still stores the library path, but
+LAMMPS-GUI itself cannot start: it prints an error message and exits.
+Selecting a Qt platform plugin explicitly, with ``-platform <name>`` or
+the ``QT_QPA_PLATFORM`` environment variable, skips this check.  For
+example, ``-platform vnc`` makes LAMMPS-GUI act as a VNC server, so it
+can be used from a VNC viewer on another machine.
+
 The optional ``file`` argument specifies a LAMMPS input file to open on
 startup.  If no file is provided, LAMMPS-GUI starts with an empty
 editor buffer.  Available choices for the visual style depend on the

@@ -552,6 +552,32 @@ and validates that help text is consistent with CMake configuration:
 
 **Environment**: ``OMP_NUM_THREADS=1`` to ensure consistent behavior
 
+CommandLine.NoDisplayHelp
+--------------------------
+
+**Purpose**: Verify that the help text is printed without a display
+
+This test runs::
+
+  lammps-gui -h
+
+with the ``DISPLAY``, ``WAYLAND_DISPLAY``, and ``QT_QPA_PLATFORM``
+environment variables set to empty values, and validates that the help
+text is printed instead of Qt aborting for lack of a platform plugin.
+
+CommandLine.NoDisplayStart
+---------------------------
+
+**Purpose**: Verify that a start without a display fails cleanly
+
+This test runs::
+
+  lammps-gui
+
+in the same environment as ``CommandLine.NoDisplayHelp`` and validates
+that LAMMPS-GUI exits with an error message stating that no graphical
+display was found, instead of aborting with a core dump.
+
 GUI Tests
 =========
 
