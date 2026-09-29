@@ -111,7 +111,7 @@ the `Journal of Open Source Software <https://joss.theoj.org/>`_:
 
    Kohlmeyer, A. (2026). LAMMPS-GUI: A Cross-Platform Graphical Tool to
    Learn and Explore Molecular Dynamics with LAMMPS. Journal of Open
-   Source Software, 11(125), 11185. https://doi.org/10.21105/joss.11185
+   Source Software, XX(XXX), 11185. https://doi.org/10.21105/joss.11185
 
 or in BibTeX format:
 
@@ -124,12 +124,19 @@ or in BibTeX format:
      journal      = {Journal of Open Source Software},
      publisher    = {The Open Journal},
      year         = {2026},
-     volume       = {11},
-     number       = {125},
+     volume       = {XX},
+     number       = {XXX},
      pages        = {11185},
      doi          = {10.21105/joss.11185},
      url          = {https://doi.org/10.21105/joss.11185},
    }
+
+.. note::
+
+   The paper is accepted for publication was not yet published at
+   release time, so volume and issue number are currently unknown and
+   the DOI was reserved but not yet active. It may become available
+   before the next LAMMPS-GUI release.
 
 Also, starting with version 3.0.0 LAMMPS-GUI releases are automatically
 archived on `Zenodo <https://zenodo.org>`_:

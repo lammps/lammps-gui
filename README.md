@@ -29,7 +29,7 @@ If you use LAMMPS-GUI in your work, please cite the following paper in the
 
 > Kohlmeyer, A. (2026). LAMMPS-GUI: A Cross-Platform Graphical Tool to Learn
 > and Explore Molecular Dynamics with LAMMPS. Journal of Open Source Software,
-> 11(125), 11185. https://doi.org/10.21105/joss.11185
+> XX(XXX), 11185. https://doi.org/10.21105/joss.11185
 
 ``` BibTex
    @article{lammps_gui_joss,
@@ -39,13 +39,17 @@ If you use LAMMPS-GUI in your work, please cite the following paper in the
      journal      = {Journal of Open Source Software},
      publisher    = {The Open Journal},
      year         = {2026},
-     volume       = {11},
-     number       = {125},
+     volume       = {XX},
+     number       = {XXX},
      pages        = {11185},
      doi          = {10.21105/joss.11185},
      url          = {https://doi.org/10.21105/joss.11185}
    }
 ```
+
+NOTE: The paper is accepted for publication was not yet published at release
+time, so volume and issue number are currently unknown and the DOI was reserved
+but not yet active.  It may become available before the next LAMMPS-GUI release.
 
 Also, starting with version 3.0.0 LAMMPS-GUI releases are automatically
 archived on [Zenodo](https://zenodo.org) [![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21035505.svg)](https://doi.org/10.5281/zenodo.21035505):
