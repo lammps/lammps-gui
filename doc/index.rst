@@ -131,6 +131,10 @@ or in BibTeX format:
      url          = {https://doi.org/10.21105/joss.11185},
    }
 
+.. raw:: html
+
+   <a href="https://doi.org/10.21105/joss.11185"><img src="https://joss.theoj.org/papers/10.21105/joss.11185/status.svg" alt="DOI"></a>
+
 .. note::
 
    The paper is accepted for publication was not yet published at
@@ -154,7 +158,6 @@ archived on `Zenodo <https://zenodo.org>`_:
 
 .. raw:: html
 
-   <a href="https://doi.org/10.21105/joss.11185"><img src="https://joss.theoj.org/papers/10.21105/joss.11185/status.svg" alt="DOI"></a>
    <a href="https://doi.org/10.5281/zenodo.21035505"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21035505.svg" alt="DOI"></a>
 
 The *Soft Matter* collection of tutorials in the :ref:`Tutorials menu
