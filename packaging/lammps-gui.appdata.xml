@@ -58,8 +58,22 @@
   <content_rating type="oars-1.1" />
 
   <releases>
-    <!-- tentative timestamp (noon UTC, 16 September 2026); update when 3.1.0 is actually released -->
-    <release version="3.1.0" timestamp="1789560000">
+    <!-- planned release together with the LAMMPS stable release (noon UTC, 30 September 2026) -->
+    <release version="3.1.1" timestamp="1790769600">
+      <description>
+        <p>Maintenance release with bug fixes, installer improvements, and documentation updates.</p>
+        <ul>
+          <li>Fail with an error message instead of aborting with a core dump when LAMMPS-GUI is started on Linux or BSD without a graphical display, e.g. on a remote machine without X11 forwarding; the -h, -v, and -p flags keep working, and selecting a Qt platform plugin explicitly, e.g. with -platform vnc, skips the check</li>
+          <li>Recognize the Windows System32, AppData, and Program Files folders regardless of the capitalization of their names, so LAMMPS-GUI falls back to the home folder and the tutorial wizard to the desktop when launched from there</li>
+          <li>Cite the LAMMPS-GUI paper in the Journal of Open Source Software as the preferred reference in the citation note of the editor and the About dialog, and in the citation metadata</li>
+          <li>Create the macOS installer disk image with dmgbuild instead of scripting the Finder, so it can also be built without a desktop session, e.g. over ssh, and works with macOS 26 Tahoe</li>
+          <li>Redesign the macOS installer disk image: a more compact window and background image, a volume icon, the LAMMPS icon on the bundled LAMMPS library, and no more README.txt file, which is not needed for the plain LAMMPS-GUI package</li>
+          <li>Document how to get the unsigned Windows and macOS packages past the operating system download checks, e.g. by downloading them with curl from a terminal, with updated screenshots</li>
+          <li>Add FreeBSD 15.1 to the list of tested platforms</li>
+        </ul>
+      </description>
+    </release>
+    <release version="3.1.0" timestamp="1789745310">
       <description>
         <p>Feature release adding an alternative single-window layout and a command window.</p>
         <ul>

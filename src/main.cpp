@@ -19,8 +19,10 @@
 #include "slideshow.h"
 
 #include <QApplication>
+#include <QByteArray>
 #include <QCommandLineOption>
 #include <QCommandLineParser>
+#include <QCoreApplication>
 #include <QFileInfo>
 #include <QFont>
 #include <QIcon>
@@ -65,6 +67,104 @@ static void initConsoleIO() {}
 #define stringify(x) myxstr(x)
 #define myxstr(x) #x
 
+// On Linux and the BSDs, Qt finds the X11 or Wayland display server through the
+// environment.  With neither there, constructing a QApplication cannot load a platform
+// plugin and aborts the process.  An explicitly chosen platform plugin or X display
+// (e.g. "-platform offscreen", "-platform vnc", or "-display host:0") is left for Qt
+// to sort out.
+static bool haveDisplay(int argc, char *argv[])
+{
+#if defined(Q_OS_UNIX) && !defined(Q_OS_DARWIN)
+    if (!qEnvironmentVariableIsEmpty("DISPLAY") ||
+        !qEnvironmentVariableIsEmpty("WAYLAND_DISPLAY") ||
+        !qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
+        return true;
+    for (int i = 1; i < argc; ++i) {
+        const QByteArray arg(argv[i]);
+        if ((arg == "-platform") || (arg == "--platform") || (arg == "-display") ||
+            (arg == "--display"))
+            return true;
+    }
+    return false;
+#else
+    Q_UNUSED(argc);
+    Q_UNUSED(argv);
+    return true;
+#endif
+}
+
+// application identity for QSettings and the help and version output
+static void setApplicationInfo()
+{
+    QCoreApplication::setOrganizationName("The LAMMPS Developers");
+    QCoreApplication::setOrganizationDomain("lammps.org");
+    QCoreApplication::setApplicationName("LAMMPS-GUI (QT" stringify(QT_VERSION_MAJOR) ")");
+    QCoreApplication::setApplicationVersion(LAMMPS_GUI_VERSION);
+#if defined(LAMMPS_GUI_USE_PLUGIN)
+    {
+        // the library path is stored under a toolchain-qualified key (see
+        // constants.h); carry the value of an installation from before the
+        // split over once, and leave the legacy key for older versions
+        QSettings settings;
+        if (!settings.contains(Keys::PLUGIN_PATH) && settings.contains(Keys::PLUGIN_PATH_LEGACY))
+            settings.setValue(Keys::PLUGIN_PATH, settings.value(Keys::PLUGIN_PATH_LEGACY));
+    }
+#endif
+}
+
+static void setupCommandLine(QCommandLineParser &parser)
+{
+    QString description(
+        "\nThis is LAMMPS-GUI v" LAMMPS_GUI_VERSION "\n"
+        "\nA graphical editor for LAMMPS input files with syntax highlighting and\n"
+        "auto-completion that can run LAMMPS directly. It has built-in capabilities\n"
+        "for monitoring, visualization, plotting, and capturing console output.");
+#if defined(LAMMPS_GUI_USE_PLUGIN)
+    description += QString("\n\nCurrent LAMMPS plugin path setting:\n  %1")
+                       .arg(QSettings().value(Keys::PLUGIN_PATH, "").toString());
+#endif
+    parser.setApplicationDescription(description);
+
+#if defined(LAMMPS_GUI_USE_PLUGIN)
+    parser.addOption(QCommandLineOption(QStringList() << "p"
+                                                      << "pluginpath",
+                                        "Set path to LAMMPS shared library", "path"));
+#endif
+
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.addOptions(
+        {{{"x", "width"}, "Override LAMMPS-GUI editor window width", "width"},
+         {{"y", "height"}, "Override LAMMPS-GUI editor window height", "height"},
+         {{"s", "style"}, "Set LAMMPS-GUI's visual style (default: Fusion)", "style", "Fusion"},
+         {{"c", "chart"}, "Open FILE directly in the chart/plot viewer", "file"},
+         {{"i", "image"}, "Open FILE in the snapshot viewer (may be given multiple times)", "file"},
+         {{"t", "text"}, "Open FILE in the text file viewer", "file"},
+         {{"j", "joined"}, "Dock the output views into the main window for this run"},
+         {{"w", "windows"}, "Show the output views as individual windows for this run"}});
+    parser.addPositionalArgument("file", "The LAMMPS input file to open (optional).");
+}
+
+// -p/--pluginpath: store the LAMMPS shared library path in the settings
+static void applyPluginPath(const QCommandLineParser &parser)
+{
+#if defined(LAMMPS_GUI_USE_PLUGIN)
+    if (parser.isSet("pluginpath")) {
+        QStringList pluginPath = parser.values("pluginpath");
+        QSettings settings;
+        if (pluginPath.length() > 0) {
+            settings.setValue(Keys::PLUGIN_PATH, QFileInfo(pluginPath.at(0)).canonicalFilePath());
+            settings.sync();
+        } else {
+            // empty string provided -> delete any old setting
+            settings.remove(Keys::PLUGIN_PATH);
+        }
+    }
+#else
+    Q_UNUSED(parser);
+#endif
+}
+
 int main(int argc, char *argv[])
 {
     initConsoleIO();
@@ -80,67 +180,30 @@ int main(int argc, char *argv[])
     // disable processor affinity for threads by default
     qputenv("OMP_PROC_BIND", "false");
 
+    // Without a display, a QApplication would abort in its constructor before the
+    // command line is even looked at.  A QCoreApplication needs no platform plugin,
+    // so parse with one of those instead: -h/--help and -v/--version then still
+    // print their text and -p still gets stored, while everything else needs a window.
+    if (!haveDisplay(argc, argv)) {
+        QCoreApplication app(argc, argv);
+        setApplicationInfo();
+        QCommandLineParser parser;
+        setupCommandLine(parser);
+        parser.process(app); // exits after printing the help or version text
+        applyPluginPath(parser);
+        fputs("Cannot start LAMMPS-GUI: no graphical display was found (neither DISPLAY\n"
+              "nor WAYLAND_DISPLAY is set).  Use X11 forwarding (ssh -X) or select a Qt\n"
+              "platform plugin with -platform <name> (e.g. -platform vnc).\n",
+              stderr);
+        return 1;
+    }
+
     QApplication app(argc, argv);
-    QCoreApplication::setOrganizationName("The LAMMPS Developers");
-    QCoreApplication::setOrganizationDomain("lammps.org");
-    QCoreApplication::setApplicationName("LAMMPS-GUI (QT" stringify(QT_VERSION_MAJOR) ")");
-    QCoreApplication::setApplicationVersion(LAMMPS_GUI_VERSION);
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    {
-        // the library path is stored under a toolchain-qualified key (see
-        // constants.h); carry the value of an installation from before the
-        // split over once, and leave the legacy key for older versions
-        QSettings settings;
-        if (!settings.contains(Keys::PLUGIN_PATH) && settings.contains(Keys::PLUGIN_PATH_LEGACY))
-            settings.setValue(Keys::PLUGIN_PATH, settings.value(Keys::PLUGIN_PATH_LEGACY));
-    }
-#endif
+    setApplicationInfo();
     QCommandLineParser parser;
-    QString description(
-        "\nThis is LAMMPS-GUI v" LAMMPS_GUI_VERSION "\n"
-        "\nA graphical editor for LAMMPS input files with syntax highlighting and\n"
-        "auto-completion that can run LAMMPS directly. It has built-in capabilities\n"
-        "for monitoring, visualization, plotting, and capturing console output.");
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    description += QString("\n\nCurrent LAMMPS plugin path setting:\n  %1")
-                       .arg(QSettings().value(Keys::PLUGIN_PATH, "").toString());
-#endif
-    parser.setApplicationDescription(description);
-
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    QCommandLineOption plugindir(QStringList() << "p"
-                                               << "pluginpath",
-                                 "Set path to LAMMPS shared library", "path");
-    parser.addOption(plugindir);
-#endif
-
-    parser.addHelpOption();
-    parser.addVersionOption();
-    parser.addOptions(
-        {{{"x", "width"}, "Override LAMMPS-GUI editor window width", "width"},
-         {{"y", "height"}, "Override LAMMPS-GUI editor window height", "height"},
-         {{"s", "style"}, "Set LAMMPS-GUI's visual style (default: Fusion)", "style", "Fusion"},
-         {{"c", "chart"}, "Open FILE directly in the chart/plot viewer", "file"},
-         {{"i", "image"}, "Open FILE in the snapshot viewer (may be given multiple times)", "file"},
-         {{"t", "text"}, "Open FILE in the text file viewer", "file"},
-         {{"j", "joined"}, "Dock the output views into the main window for this run"},
-         {{"w", "windows"}, "Show the output views as individual windows for this run"}});
-    parser.addPositionalArgument("file", "The LAMMPS input file to open (optional).");
+    setupCommandLine(parser);
     parser.process(app);
-
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    if (parser.isSet(plugindir)) {
-        QStringList pluginPath = parser.values(plugindir);
-        QSettings settings;
-        if (pluginPath.length() > 0) {
-            settings.setValue(Keys::PLUGIN_PATH, QFileInfo(pluginPath.at(0)).canonicalFilePath());
-            settings.sync();
-        } else {
-            // empty string provided -> delete any old setting
-            settings.remove(Keys::PLUGIN_PATH);
-        }
-    }
-#endif
+    applyPluginPath(parser);
 
     // -j/--joined and -w/--windows pick the layout for this run and leave the
     // preference alone.  This has to happen before any window is built, since

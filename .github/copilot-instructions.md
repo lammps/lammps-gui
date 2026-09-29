@@ -108,7 +108,8 @@
 
 ### Packaging Scripts (`packaging/`)
 - `build_linux_tgz.sh` - Linux tarball creation
-- `build_macos_dmg.sh` - macOS DMG installer
+- `build_macos_dmg.sh` - macOS DMG installer (uses dmgbuild)
+- `dmg_settings.py` - dmgbuild settings for the DMG window layout
 - `lammps-gui.desktop` - Linux desktop entry
 - `lammps-gui.appdata.xml` - Linux appdata metadata
 - `org.lammps.lammps-gui.yml` - Flatpak manifest

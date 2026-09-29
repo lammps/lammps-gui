@@ -46,6 +46,11 @@ jobs:
       run: |
         build/lammps-gui.app/Contents/MacOS/lammps-gui --platform offscreen -v
 
+    - name: Install dmgbuild
+      shell: bash
+      run: |
+        python3 -m pip install --user --break-system-packages dmgbuild
+
     - name: Create DMG installer
       shell: bash
       run: |

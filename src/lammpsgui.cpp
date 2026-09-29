@@ -130,7 +130,7 @@ void purgeLibraryLeftovers()
 }
 
 const QString citeme("# When using LAMMPS-GUI in your project, please cite: "
-                     "https://doi.org/10.33011/livecoms.6.1.3037\n");
+                     "https://doi.org/10.21105/joss.11185\n");
 const QString bannerstyle("CodeEditor {background-position: center center; "
                           "padding: 0px; "
                           "background-repeat: no-repeat; "
@@ -873,8 +873,8 @@ LammpsGui::LammpsGui(QWidget *parent, const QString &filename, int width, int he
     currentDir = QDir(".").absolutePath();
     // use $HOME if we get dropped to "/" like on macOS or the installation folder or
     // system folder like on Windows
-    if ((currentDir == "/") || (currentDir.contains("AppData")) ||
-        (currentDir.contains("system32")))
+    if ((currentDir == "/") || (currentDir.contains("AppData", Qt::CaseInsensitive)) ||
+        (currentDir.contains("System32", Qt::CaseInsensitive)))
         currentDir = QDir::homePath();
     QDir::setCurrent(currentDir);
     dirstatus->setText(QString(" Directory: ") + currentDir);
@@ -2976,8 +2976,10 @@ QWizardPage *LammpsGui::tutorialDirectory(int collection, int ntutorial)
     }
     if (inCollFolder) {
         currentDir.truncate(idx);
-    } else if ((currentDir == QDir::homePath()) || currentDir.contains("AppData") ||
-               currentDir.contains("system32") || currentDir.contains("Program Files")) {
+    } else if ((currentDir == QDir::homePath()) ||
+               currentDir.contains("AppData", Qt::CaseInsensitive) ||
+               currentDir.contains("System32", Qt::CaseInsensitive) ||
+               currentDir.contains("Program Files", Qt::CaseInsensitive)) {
         currentDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     }
     currentDir.append("/" + folder);

@@ -69,6 +69,22 @@ else()
     PASS_REGULAR_EXPRESSION "Options:.?  -h, --help   +Displays help on commandline options.")
 endif()
 
+# Without a display (no DISPLAY, WAYLAND_DISPLAY, or QT_QPA_PLATFORM) the help text
+# must still be printed, and a GUI start must fail with a message instead of aborting
+set(NO_DISPLAY_ENV "OMP_NUM_THREADS=1;DISPLAY=;WAYLAND_DISPLAY=;QT_QPA_PLATFORM=")
+add_test(NAME CommandLine.NoDisplayHelp
+  COMMAND $<TARGET_FILE:lammps-gui> -h)
+set_tests_properties(CommandLine.NoDisplayHelp PROPERTIES
+  ENVIRONMENT "${NO_DISPLAY_ENV}"
+  PASS_REGULAR_EXPRESSION "  -h, --help +Displays help on commandline options.")
+
+add_test(NAME CommandLine.NoDisplayStart
+  COMMAND $<TARGET_FILE:lammps-gui>)
+set_tests_properties(CommandLine.NoDisplayStart PROPERTIES
+  ENVIRONMENT "${NO_DISPLAY_ENV}"
+  TIMEOUT 30
+  PASS_REGULAR_EXPRESSION "Cannot start LAMMPS-GUI: no graphical display was found")
+
 # Test executable for helpers
 add_executable(test_helpers
   test_helpers.cpp
