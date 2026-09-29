@@ -29,7 +29,7 @@ background = defines["background"]
 icon = defines.get("icon")
 
 # window width matches the background; the height adds ~24pt for the title bar
-window_rect = ((100, 100), (514, 340))
+window_rect = ((100, 100), (520, 350))
 default_view = "icon-view"
 show_status_bar = False
 show_tab_view = False
