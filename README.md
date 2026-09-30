@@ -47,9 +47,9 @@ If you use LAMMPS-GUI in your work, please cite the following paper in the
    }
 ```
 
-NOTE: The paper is accepted for publication was not yet published at release
-time, so volume and issue number are currently unknown and the DOI was reserved
-but not yet active.  It may become available before the next LAMMPS-GUI release.
+NOTE: The paper is accepted for publication but was not yet published at release
+time.  Volume and issue number are thus currently unknown.  The DOI is reserved
+but is not yet active.  It may become available before the next LAMMPS-GUI release.
 
 Also, starting with version 3.0.0 LAMMPS-GUI releases are automatically
 archived on [Zenodo](https://zenodo.org) [![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21035505.svg)](https://doi.org/10.5281/zenodo.21035505):

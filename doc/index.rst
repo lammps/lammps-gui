@@ -137,9 +137,9 @@ or in BibTeX format:
 
 .. note::
 
-   The paper is accepted for publication was not yet published at
-   release time, so volume and issue number are currently unknown and
-   the DOI was reserved but not yet active. It may become available
+   The paper is accepted for publication but was not yet published at
+   release time.  Volume and issue number are thus currently unknown.
+   The DOI is reserved but is not yet active.  It may become available
    before the next LAMMPS-GUI release.
 
 Also, starting with version 3.0.0 LAMMPS-GUI releases are automatically
