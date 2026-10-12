@@ -13,81 +13,136 @@
     <file>icons/tutorial6-logo.png</file>
     <file>icons/tutorial7-logo.png</file>
     <file>icons/tutorial8-logo.png</file>
+    <file>icons/matsci1-logo.png</file>
+    <file>icons/matsci2-logo.png</file>
+    <file>icons/matsci3-logo.png</file>
+    <file>icons/matsci4-logo.png</file>
+    <file>icons/matsci5-logo.png</file>
+    <file>icons/matsci6-logo.png</file>
+    <file>icons/matsci7-logo.png</file>
+    <file>icons/matsci8-logo.png</file>
+    <file>icons/matsci9-logo.png</file>
+    <file>icons/matsci10-logo.png</file>
+    <file>icons/matsci11-logo.png</file>
+    <file>icons/matsci12-logo.png</file>
+    <file>icons/matsci13-logo.png</file>
+    <file>icons/matsci14-logo.png</file>
+    <file>icons/matsci15-logo.png</file>
+    <file>icons/matsci16-logo.png</file>
+    <file>icons/matsci17-logo.png</file>
+    <file>icons/matsci18-logo.png</file>
     <file>help_index.table</file>
     <file>image_style.table</file>
+    <file>command_specs.table</file>
     <!-- This file is updated with: grep 'mycmd ==' ../../src/input.cpp | sed -e 's/^.*mycmd == "\(.*\)".*$/\1/' > lammps_internal_commands.txt -->
     <file>lammps_internal_commands.txt</file>
-    <file>icons/antialias.png</file>
-    <file>icons/autobonds.png</file>
-    <file>icons/application-calc.png</file>
-    <file>icons/application-exit.png</file>
-    <file>icons/application-plot.png</file>
-    <file>icons/application-yaml.png</file>
-    <file>icons/axes-img.png</file>
-    <file>icons/chart-smooth.png</file>
-    <file>icons/dialog-ok.png</file>
-    <file>icons/dialog-no.png</file>
-    <file>icons/dialog-cancel.png</file>
-    <file>icons/document-new.png</file>
-    <file>icons/document-open-recent.png</file>
-    <file>icons/document-open.png</file>
-    <file>icons/document-revert.png</file>
-    <file>icons/document-save-as.png</file>
-    <file>icons/document-save.png</file>
-    <file>icons/download-file.png</file>
-    <file>icons/edit-copy.png</file>
-    <file>icons/edit-cut.png</file>
-    <file>icons/edit-delete.png</file>
-    <file>icons/edit-paste.png</file>
-    <file>icons/edit-redo.png</file>
-    <file>icons/edit-undo.png</file>
+    <file>icons/birch-murnaghan-eos.png</file>
+    <file>icons/show-axes.png</file>
     <file>icons/emblem-photos.png</file>
-    <file>icons/expand-text.png</file>
-    <file>icons/export-movie.png</file>
-    <file>icons/file-clipboard.png</file>
-    <file>icons/format-indent-less-3.png</file>
-    <file>icons/go-first.png</file>
-    <file>icons/go-last.png</file>
-    <file>icons/go-next-2.png</file>
-    <file>icons/go-previous-2.png</file>
-    <file>icons/gtk-go-down.png</file>
-    <file>icons/gtk-go-up.png</file>
-    <file>icons/gtk-zoom-fit.png</file>
-    <file>icons/gtk-zoom-in.png</file>
-    <file>icons/gtk-zoom-out.png</file>
-    <file>icons/hd-img.png</file>
-    <file>icons/help-about.png</file>
-    <file>icons/help-browser.png</file>
-    <file>icons/help-faq.png</file>
-    <file>icons/help-tutorial.png</file>
-    <file>icons/image-shiny.png</file>
-    <file>icons/image-x-generic.png</file>
-    <file>icons/media-playback-start-2.png</file>
-    <file>icons/media-playlist-repeat.png</file>
-    <file>icons/move-recenter.png</file>
-    <file>icons/object-rotate-left.png</file>
-    <file>icons/object-rotate-right.png</file>
-    <file>icons/object-flip-horizontal.png</file>
-    <file>icons/object-flip-vertical.png</file>
     <file>icons/ovito.png</file>
-    <file>icons/preferences-desktop-font.png</file>
-    <file>icons/preferences-desktop-personal.png</file>
-    <file>icons/preferences-desktop.png</file>
-    <file>icons/process-stop.png</file>
-    <file>icons/run-file.png</file>
-    <file>icons/search.png</file>
-    <file>icons/system-box.png</file>
-    <file>icons/system-help.png</file>
-    <file>icons/system-restart.png</file>
-    <file>icons/system-run.png</file>
-    <file>icons/trash.png</file>
+    <file>icons/show-box.png</file>
     <file>icons/tutorial-logo.png</file>
-    <file>icons/utilities-terminal.png</file>
-    <file>icons/vdw-style.png</file>
-    <file>icons/vmd.png</file>
-    <file>icons/warning.png</file>
-    <file>icons/window-close.png</file>
-    <file>icons/x-office-drawing.png</file>
-    <file>icons/yaml-file-icon.png</file>
+    <file>icons/antialias.svg</file>
+    <file>icons/application-exit.svg</file>
+    <file>icons/application-plot.svg</file>
+    <file>icons/autobonds.svg</file>
+    <file>icons/binary-file-icon.svg</file>
+    <file>icons/chart-smooth.svg</file>
+    <file>icons/comment-out.svg</file>
+    <file>icons/csv-file-icon.svg</file>
+    <file>icons/defocus.svg</file>
+    <file>icons/depth-cue.svg</file>
+    <file>icons/dialog-cancel.svg</file>
+    <file>icons/dialog-no.svg</file>
+    <file>icons/dialog-ok.svg</file>
+    <file>icons/document-new.svg</file>
+    <file>icons/document-check.svg</file>
+    <file>icons/document-open-recent.svg</file>
+    <file>icons/document-open.svg</file>
+    <file>icons/document-save-as.svg</file>
+    <file>icons/document-save.svg</file>
+    <file>icons/download-file.svg</file>
+    <file>icons/edit-copy.svg</file>
+    <file>icons/edit-cut.svg</file>
+    <file>icons/edit-delete.svg</file>
+    <file>icons/edit-paste.svg</file>
+    <file>icons/edit-select-all.svg</file>
+    <file>icons/edit-redo.svg</file>
+    <file>icons/edit-undo.svg</file>
+    <file>icons/expand-text.svg</file>
+    <file>icons/export-movie.svg</file>
+    <file>icons/extend-run.svg</file>
+    <file>icons/file-clipboard.svg</file>
+    <file>icons/fit-window.svg</file>
+    <file>icons/format-indent-less-3.svg</file>
+    <file>icons/go-first.svg</file>
+    <file>icons/go-last.svg</file>
+    <file>icons/go-next-2.svg</file>
+    <file>icons/go-previous-2.svg</file>
+    <file>icons/gtk-zoom-fit.svg</file>
+    <file>icons/gtk-zoom-in.svg</file>
+    <file>icons/gtk-zoom-out.svg</file>
+    <file>icons/hd-img.svg</file>
+    <file>icons/help-about.svg</file>
+    <file>icons/help-browser.svg</file>
+    <file>icons/help-faq.svg</file>
+    <file>icons/help-tutorial.svg</file>
+    <file>icons/image-cache.svg</file>
+    <file>icons/image-shiny.svg</file>
+    <file>icons/image-viewer.svg</file>
+    <file>icons/image-x-generic.svg</file>
+    <file>icons/media-playback-start-2.svg</file>
+    <file>icons/media-playlist-repeat.svg</file>
+    <file>icons/move-recenter.svg</file>
+    <file>icons/object-flip-horizontal.svg</file>
+    <file>icons/object-flip-vertical.svg</file>
+    <file>icons/object-rotate-left.svg</file>
+    <file>icons/object-rotate-right.svg</file>
+    <file>icons/preferences-desktop-font.svg</file>
+    <file>icons/preferences-desktop-personal.svg</file>
+    <file>icons/preferences-desktop.svg</file>
+    <file>icons/preferences-reset.svg</file>
+    <file>icons/process-stop.svg</file>
+    <file>icons/reference-lines.svg</file>
+    <!-- the PNGs are the fallback for Qt < 6.7, which cannot render the masks -->
+    <file>icons/rotate-down.png</file>
+    <file>icons/rotate-down.svg</file>
+    <file>icons/rotate-left.png</file>
+    <file>icons/rotate-left.svg</file>
+    <file>icons/rotate-right.png</file>
+    <file>icons/rotate-right.svg</file>
+    <file>icons/rotate-up.png</file>
+    <file>icons/rotate-up.svg</file>
+    <file>icons/run-file.svg</file>
+    <file>icons/search.svg</file>
+    <file>icons/system-help.svg</file>
+    <file>icons/skull.svg</file>
+    <file>icons/system-restart.svg</file>
+    <file>icons/system-run.svg</file>
+    <file>icons/system-dryrun.svg</file>
+    <file>icons/trash.svg</file>
+    <file>icons/txt-file-icon.svg</file>
+    <file>icons/uncomment.svg</file>
+    <file>icons/utilities-terminal.svg</file>
+    <file>icons/vdw-style.svg</file>
+    <file>icons/vmd.svg</file>
+    <file>icons/warning.svg</file>
+    <file>icons/window-close.svg</file>
+    <file>icons/x-office-drawing.svg</file>
+    <file>icons/yaml-file-icon.svg</file>
+  </qresource>
+  <!-- Minimal QIcon theme so QIcon::fromTheme() resolves the standard
+       text-edit context-menu action icons (undo/redo/cut/copy/paste/delete/
+       select-all) to our own icons instead of the desktop theme.  The icons
+       are aliased from the flat set above so there is only one copy of each. -->
+  <qresource prefix="/icons/lammpsgui">
+    <file alias="index.theme">icons/lammpsgui/index.theme</file>
+    <file alias="scalable/actions/edit-undo.svg">icons/edit-undo.svg</file>
+    <file alias="scalable/actions/edit-redo.svg">icons/edit-redo.svg</file>
+    <file alias="scalable/actions/edit-cut.svg">icons/edit-cut.svg</file>
+    <file alias="scalable/actions/edit-copy.svg">icons/edit-copy.svg</file>
+    <file alias="scalable/actions/edit-paste.svg">icons/edit-paste.svg</file>
+    <file alias="scalable/actions/edit-delete.svg">icons/edit-delete.svg</file>
+    <file alias="scalable/actions/edit-select-all.svg">icons/edit-select-all.svg</file>
   </qresource>
 </RCC>

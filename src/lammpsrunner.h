@@ -42,7 +42,6 @@ public:
      */
     ~LammpsRunner() override = default;
 
-    LammpsRunner()                                = delete;
     LammpsRunner(const LammpsRunner &)            = delete;
     LammpsRunner(LammpsRunner &&)                 = delete;
     LammpsRunner &operator=(const LammpsRunner &) = delete;
@@ -50,15 +49,18 @@ public:
 
     /**
      * @brief Prepare the runner thread with LAMMPS instance and commands
-     * @param _lammps Pointer to LammpsWrapper instance
-     * @param _input  String of LAMMPS commands to execute (can be empty)
-     * @param _file   Input file path to execute (can be empty)
+     * @param _lammps     Pointer to LammpsWrapper instance
+     * @param _input      String of LAMMPS commands to execute (can be empty)
+     * @param _file       Input file path to execute (can be empty)
+     * @param _clearfirst If true, wipe the current LAMMPS system state first
      *
      * Sets up the runner with the LAMMPS instance and input. Clears any
-     * previous LAMMPS state with the "clear" command. Either input or
-     * file should be provided, not both.
+     * previous LAMMPS state with the "clear" command, unless _clearfirst
+     * is false, which continues from the current state (used to extend a
+     * previous run). Either input or file should be provided, not both.
      */
-    void setupRun(LammpsWrapper *_lammps, std::string _input, std::string _file = {});
+    void setupRun(LammpsWrapper *_lammps, std::string _input, std::string _file = {},
+                  bool _clearfirst = true);
 
 signals:
     /**

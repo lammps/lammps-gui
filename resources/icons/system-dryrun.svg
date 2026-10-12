@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 48 48"
+   width="48"
+   height="48"
+   version="1.1"
+   id="svg10"
+   sodipodi:docname="system-dryrun.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs10">
+    <radialGradient
+       id="gls"
+       cx="17"
+       cy="16"
+       r="14"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.64672185,0,0,0.64672185,17.10172,16.701719)">
+      <stop
+         offset="0"
+         stop-color="#FFFFFF"
+         id="stop5-3" />
+      <stop
+         offset="0.6"
+         stop-color="#DCEBF6"
+         id="stop6-6" />
+      <stop
+         offset="1"
+         stop-color="#A9C6DD"
+         id="stop7-7" />
+    </radialGradient>
+    <linearGradient
+       id="se"
+       x1="0"
+       y1="6"
+       x2="0"
+       y2="38"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#FFF1CF"
+         id="stop2-5" />
+      <stop
+         offset="0.5"
+         stop-color="#F4B73E"
+         id="stop3-3" />
+      <stop
+         offset="1"
+         stop-color="#C8861A"
+         id="stop4-5" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#se"
+       id="linearGradient10"
+       gradientUnits="userSpaceOnUse"
+       x1="0"
+       y1="6"
+       x2="0"
+       y2="38"
+       gradientTransform="matrix(0.64672185,0,0,0.64672185,17.10172,16.701719)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#se"
+       id="linearGradient1"
+       gradientUnits="userSpaceOnUse"
+       x1="0"
+       y1="6"
+       x2="0"
+       y2="38" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview10"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="5"
+     inkscape:cx="24"
+     inkscape:cy="24"
+     inkscape:window-width="1087"
+     inkscape:window-height="1045"
+     inkscape:window-x="1205"
+     inkscape:window-y="256"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg10" />
+  <g
+     transform="matrix(1.2504262,0,0,1.2160873,-7.5266597,-4.4587367)"
+     id="g10">
+    <defs
+       id="defs7">
+      <filter
+         id="sh"
+         x="-0.11800734"
+         y="-0.10506117"
+         width="1.2535709"
+         height="1.2445182">
+        <feGaussianBlur
+           in="SourceAlpha"
+           stdDeviation="0.9"
+           id="feGaussianBlur1" />
+        <feOffset
+           dx="0.5"
+           dy="1.1"
+           result="offsetblur"
+           id="feOffset1" />
+        <feFlood
+           flood-color="#000"
+           flood-opacity="0.38"
+           id="feFlood1" />
+        <feComposite
+           in2="offsetblur"
+           operator="in"
+           id="feComposite1" />
+        <feMerge
+           id="feMerge2">
+          <feMergeNode
+             id="feMergeNode1" />
+          <feMergeNode
+             in="SourceGraphic"
+             id="feMergeNode2" />
+        </feMerge>
+      </filter>
+      <linearGradient
+         id="ru"
+         x1="0"
+         y1="6"
+         x2="0"
+         y2="42"
+         gradientUnits="userSpaceOnUse"
+         gradientTransform="matrix(1.0168859,0,0,0.99939245,0.64438917,0.01458132)">
+        <stop
+           offset="0"
+           stop-color="#D8F3B0"
+           id="stop2" />
+        <stop
+           offset="0.5"
+           stop-color="#5BB12F"
+           id="stop3" />
+        <stop
+           offset="1"
+           stop-color="#3C7E18"
+           id="stop4" />
+      </linearGradient>
+      <linearGradient
+         id="blt"
+         x1="0"
+         y1="4"
+         x2="0"
+         y2="22"
+         gradientUnits="userSpaceOnUse"
+         gradientTransform="translate(-8.540557,0.16597991)">
+        <stop
+           offset="0"
+           stop-color="#FFF1CF"
+           id="stop5" />
+        <stop
+           offset="0.5"
+           stop-color="#F4B73E"
+           id="stop6" />
+        <stop
+           offset="1"
+           stop-color="#C8861A"
+           id="stop7" />
+      </linearGradient>
+    </defs>
+    <g
+       filter="url(#sh)"
+       id="g9">
+      <path
+         d="M 11.830134,8.0097209 40.302939,24 11.830134,39.990279 Z"
+         fill="url(#ru)"
+         stroke="#244f0d"
+         stroke-width="2.4"
+         stroke-linejoin="round"
+         id="path7"
+         style="fill:url(#ru)" />
+      <path
+         d="m 14,12 12,7"
+         stroke="#ffffff"
+         stroke-width="2.2"
+         stroke-linecap="round"
+         opacity="0.5"
+         id="path8" />
+    </g>
+  </g>
+  <line
+     x1="35.856647"
+     y1="35.45665"
+     x2="43.617313"
+     y2="43.217316"
+     stroke="#7a4e0e"
+     stroke-width="5.17377"
+     stroke-linecap="round"
+     id="line7" />
+  <line
+     x1="35.856647"
+     y1="35.45665"
+     x2="43.617313"
+     y2="43.217316"
+     stroke="url(#se)"
+     stroke-width="3.2336"
+     stroke-linecap="round"
+     id="line8"
+     style="stroke:url(#linearGradient1)" />
+  <circle
+     cx="30.036158"
+     cy="29.636156"
+     r="9.0541058"
+     fill="url(#se)"
+     stroke="#7a4e0e"
+     stroke-width="1.1641"
+     id="circle8"
+     style="fill:url(#linearGradient10)" />
+  <circle
+     cx="30.036158"
+     cy="29.636156"
+     r="5.8204956"
+     fill="url(#gls)"
+     stroke="#7a4e0e"
+     stroke-width="0.905411"
+     id="circle9"
+     style="fill:url(#gls)" />
+</svg>

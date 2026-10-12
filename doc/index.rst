@@ -45,8 +45,22 @@ has been found extremely useful in creating, debugging, and tweaking
 visualization facility of the `dump image command
 <https://docs.lammps.org/dump_image.html>`_.
 
-LAMMPS-GUI is Copyright (c) |copyright|, and distributed under the
-terms of the GNU public license version 2.0 or later (GPL-2.0-or-later).
+--------
+
+LAMMPS-GUI is Copyright (c) |copyright|, and its source code is
+distributed under the terms of the `GNU General Public License v2.0
+<https://choosealicense.com/licenses/gpl-2.0/>`_ or later.
+
+Custom rangeslider widget for Qt written by Hoyoung Lee and
+distributed under the `CeCILL Free Software License
+<https://choosealicense.com/licenses/cecill-2.1/>`_.
+
+Lepton library written by Peter Eastman and OpenMM contributors
+distributed under the `MIT License <https://choosealicense.com/licenses/mit/>`_.
+
+The LAMMPS-GUI documentation is available under the `Creative Commons
+Attribution 4.0 International License
+<https://choosealicense.com/licenses/cc-by-4.0/>`_.
 
 --------
 
@@ -60,7 +74,7 @@ features and reports of bugs are always welcome.  You can use the `same
 channels as for LAMMPS itself
 <https://docs.lammps.org/Errors_bugs.html>`_ for that purpose or submit
 bug reports or pull requests in the `LAMMPS-GUI GitHub repository
-<https://github.com/akohlmey/lammps-gui>`_.
+<https://github.com/lammps/lammps-gui>`_.
 
 ------------------
 
@@ -75,14 +89,15 @@ This document describes LAMMPS-GUI version |version|.
    </h2>
    <hr>
    <h3>Test Status of the development branch:</h3>
-   <p>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-linux-qt6.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-linux-qt6.yml/badge.svg" alt="Compile with Qt 6.x" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-macos-dmg.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-macos-dmg.yml/badge.svg" alt="Compile on macOS and build DMG" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/codeql-analysis.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/codeql-analysis.yml/badge.svg" alt="CodeQL Code Analysis" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/build-html-docs.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/build-html-docs.yml/badge.svg" alt="Build Documentation in HTML" style="max-width: 100%;"></a><br>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-windows-msvc.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-windows-msvc.yml/badge.svg" alt="Compile on Windows with MSVC" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-mingw64-cross.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/compile-mingw64-cross.yml/badge.svg" alt="Cross-compile for Windows with MinGW64" style="max-width: 100%;"></a>
-   <a href="https://github.com/akohlmey/lammps-gui/actions/workflows/build-linux-flatpak.yml"><img src="https://github.com/akohlmey/lammps-gui/actions/workflows/build-linux-flatpak.yml/badge.svg" alt="Build LAMMPS-GUI as flatpak bundle" style="max-width: 100%;"></a>
+   <p align="left">
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/compile-linux-qt6.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/compile-linux-qt6.yml/badge.svg" alt="Compile with Qt 6.x" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/compile-macos-dmg.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/compile-macos-dmg.yml/badge.svg" alt="Compile on macOS and build DMG" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/build-html-docs.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/build-html-docs.yml/badge.svg" alt="Build Documentation in HTML" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/compile-windows-msvc.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/compile-windows-msvc.yml/badge.svg" alt="Compile on Windows with MSVC" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/compile-mingw64-cross.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/compile-mingw64-cross.yml/badge.svg" alt="Cross-compile for Windows with MinGW64" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/build-linux-flatpak.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/build-linux-flatpak.yml/badge.svg" alt="Build LAMMPS-GUI as flatpak bundle" style="max-width: 100%;"></a>
+   <a href="https://github.com/lammps/lammps-gui/actions/workflows/codeql-analysis.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/codeql-analysis.yml/badge.svg" alt="CodeQL Code Analysis" style="max-width: 100%;"></a>
+   <a href="https://scan.coverity.com/projects/akohlmey-lammps-gui"><img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/33110/badge.svg"/></a>
    </p>
 
 ------------------
@@ -91,15 +106,69 @@ This document describes LAMMPS-GUI version |version|.
 Citing LAMMPS-GUI
 *****************
 
-There is currently no citation specifically describing LAMMPS-GUI, but
-an introduction to LAMMPS-GUI is included in the following publication
-in LiveCoMS for the LAMMPS tutorials that are linked from LAMMPS-GUI, so
-the suggestion is to cite that publication for now:
+If you use LAMMPS-GUI in your work, please cite the following paper in
+the `Journal of Open Source Software <https://joss.theoj.org/>`_:
+
+   Kohlmeyer, A. (2026). LAMMPS-GUI: A Cross-Platform Graphical Tool to
+   Learn and Explore Molecular Dynamics with LAMMPS. Journal of Open
+   Source Software, XX(XXX), 11185. https://doi.org/10.21105/joss.11185
+
+or in BibTeX format:
+
+.. code-block:: bibtex
+
+   @article{lammps_gui_joss,
+     author       = {Kohlmeyer, Axel},
+     title        = {{LAMMPS-GUI}: A Cross-Platform Graphical Tool to
+                      Learn and Explore Molecular Dynamics with {LAMMPS}},
+     journal      = {Journal of Open Source Software},
+     publisher    = {The Open Journal},
+     year         = {2026},
+     volume       = {XX},
+     number       = {XXX},
+     pages        = {11185},
+     doi          = {10.21105/joss.11185},
+     url          = {https://doi.org/10.21105/joss.11185},
+   }
+
+.. raw:: html
+
+   <a href="https://doi.org/10.21105/joss.11185"><img src="https://joss.theoj.org/papers/10.21105/joss.11185/status.svg" alt="DOI"></a>
+
+.. note::
+
+   The paper is accepted for publication but was not yet published at
+   release time.  Volume and issue number are thus currently unknown.
+   The DOI is reserved but is not yet active.  It may become available
+   before the next LAMMPS-GUI release.
+
+Also, starting with version 3.0.0 LAMMPS-GUI releases are automatically
+archived on `Zenodo <https://zenodo.org>`_:
+
+.. code-block:: bibtex
+
+   @software{lammps_gui_zenodo,
+     author       = {Kohlmeyer, Axel},
+     title        = {{LAMMPS-GUI}: A Cross-Platform Graphical Tool to
+                      Learn and Explore Molecular Dynamics with {LAMMPS}},
+     publisher    = {Zenodo},
+     doi          = {10.5281/zenodo.21035505},
+     url          = {https://doi.org/10.5281/zenodo.21035505},
+   }
+
+.. raw:: html
+
+   <a href="https://doi.org/10.5281/zenodo.21035505"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21035505.svg" alt="DOI"></a>
+
+The *Soft Matter* collection of tutorials in the :ref:`Tutorials menu
+<tutorials>` is published in LiveCoMS.  Those tutorials teach how to use
+LAMMPS-GUI as much as how to use LAMMPS, so this publication is a
+suitable secondary citation:
 
    Gravelle, S., Alvares, C. M. S., Gissinger, J. R., &
    Kohlmeyer, A. (2025). A Set of Tutorials for the LAMMPS Simulation
    Package [Article v1.0]. Living Journal of Computational Molecular
-   Science, 6(1), 3027. https://doi.org/10.33011/livecoms.6.1.3037
+   Science, 6(1), 3037. https://doi.org/10.33011/livecoms.6.1.3037
 
 or in BibTeX format:
 
@@ -109,7 +178,7 @@ or in BibTeX format:
      author={Gravelle, Simon and Alvares, Cecilia M. S. and Gissinger, Jacob R. and Kohlmeyer, Axel},
      title={A Set of Tutorials for the {LAMMPS} Simulation Package [Article v1.0]},
      journal={Living Journal of Computational Molecular Science},
-     pages={3027},
+     pages={3037},
      volume={6},
      number={1},
      year={2025},
@@ -166,7 +235,7 @@ the internals of LAMMPS-GUI or contribute to its development.
    and not everything has been carefully checked.  It is therefore
    possible that it contains errors where the LLM has misinterpreted the
    LAMMPS-GUI source code.  If you spot any such errors or inconsistencies,
-   please submit a bug report issue to point them out or - even better -
+   please submit a bug report issue to point them out or -- even better --
    submit a pull request with the necessary corrections.
 
 .. toctree::

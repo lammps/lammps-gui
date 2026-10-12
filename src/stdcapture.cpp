@@ -14,7 +14,7 @@
 #include "stdcapture.h"
 #include "helpers.h"
 
-#ifdef _WIN32
+#if defined(Q_OS_WIN32)
 #include <io.h>
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -32,7 +32,7 @@
 #include <fcntl.h>
 #include <thread>
 
-#ifdef _WIN32
+#if defined(Q_OS_WIN32)
 // Check if a pipe has data available for reading without blocking.
 // Uses PeekNamedPipe() instead of _eof() because _eof() relies on _lseek()
 // internally to check the file position.  Since pipes are not seekable,
@@ -53,101 +53,207 @@ namespace {
 constexpr int bufSize = (1 << 16) + 1;
 } // namespace
 
-StdCapture::StdCapture() : m_oldStdOut(0), m_capturing(false), maxread(0), buf(bufSize)
+// The numbers matter more than the words when this has to be diagnosed from a
+// user's screenshot, so every message carries them.
+std::string StdCapture::describe(const char *what) const
 {
+    return std::string(what) + " (stdout fd " + std::to_string(fileno(stdout)) + ", pipe " +
+           std::to_string(m_pipe[READ]) + "/" + std::to_string(m_pipe[WRITE]) + ", saved " +
+           std::to_string(m_oldStdOut) + ")";
+}
+
+StdCapture::StdCapture() : m_oldStdOut(-1), m_capturing(false), maxread(0), buf(bufSize)
+{
+#if defined(Q_OS_WIN32)
+    // A Windows GUI-subsystem process is started without a console, and the C
+    // runtime then leaves stdout with no file descriptor at all: fileno(stdout)
+    // is -2 and every attempt to redirect it fails.  Nothing reports this --
+    // printf() still claims to have written the bytes, the runtime simply drops
+    // them -- so the whole capture silently yields an empty Output window.  It
+    // has therefore only ever worked when the program was started from a
+    // console.  Attaching stdout to the null device gives it a real descriptor,
+    // which is all that redirecting it needs; what is written there is replaced
+    // by the pipe in beginCapture() and never reaches the device.
+    if (fileno(stdout) < 0) {
+        if (!freopen("NUL", "w", stdout)) {
+            m_diagnostic = "stdout has no file descriptor and could not be attached to NUL";
+            return;
+        }
+    }
+#endif
     // make stdout unbuffered so that we don't need to flush the stream
     setvbuf(stdout, nullptr, _IONBF, 0);
 
-    m_pipe[READ]  = 0;
-    m_pipe[WRITE] = 0;
-#if _WIN32
-    if (_pipe(m_pipe, 65536, O_BINARY) == -1) return;
+#if defined(Q_OS_WIN32)
+    if (_pipe(m_pipe, 65536, O_BINARY) == -1) {
+        m_diagnostic = "the capture pipe could not be created";
+        return;
+    }
 #else
-    if (pipe(m_pipe) == -1) return;
-    fcntl(m_pipe[READ], F_SETFL, fcntl(m_pipe[READ], F_GETFL) | O_NONBLOCK);
+    if (pipe(m_pipe) == -1) {
+        m_diagnostic = "the capture pipe could not be created";
+        return;
+    }
+    if (fcntl(m_pipe[READ], F_SETFL, fcntl(m_pipe[READ], F_GETFL) | O_NONBLOCK) == -1) {
+        m_diagnostic = "the capture pipe could not be made non-blocking";
+        return;
+    }
 #endif
     m_oldStdOut = dup(fileno(stdout));
-    if (m_oldStdOut == -1) return;
+    if (m_oldStdOut == -1) {
+        m_diagnostic = describe("stdout could not be duplicated");
+        return;
+    }
+    m_usable = true;
 }
 
 StdCapture::~StdCapture()
 {
     notifyCaptureState(false);
-    if (m_oldStdOut > 0) close(m_oldStdOut);
-    if (m_pipe[READ] > 0) close(m_pipe[READ]);
-    if (m_pipe[WRITE] > 0) close(m_pipe[WRITE]);
+    if (m_oldStdOut >= 0) close(m_oldStdOut);
+    if (m_pipe[READ] >= 0) close(m_pipe[READ]);
+    if (m_pipe[WRITE] >= 0) close(m_pipe[WRITE]);
 }
 
 void StdCapture::beginCapture()
 {
     if (m_capturing) endCapture();
     if (isStdoutSilenced()) restoreStdout();
-    dup2(m_pipe[WRITE], fileno(stdout));
+    if (m_pipe[WRITE] < 0) return; // no pipe to capture into
+    if (dup2(m_pipe[WRITE], fileno(stdout)) == -1) {
+        // the library's output now goes wherever stdout pointed, which in a
+        // process without a console is nowhere at all
+        m_usable     = false;
+        m_diagnostic = describe("stdout could not be redirected into the capture pipe");
+        return;
+    }
     m_capturing = true;
     maxread     = 0;
+    m_totalread = 0;
     notifyCaptureState(true);
+    verifyCapture();
+}
+
+// A capture that does not work leaves no trace of its own: printf() reports
+// success and the runtime drops the bytes.  Every probe of the individual steps
+// can pass and the assembled whole still fail, so prove the plumbing whenever
+// it is set up: write a marker through the very stream the library will use and
+// read it back out of the pipe.  This runs in the gap between the redirect and
+// the start of the run, when nothing else writes, so the pipe carries exactly
+// the marker and is drained again before real output arrives.
+void StdCapture::verifyCapture()
+{
+    if (!m_usable || !m_capturing) return;
+
+    static constexpr char marker[] = "__LGUI_CAPTURE_TEST__\n";
+    constexpr int len              = static_cast<int>(sizeof(marker)) - 1;
+    printf("%s", marker); // its return value is the known lie; the read-back is the test
+
+    // the write is a same-process pipe write of a few bytes, so it is visible
+    // at once; the loop only covers scheduling noise
+    std::string got;
+    for (int wait = 0; wait < 100; ++wait) {
+        const int bytesRead = readPipe();
+        if (bytesRead > 0) got.append(buf.data(), bytesRead);
+        if (static_cast<int>(got.size()) >= len) break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    if (got != marker) {
+        m_usable = false;
+        m_diagnostic =
+            describe(got.empty() ? "the test marker did not come back out of the capture pipe"
+                                 : "the capture pipe returned something other than the test "
+                                   "marker");
+    }
+}
+
+// The counterpart at the other end: when a whole run yielded nothing, decide
+// which side lost it.  One more marker round trip through the still-active
+// capture tells the two failure modes apart: a marker that comes back proves
+// the redirect held for the entire run -- so the library's output went
+// somewhere else -- and one that does not means stdout was re-pointed while
+// the run was underway.  Any real output drained along with the marker is
+// kept and handed back through the next endCapture()/getCapture().
+std::string StdCapture::probeRunEnd()
+{
+    if (!m_capturing || !m_usable) return {};
+
+    static constexpr char marker[] = "__LGUI_CAPTURE_TEST__\n";
+    printf("%s", marker);
+
+    std::string got;
+    for (int wait = 0; wait < 100; ++wait) {
+        const int bytesRead = readPipe();
+        if (bytesRead > 0) got.append(buf.data(), bytesRead);
+        if (got.find(marker) != std::string::npos) break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    const auto pos = got.find(marker);
+    if (pos == std::string::npos) {
+        m_probeleftover = std::move(got);
+        return describe("stdout no longer feeds the capture pipe: a marker written at the"
+                        " end of the run did not come back");
+    }
+    m_probeleftover = got.substr(0, pos) + got.substr(pos + sizeof(marker) - 1);
+    return describe("the capture stayed intact for the whole run -- a marker written at"
+                    " its end came back -- so the library's output went elsewhere");
 }
 
 bool StdCapture::endCapture()
 {
     if (!m_capturing) return false;
     notifyCaptureState(false);
-    dup2(m_oldStdOut, fileno(stdout));
-    m_captured.clear();
+    if (m_oldStdOut >= 0) dup2(m_oldStdOut, fileno(stdout));
+    // not clear(): keep what an end-of-run probe drained alongside its marker
+    m_captured = m_probeleftover;
+    m_probeleftover.clear();
 
+    // Whatever wrote into the pipe has returned by the time this is called, so
+    // what is in it is all there will be: the first read that would block means
+    // the pipe is drained.  Waiting for more instead cost a full second on
+    // every empty pipe.  Only a read cut short by a signal is tried again.
     int bytesRead;
-    bool fd_blocked;
-    int maxwait = 100;
+    bool interrupted;
+    int retries = 100;
 
     do {
-        bytesRead  = 0;
-        fd_blocked = false;
+        bytesRead   = 0;
+        interrupted = false;
 
-#ifdef _WIN32
-        if (pipe_has_data(m_pipe[READ])) {
-            bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-        }
-#else
-        bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#endif
+        bytesRead = readPipe();
         if (bytesRead > 0) {
-            buf[bytesRead] = 0;
-            m_captured += buf.data();
+            m_captured.append(buf.data(), bytesRead);
         } else if (bytesRead < 0) {
-            fd_blocked =
-                ((errno == EAGAIN) || (errno == EWOULDBLOCK) || (errno == EINTR)) && (maxwait > 0);
-
-            if (fd_blocked) std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            --maxwait;
+            interrupted = (errno == EINTR) && (--retries > 0);
         }
-    } while (fd_blocked || (bytesRead == (bufSize - 1)));
+    } while (interrupted || (bytesRead == (bufSize - 1)));
     m_capturing = false;
     return true;
+}
+
+int StdCapture::readPipe()
+{
+#if defined(Q_OS_WIN32)
+    if (!pipe_has_data(m_pipe[READ])) return 0;
+#endif
+    return read(m_pipe[READ], buf.data(), bufSize - 1);
 }
 
 std::string StdCapture::getChunk()
 {
     if (!m_capturing) return {};
-    int bytesRead = 0;
-    buf[0]        = '\0';
-
-#ifdef _WIN32
-    if (pipe_has_data(m_pipe[READ])) {
-        bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-    }
-#else
-    bytesRead = read(m_pipe[READ], buf.data(), bufSize - 1);
-#endif
-    if (bytesRead > 0) {
-        buf[bytesRead] = '\0';
-    }
+    const int bytesRead = readPipe();
+    if (bytesRead > 0) m_totalread += bytesRead;
     maxread = (maxread > bytesRead) ? maxread : bytesRead;
-    return {buf.data()};
+    // by length, not up to a NUL: no scan of the buffer, and a stray NUL byte
+    // in the output cannot swallow what follows it
+    return {buf.data(), static_cast<std::size_t>(bytesRead > 0 ? bytesRead : 0)};
 }
 
 double StdCapture::getBufferUse() const
 {
-    return (double)maxread / (double)(bufSize - 1);
+    return static_cast<double>(maxread) / static_cast<double>(bufSize - 1);
 }
 
 std::string StdCapture::getCapture()

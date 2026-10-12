@@ -53,37 +53,48 @@ comfortable with.  In fact, it is often *required* to adopt this
 workflow when running LAMMPS simulations on high-performance computing
 facilities.
 
-.. image:: JPG/lammps-gui-screen.png
-   :align: center
-   :scale: 50%
+.. |fullscreen1| image:: JPG/lammps-gui-screen.png
+   :width: 46%
+
+.. |fullscreen2| image:: JPG/lammps-gui-joined.png
+   :width: 52%
+
+|fullscreen1|  |fullscreen2|
 
 Most features in LAMMPS-GUI have been exposed to keyboard shortcuts,
 making it also appealing for experienced LAMMPS users for prototyping
 and testing simulation setups.
 
-.. admonition:: Features
+.. admonition:: LAMMPS-GUI Key Features
 
    A detailed discussion and explanation of all features and functionality
    are in the following pages. Here are a few highlights of LAMMPS-GUI:
 
-   - Text editor with line numbers and syntax highlighting customized for LAMMPS
+   - Individual windows or combined window viewing modes
+   - Text editor with line numbers, syntax highlighting, and find & replace, customized for LAMMPS
    - Text editor features command completion and indentation for known commands and styles
-   - Text editor will switch its working directory to the folder of the file in the buffer
-   - Indicator for currently executed command
-   - Indicator for line that caused an error
+   - Input validation with a static pre-run check of the input script and
+     a dry-run mode that executes only the setup phase of each command
+   - Switch its working directory to the folder of the file in the buffer
+   - Indicator for currently executed command and line that caused an error
    - Progress bar indicates how far a run command has completed and how the CPUs are utilized
    - Context-sensitive help for LAMMPS commands via the online documentation
    - Auto-adapting to features and packages available in the LAMMPS library in use
    - LAMMPS is running in a concurrent thread, so the GUI remains responsive
    - LAMMPS can be started and stopped with a mouse click or a hotkey
-   - Screen output is captured in an *Output* Window
+   - Screen output is captured in an *Output* window
    - Many adjustable settings and preferences are persistent, including the 5 most recent files
-   - Thermodynamic output is captured and displayed as line graph in a *Chart* Window
-   - Interactive visualization of current state via calling `write_dump
-     image <https://docs.lammps.org/dump_image.html>`_
-   - Capture of images created by `dump image
-     <https://docs.lammps.org/dump_image.html>`_ in Slide show window
+   - Thermodynamic output is captured and displayed as a line graph in a *Charts* window
+   - Export of thermodynamic data to CSV, YAML, and multi-column text format
+   - Create simple plots from imported CSV, YAML, and plain multi-column data
+   - Multiple post-processing options for plot data, and plot style customizations
+   - Interactive visualization of current state via calling `dump image <https://docs.lammps.org/dump_image.html>`_
+   - Capture of images created by `dump image <https://docs.lammps.org/dump_image.html>`_ in the *Slide Show* window
+   - Export of *Slide Show* animations to movie files, or images to arbitrary formats
    - Dialog to set variables, similar to the LAMMPS command-line flag '-v' / '-var'
    - Support for GPU, INTEL, KOKKOS/OpenMP, OPENMP, and OPT accelerator packages
    - Inspection of binary restart files created by LAMMPS
+   - View text, image, and animation/movie files
    - Integration with `LAMMPS tutorials <https://lammpstutorials.github.io>`_
+   - Command prompt window for issuing shell commands with Tab completion for commands and filenames, scrollable history and aliases
+   - Update dynamically loaded LAMMPS library from LAMMPS download server

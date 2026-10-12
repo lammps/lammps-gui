@@ -51,7 +51,7 @@ def check_image(fname, color, delta):
             return False
 
 def focus():
-    """Give focus to the editor window by positioning then mouse and clicking"""
+    """Give focus to the editor window by positioning the mouse and clicking"""
     pyautogui.click(button='left', x=100, y=100)
 
 class GUIEditorChecks(unittest.TestCase):
@@ -71,7 +71,7 @@ class GUIEditorChecks(unittest.TestCase):
             cmdline.append('-p')
             cmdline.append('liblammps.so.0')
 
-        # append path to LAMMPS shared library if present.
+        # launch LAMMPS-GUI and give it a moment to come up
         self.gui=subprocess.Popen(cmdline, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         time.sleep(1.0)
         for f in ['hello.txt', 'hello1.txt', 'hello2.txt', 'empty.txt', 'complete.txt',
@@ -82,7 +82,7 @@ class GUIEditorChecks(unittest.TestCase):
 
     def tearDown(self):
         """Stop LAMMPS-GUI"""
-        if not self.gui.poll():
+        if self.gui.poll() is None:
             self.gui.terminate()
 
     def testExitShortcut(self):
@@ -117,7 +117,8 @@ class GUIEditorChecks(unittest.TestCase):
         pyautogui.hotkey('alt','n')
         self.assertEqual(self.gui.poll(), 0)
 
-    def NOtestExitModSave(self):
+    @unittest.skip("unreliable interaction with the modal save dialog; needs rework")
+    def testExitModSave(self):
         """Exit LAMMPS-GUI with a modified buffer and save it to a file"""
         # First enter some text
         pyautogui.typewrite("Hello, World!")
@@ -139,7 +140,8 @@ class GUIEditorChecks(unittest.TestCase):
             os.remove('hello.txt')
         self.assertEqual(self.gui.poll(), 0)
 
-    def NOtestEditSaveLoad(self):
+    @unittest.skip("unreliable interaction with the modal file dialogs; needs rework")
+    def testEditSaveLoad(self):
         """Exercise various Load/Save/Save As/New file options"""
         pyautogui.hotkey('ctrl','a')
         pyautogui.press('delete')
@@ -227,7 +229,9 @@ class GUIEditorChecks(unittest.TestCase):
         time.sleep(0.2)
         self.assertEqual(self.gui.poll(), 0)
 
-    def NOtestEditCompletion(self):
+    @unittest.skip("depends on completion popup timing; needs rework")
+    def testEditCompletion(self):
+        """Exercise the editor auto-completion popup"""
         # clear buffer
         pyautogui.hotkey('ctrl','a')
         pyautogui.press('delete')

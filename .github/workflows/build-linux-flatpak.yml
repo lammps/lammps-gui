@@ -5,9 +5,6 @@ on:
   push:
     branches:
       - develop
-  pull_request:
-    branches:
-      - develop
 
   workflow_dispatch:
 
@@ -18,14 +15,16 @@ concurrency:
 jobs:
   build:
     name: LAMMPS-GUI flatpak build
-    if: ${{ github.repository == 'akohlmey/lammps-gui' }}
+    if: ${{ github.repository == 'lammps/lammps-gui' }}
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 20
+        show-progress: false
+        ref: develop
 
     - name: Install extra packages
       run: |

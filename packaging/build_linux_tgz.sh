@@ -4,6 +4,15 @@ APP_NAME=lammps-gui
 DESTDIR=${PWD}/../LAMMPS_GUI
 VERSION="$1"
 
+# copy shared libraries into the staging area and make sure they are executable
+copy_libs () {
+    for lib in "$@"
+    do \
+        cp ${lib} ${DESTDIR}/lib
+        chmod +x ${DESTDIR}/lib/$(basename ${lib})
+    done
+}
+
 echo "Delete old files, if they exist"
 rm -rf ${DESTDIR} ../LAMMPS-GUI-Linux-x86_64*.tar.gz
 
@@ -32,6 +41,7 @@ rm -f ${DESTDIR}/lib/lib{c,dl,rt,m,pthread}-[0-9].[0-9]*.so
 rm -f ${DESTDIR}/lib/libX* ${DESTDIR}/lib/libxcb* ${DESTDIR}/lib/libxkb*
 rm -f ${DESTDIR}/lib/libgcc_s*
 rm -f ${DESTDIR}/lib/libstdc++*
+chmod +x ${DESTDIR}/lib/lib*.so.*
 
 # get Qt dir
 QTDIR=$(ldd ${DESTDIR}/bin/lammps-gui | grep libQt.Core | sed -e 's/^.*=> *//' -e 's/libQt\(.\)Core.so.*$/qt\1/')
@@ -55,14 +65,14 @@ chmod +x ${DESTDIR}/qtplugins/platforms/libqxcb.so
 
 # get platform plugin dependencies
 QTDEPS=$(LD_LIBRARY_PATH=${DESTDIR}/lib ldd ${QTDIR}/plugins/platforms/libqxcb.so | grep -v ${DESTDIR} | grep libQt[56] | sed -e 's/^.*=> *//' -e 's/\(libQt[56].*.so.*\) .*$/\1/')
-for dep in ${QTDEPS}
-do \
-    cp ${dep} ${DESTDIR}/lib
-    chmod +x ${DESTDIR}/lib/${dep}
-done
+copy_libs ${QTDEPS}
+
+# get more platform plugin dependencies
+QTDEPS=$(LD_LIBRARY_PATH=${DESTDIR}/lib ldd ${QTDIR}/plugins/platforms/libqxcb.so | grep -v ${DESTDIR} | grep libxcb- | sed -e 's/^.*=> *//' -e 's/\(libxcb-.*.so.*\) .*$/\1/')
+copy_libs ${QTDEPS}
 
 echo "Add additional plugins for Qt"
-for dir in styles imageformats tls
+for dir in styles imageformats tls iconengines
 do \
     cp -r  ${QTDIR}/plugins/${dir} ${DESTDIR}/qtplugins/
     chmod +x ${DESTDIR}/qtplugins/*/*.so
@@ -72,11 +82,7 @@ done
 for s in ${DESTDIR}/qtplugins/imageformats/*.so
 do \
     QTDEPS=$(LD_LIBRARY_PATH=${DESTDIR}/lib ldd $s | grep -v ${DESTDIR} | grep -E '(libQt.|jpeg)' | sed -e 's/^.*=> *//' -e 's/\(lib.*.so.*\) .*$/\1/')
-    for dep in ${QTDEPS}
-    do \
-        cp ${dep} ${DESTDIR}/lib
-        chmod +x ${DESTDIR}/lib/${dep}
-    done
+    copy_libs ${QTDEPS}
 done
 
 echo "Set up wrapper script"

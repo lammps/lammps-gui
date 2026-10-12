@@ -29,17 +29,19 @@
       <caption>LAMMPS-GUI slideshow window</caption>
     </screenshot>
     <screenshot>
-      <image>https://lammps-gui.lammps.org/_images/lammps-gui-image.png</image>
+      <image>https://lammps-gui.lammps.org/_images/lammps-gui-image-water.png</image>
       <caption>LAMMPS-GUI snapshot image window</caption>
     </screenshot>
   </screenshots>
 
   <url type="homepage">https://lammps-gui.lammps.org/</url>
-  <url type="bugtracker">https://github.com/akohlmey/lammps-gui/issues</url>
+  <url type="bugtracker">https://github.com/lammps/lammps-gui/issues</url>
   <url type="help">https://lammps-gui.lammps.org/</url>
 
   <update_contact>akohlmey@gmail.com</update_contact>
-  <developer_name>Axel Kohlmeyer</developer_name>
+  <developer id="org.lammps">
+    <name>Axel Kohlmeyer</name>
+  </developer>
   <project_group>LAMMPS</project_group>
   <keywords>
     <keyword>Molecular Dynamics</keyword>
@@ -53,345 +55,644 @@
     <binary>lammps-gui</binary>
   </provides>
 
+  <content_rating type="oars-1.1" />
+
   <releases>
+    <!-- planned release together with the LAMMPS stable release (noon UTC, 30 September 2026) -->
+    <release version="3.1.1" timestamp="1790769600">
+      <description>
+        <p>Maintenance release with bug fixes, installer improvements, and documentation updates.</p>
+        <ul>
+          <li>Fail with an error message instead of aborting with a core dump when LAMMPS-GUI is started on Linux or BSD without a graphical display, e.g. on a remote machine without X11 forwarding; the -h, -v, and -p flags keep working, and selecting a Qt platform plugin explicitly, e.g. with -platform vnc, skips the check</li>
+          <li>Recognize the Windows System32, AppData, and Program Files folders regardless of the capitalization of their names, so LAMMPS-GUI falls back to the home folder and the tutorial wizard to the desktop when launched from there</li>
+          <li>Cite the LAMMPS-GUI paper in the Journal of Open Source Software as the preferred reference in the citation note of the editor and the About dialog, and in the citation metadata</li>
+          <li>Create the macOS installer disk image with dmgbuild instead of scripting the Finder, so it can also be built without a desktop session, e.g. over ssh, and works with macOS 26 Tahoe</li>
+          <li>Redesign the macOS installer disk image: a more compact window and background image, a volume icon, the LAMMPS icon on the bundled LAMMPS library, and no more README.txt file, which is not needed for the plain LAMMPS-GUI package</li>
+          <li>Document how to get the unsigned Windows and macOS packages past the operating system download checks, e.g. by downloading them with curl from a terminal, with updated screenshots</li>
+          <li>Add FreeBSD 15.1 to the list of tested platforms</li>
+        </ul>
+      </description>
+    </release>
+    <release version="3.1.0" timestamp="1789745310">
+      <description>
+        <p>Feature release adding an alternative single-window layout and a command window.</p>
+        <ul>
+          <li>Add a preference to combine the editor and all output views into a single main window with dockable panels: charts, image, slide show, and plots of imported data in a tabbed group on the right, output, variables, and command window tabbed across the bottom; panel proportions are kept across resizes, across closing a panel, and across sessions</li>
+          <li>Add the -j/--joined and -w/--windows command-line flags to select the window layout for a single session without changing the preference, and F6/Shift-F6 to cycle the focus between the sections of the combined window</li>
+          <li>Add a Command window: a shell prompt with scrollback next to the simulation, with persistent history, completion of commands, file names, and earlier command lines, configurable aliases, and kill/interrupt/restart controls</li>
+          <li>Add a preference selecting which of the installed shells the Command window starts</li>
+          <li>Add open, edit, and plot commands to the Command window, also under the names gui-open, gui-edit, and gui-plot, which are defined even where the short name is already taken, to send files from the prompt to a slide show, the editor, or a plot</li>
+          <li>Plot the block-structured output files of the fix ave/time (in vector mode), fix ave/histo, fix ave/correlate, and fix ave/correlate/long styles: the format is recognized from the block structure itself, and the column picker grows a group that reduces the blocks either to a single one or to the average of a selected range, with the spread shown as error bars (standard deviation, standard error of the mean, or the min/max range the blocks covered)</li>
+          <li>Reference columns by name in braces in the derived-column expressions of the column picker, in the manner of Python format strings: {name} works for any column name, including names like c_rdf[2] or g(r) that used to break the expression, {name:first}, {name:last}, {name:min}, {name:max}, and {name:mean} are per-column constants, and renaming a column takes effect immediately everywhere, rewriting the references in already added derived columns</li>
+          <li>Add Fourier transform post-processing: the one-sided cosine transform (the spectral density of a correlation function), the sine transform, or the power spectrum, computed by direct integration so unevenly spaced data works and the output grid is freely adjustable, with an optional Hann window against the ringing of truncated data</li>
+          <li>Add structure factor post-processing, computing S(q) from a plotted radial distribution function and the number density, with the -1 shift applied internally so it works on the plain g(r) chart</li>
+          <li>Add an Overlay other data column post-processing entry, which copies another column of the same chart window onto the current chart for a direct comparison</li>
+          <li>Add a Smoothed data (restore) post-processing entry, offered while a fitted or overlaid curve is in place, which removes that curve and returns the plot to the Savitzky-Golay smoothing of the raw data</li>
+          <li>Post-processing results with a new x axis (autocorrelation, Fourier transform, structure factor) join the Charts tab group of the combined layout as tabs instead of opening free windows</li>
+          <li>Add settings for the display style, color, line width, and point size of the raw and the processed data series, and for the color and line width of error bars, to the Chart Style dialog of the chart window and to the charts preferences tab that presets it</li>
+          <li>Show the application-wide Run, View, Tutorials, and About menus in all output windows, so a run can be started or stopped from any of them; Output, Slide Show, and file viewer windows gain a File menu</li>
+          <li>Reuse the Output and Charts windows across runs instead of recreating them; the options to keep old Output, Charts, and Image windows have been removed</li>
+          <li>Move the Preferences entries from the Edit menu to the View menu and add an option to open the combined main window maximized</li>
+          <li>Open the Image window from the View menu also before a snapshot was created: the entry then renders the snapshot first, like Create Image in the Run menu</li>
+          <li>Ask before opening a file that does not look like what it is being opened as, such as a binary file in the editor or an image in the plotter, instead of filling a window with unreadable content</li>
+          <li>Highlight the LAMMPS commands embedded in write_dump and rerun lines</li>
+          <li>Step the view angles in the Image Viewer by 5 degrees instead of 10</li>
+          <li>Fix LAMMPS screen output capture on Windows, which only worked when launched from a console; the capture now verifies itself and reports into the Output window when the library's output cannot reach it</li>
+          <li>Remember the LAMMPS shared library path per compiler toolchain, so differently built versions of LAMMPS-GUI on one machine no longer silently use each other's library</li>
+          <li>Remember separate main window sizes for the two layout styles, and report the selected layout in the About dialog</li>
+          <li>Offer ten instead of five preset colors for chart data series</li>
+          <li>Ask about unsaved changes before a running simulation is stopped when opening another file</li>
+          <li>Show non-ASCII characters in captured LAMMPS output correctly</li>
+          <li>Remove a one second delay at the end of every run</li>
+          <li>Fix several Command window issues: the state after a shell restart, directory names with special characters, and output that contains the internal end-of-command mark</li>
+          <li>Fix chart updates stopping when a run crosses midnight, and closed text viewers lingering in the individual windows layout</li>
+          <li>Import large data files for plotting several times faster, and reduce the overhead of updating the Output, Charts, and Command windows during a run</li>
+          <li>Require LAMMPS version 2 September 2026 or newer</li>
+        </ul>
+      </description>
+    </release>
+    <release version="3.0.7" timestamp="1785424779">
+      <description>
+        <p>Maintenance release with small feature additions and bug fixes.
+        The bulk of the changes are actually implemented in LAMMPS:</p>
+        <ul>
+          <li>add GUI support for dump image enhancements in LAMMPS: depth cueing, depth of focus, specular settings (change appearance of material), outline drawing style, set SSAO samples to adjust rendering speed, adjust image gamma value</li>
+          <li>fix warnings indicated by coverity scan</li>
+        </ul>
+      </description>
+    </release>
+    <release version="3.0.6" timestamp="1784576289">
+      <description>
+        <p>Maintenance release with small feature additions and bug fixes.</p>
+        <ul>
+          <li>Add more detailed resource data and a manifest</li>
+          <li>Try to extract diameter information from more kinds of pair styles</li>
+          <li>Support choosing between a static and a dynamic view center in the Image Viewer</li>
+          <li>Add File menu entry to write a restart file with the current state of the system</li>
+          <li>Add Run menu entry to extend the previous run by a given number of steps</li>
+          <li>Rewrite syntax highlighting on a shared syntax engine: aware of line continuations, argument roles are colored, unknown commands and styles are marked</li>
+          <li>Regroup the command colors: the *_modify commands get their own color group, the file input commands join the output group</li>
+          <li>Use the same color for IDs whether they are being defined (fix, compute, dump) or referenced (fix_modify, unfix, and so on)</li>
+          <li>Recognize and complete sub-styles of hybrid styles in style and coeff commands</li>
+          <li>Mark dump image keywords, show color names in their actual color, and complete both</li>
+          <li>Detect the light/dark theme from the platform color scheme when available</li>
+          <li>Auto-completion and context help are aware of line continuations</li>
+          <li>Add automatic pre-run input check with a run-anyway dialog plus Run menu entries to check the input statically or via a dry run</li>
+          <li>Tweak some icons for better readability at 24x24px size</li>
+          <li>Show the sample frame behind the movie import size estimate as a thumbnail</li>
+          <li>Skip the Image Viewer re-render after closing the Preferences dialog when the LAMMPS instance had to be recreated</li>
+          <li>Remove temporary image frame files also when a render in the Image Viewer fails</li>
+          <li>Find external helper programs like ffmpeg in common package manager locations on macOS</li>
+          <li>Delete a downloaded LAMMPS shared library for any platform when resetting the preferences</li>
+          <li>Verify the checksum of a downloaded LAMMPS library before it replaces a working file, rename a locked library instead of failing on Windows, and clean up backups and partial downloads at launch</li>
+          <li>Consistent file dialogs: always start in the input file directory, offer default file names derived from the input file name, and filter for the expected file types</li>
+          <li>Abort a download when no data arrives for a configurable time (General Settings, default 10 seconds) instead of waiting forever without feedback on a stalled connection</li>
+          <li>Report a failed tutorial download with a clear error dialog pointing to the LAMMPS forum instead of failing silently</li>
+          <li>Show tutorial downloads in a progress dialog with a Cancel button, visible from the first network request on</li>
+          <li>Keep the Set Variables dialog in sync with index variable edits in the input script: a changed definition in the input wins over an earlier dialog override</li>
+          <li>Mark values in the Set Variables dialog that override the input script in bold and draw a thin frame around the overridden value in the editor</li>
+          <li>Offer the Set Variables dialog in the editor context menu when the current line defines an index style variable</li>
+          <li>Use spin boxes for the SSAO strength, Shiny, and view center fields of the Global image settings dialog</li>
+        </ul>
+      </description>
+    </release>
+    <release version="3.0.5" timestamp="1784426451">
+      <description>
+        <p>Windows-only maintenance release with Windows specific updates.</p>
+        <ul>
+          <li>Add tooling to implement cryptographic signing of executables and the installer</li>
+          <li>Create a GUI executable with a workaround to still use the console capture</li>
+          <li>Update citation info file</li>
+          <li>Replace ugly Windows FFMpeg concat file hack with a portable solution</li>
+        </ul>
+      </description>
+    </release>
+    <release version="3.0.4" timestamp="1783600400">
+      <description>
+        <p>Maintenance release with small feature additions and bug fixes.</p>
+        <ul>
+          <li>Update the list of materials science tutorials to 18 to correspond the latest status of the collection</li>
+          <li>Import additional tutorial logos and blurbs for all 18 tutorials</li>
+          <li>Reenable setting index style variables from Set Variables dialog which broke when making variable behavior more consistent for image creation</li>
+          <li>Support setting the atom size from atom style variables</li>
+          <li>Update citation section with newly available information</li>
+          <li>Add a missing dependency to always render PDF files correctly</li>
+          <li>Prevent MSVC builds of LAMMPS-GUI from downloading a GCC compiled LAMMPS shared library</li>
+          <li>Document that MSVC support is for development but not packaging</li>
+          <li>Make the column selection when plotting external data more intuitive</li>
+          <li>Add a little buffer space between the largest and smallest data value and the y-axis limits of a chart</li>
+          <li>Add a custom 404 error page</li>
+          <li>Catch and display FFMpeg and ImageMagick errors and tune encoding settings for H.264 and WebM</li>
+        </ul>
+      </description>
+    </release>
+    <release version="3.0.2" timestamp="1783598400">
+      <description>
+        <p>Maintenance release with small feature additions and bug fixes.</p>
+        <ul>
+          <li>Import movie files into the slide show viewer: the frames of a movie are extracted into individual images with FFmpeg after confirming a dialog that shows the properties of the movie, selects the range of frames and the interval between them, and estimates the required temporary disk space with a highlighted warning for large imports</li>
+          <li>Cache images that were converted with ImageMagick for display in the slide show viewer, so each file in a format that Qt cannot decode is converted only once instead of on every display</li>
+          <li>Stop the repeated warnings that some of the Qt image format plugins print for every file they reject, for example "QTgaHandler::canRead(): Image type not supported" when viewing Targa images: such a file is now handed to Qt only once, and an image that can be read by neither Qt nor ImageMagick is reported once instead of on every display</li>
+          <li>Add an image cache indicator to the slide show viewer toolbar that is grayed out while the cache is empty and reports the number and size of the cached images in its tooltip. Pressing it discards the converted images, which are then converted again when needed; the extracted frames of an imported movie are kept, since re-creating them requires running FFmpeg again</li>
+          <li>Deleting images in the slide show viewer now also discards their converted copies from the image cache instead of leaving them behind until the window is closed</li>
+          <li>Fix the automatic window sizing of the slide show and snapshot image viewers: the computed size depended on the scroll bar state left over from the previous layout, so it would jump while stepping through images of identical size, and the slide show ignored the zoom factor and rotation of the displayed image</li>
+          <li>The slide show and snapshot image viewer windows can now be freely resized by hand, since the automatic sizing only kicks in when the image size actually changes; a new "fit window" toolbar button in both viewers resizes the window back to show the image at its full size</li>
+          <li>Expose more dump image settings in the Global image settings dialog of the snapshot viewer: the view angles theta and phi, the zoom factor, and the camera up direction</li>
+          <li>Fix the rotate icons of the snapshot viewer toolbar, where the arrow tail was drawn in front of the rotation axis instead of behind it: the icons used an SVG clipPath element, which Qt does not implement, so they now use an equivalent mask element and fall back to pre-rendered PNG images with Qt versions before 6.7, which cannot render masks either</li>
+          <li>Use a more portable implementation of the icon drop shadows for compatibility with older SVG libraries</li>
+          <li>Add a JOSS submission status badge to the README file and the documentation</li>
+          <li>Fix a regression from version 3.0.0 where the Help button of the snapshot image viewer would reset all color and light customizations instead of opening the documentation</li>
+          <li>Fix the "Default chart title" and "Bond Cutoff" fields of the Preferences dialog, whose values were silently never saved</li>
+          <li>Failed renders in the snapshot image viewer no longer leave the render status indicator stuck or corrupt subsequent renders of molecule visualizations</li>
+          <li>Offer the atom and bond color map under its historical name BWR (blue at low values) again; the previous RWB default rendered low values red</li>
+          <li>Fix the "Reformat on Return" and automatic completion preferences, which were pinned to their default values regardless of the settings</li>
+          <li>An error in the first line of an input script is now highlighted red like errors in all other lines</li>
+          <li>Many small fixes: correct typos in the Quick Help text and tutorial descriptions, complete the missing paragraph markup in the materials-science tutorial descriptions, center the settings dialog buttons as intended, apply changes to the smoothing window/order once per edit instead of on every typed digit, and roll back light levels loaded from a colors file when the dialog is cancelled</li>
+          <li>Add support to enable collecting code coverage information during compilation</li>
+          <li>Add targets to report code coverage data</li>
+          <li>Add support to enable known code sanitizers for GNU and Clang compilers during compilation</li>
+          <li>Fix the Set Variables dialog, whose values no longer took precedence over index variable definitions in the input script: the variables are now re-created before each run instead of being passed only when the LAMMPS instance is first created, where they were immediately discarded by the cleanup of variables left over from the previous run</li>
+          <li>Make the column selection when plotting external data files explicit: each column now has an exclusive radio button that marks it as the x-axis and a check box that plots it on the y-axis, and columns with neither selected are ignored. When the x-axis choice moves to a different column, the previous x-axis column is plotted again. Previously the first column without a check mark silently became the x-axis. Derived columns can now also be selected as the x-axis</li>
+          <li>Add a little buffer space between the largest and smallest data value and the y-axis limits of a chart, so extrema like the minimum of an energy-volume curve are no longer drawn on the plot frame itself; a tighter framing remains available through the range sliders</li>
+          <li>The atom Size setting of the snapshot image viewer can now select atom-style variables defined in the current simulation state, whose per-atom values are then used directly as atom diameters -- for example to apply a scaling factor to a per-atom property or to per-atom data from computes and fixes referenced by the variable</li>
+        </ul>
+      </description>
+    </release>
+    <release version="3.0.1" timestamp="1782820800">
+      <description>
+        <p>Maintenance release following the 3.0.0 major release.</p>
+        <ul>
+          <li>Require LAMMPS version 4 July 2026 and remove all remaining backward compatibility workarounds</li>
+          <li>Add a Zenodo DOI badge and a BibTeX entry for the archived releases to the documentation and citation metadata, so a specific release can be cited directly</li>
+          <li>Finish consolidating the code on QString internally by removing the remaining const char * and std::string overloads from the LAMMPS wrapper and parsing input lines directly as a QString</li>
+          <li>Add a daily Coverity Scan static-analysis workflow and broaden the CodeQL analysis to the security-and-quality query suite, and fix the defects they surfaced -- including a use-after-free and a memory leak on the LAMMPS plugin load and unload error paths, several unchecked return values, and the Recent Files list now reliably dropping entries whose files are no longer readable</li>
+          <li>Minor build, continuous-integration, and documentation maintenance</li>
+        </ul>
+      </description>
+    </release>
+    <release version="3.0.0" timestamp="1782648000">
+      <description>
+        <p>New major release after the 2.x development series. Internally, 2.x was a major reorganization and refactor effort of the code base that drops backward compatibility (Qt 5 and LAMMPS versions older than 30 March 2026) and instead builds on current LAMMPS features. It collects the work since version 1.12.0.</p>
+        <ul>
+          <li>Require Qt 6.2 or newer (Qt 5.x support removed) and a LAMMPS library from 30 March 2026 or newer, with all GUI features unconditionally available</li>
+          <li>Replace the Qt Charts and Qt Graphs chart backends with a single self-contained native renderer that looks and behaves identically on every platform and Qt version</li>
+          <li>Plot external data files (whitespace/.dat, CSV, LAMMPS YAML, and JSON) in the chart window without running a simulation, with column selection, renaming, derived columns, and multi-file overlay</li>
+          <li>Add a Postprocess dialog with autocorrelation, polynomial and Birch-Murnaghan equation-of-state curve fits, and custom-function plotting and nonlinear curve fitting via a vendored subset of the Lepton expression parser</li>
+          <li>Add a Chart Style dialog with line and point display modes and independent raw and processed series styling, an optional in-plot legend, and reference lines</li>
+          <li>Color bonds in the snapshot viewer by a per-bond compute value with an independent bond color map, range, and opacity, and overhaul the color maps (single source of truth, corrected Viridis, Plasma, and Inferno, added Magma, Cividis, and Turbo, and a reversible-map option)</li>
+          <li>Improve the slide show and image viewing: open image files directly, standalone viewer modes, ImageMagick conversion, stable window sizing, Start/Stop range controls, and a color-coded slider</li>
+          <li>Reorganize the Tutorials menu into multiple collections (Soft Matter and a new Materials Science collection, plus a Granular / DEM placeholder)</li>
+          <li>Reorganize the File menu, add an Inspect Restart File action and -c/--chart, -i/--image, and -t/--text command-line flags, and let plugin builds browse for or download a compatible LAMMPS library with SHA-256 verification</li>
+          <li>Overhaul the icons to scalable SVG (sharp on high-resolution displays) with consistent toolbars and application-themed text context-menu icons</li>
+          <li>Add flatpak packaging and Linux, macOS, and Windows continuous integration, refactor extensively for consistency and testability, and thoroughly revise the documentation</li>
+        </ul>
+      </description>
+    </release>
+    <release version="2.0.9999" timestamp="1782556444">
+      <description>
+        <p>Another pre-release for the upcoming 3.0.0 version.</p>
+        <ul>
+          <li>Overhaul the icon library: redraw the icons and convert them to scalable SVG so they stay sharp on high-resolution and HiDPI/Retina displays, and drop the now-unused bitmap icons</li>
+          <li>Give the toolbars a consistent look: the image viewer, slide show, chart window, and editor status bar now use square buttons with larger, snug icons, with the neighboring input fields matched to the button height</li>
+          <li>Replace the desktop-theme icons on the standard text context menus (undo, redo, cut, copy, paste, delete, select all) with the application's own icons so right-click menus match the rest of the interface on every platform</li>
+          <li>Fix the "Variables Window" entry in the View menu, which had stopped opening the window after creating or loading an input file</li>
+          <li>Internal cleanup: share the toolbar-button sizing and window-manager hint logic through common helpers</li>
+        </ul>
+      </description>
+    </release>
+    <release version="2.0.999" timestamp="1782228677">
+      <description>
+        <p>Pre-release for the upcoming 3.0.0 version.</p>
+        <ul>
+          <li>Replace the QtCharts and QtGraphs chart backends with a single self-contained native renderer (a QWidget plus QPainter 2D line and scatter plotter) so charts look and behave identically on every platform and Qt version, the build no longer depends on the Qt Charts or Qt Graphs modules, and a Qt-free axis-layout core (nice ticks, label formatting) is shared by all plots</li>
+          <li>Collapse the multi-view chart layout into one shared plot widget that is rebound as you switch the displayed property, reducing memory use and redraw overhead</li>
+          <li>Add an optional in-plot legend with a placement selector in the Chart Style dialog (off or any of the four corners), remembered across sessions</li>
+          <li>Add reference lines to the chart window: vertical or horizontal annotation lines drawn on every chart with per-line label, color, and label anchor, plus window-wide label font size, gap, and optional boxed labels</li>
+          <li>Add an independent point-size control for the raw and processed series in the Chart Style dialog and enlarge the default point size</li>
+          <li>Render snapshot images for input decks that keep a "fix graphics/labels" color scale: the snapshot viewer now satisfies the fix's dump dependency instead of aborting the render</li>
+          <li>Add a reversible color map to the image viewer: a Reverse Map checkbox on each atom and bond color-map row mirrors the selected map (for example RWB becomes blue-white-red), replacing the now-removed redundant BWR map</li>
+          <li>Several chart refinements and fixes: keep the zoom and range sliders consistent when adding reference lines or switching between raw and smoothed data, bold titles and dashed minor grid lines, adaptive tick precision, and corrected processed-series labeling</li>
+          <li>Performance: remove per-point QSettings reads and O(N) rescans from the live thermo update path, coalesce the log warnings-summary repaint, and restyle the CPU-usage label only when its color bucket changes</li>
+          <li>Convert the AppStream metadata to a valid format</li>
+          <li>Further internal refactoring for consistency and testability: store image colors as QString, factor shared dialog and parser helpers, confine the Lepton expression boundary behind a compiled-expression type, and update the source file map</li>
+        </ul>
+      </description>
+    </release>
+    <release version="2.0.99" timestamp="1782069988">
+      <description>
+        <ul>
+          <li>Reorganize the tutorials into multiple collections: rename the existing set to "Soft Matter", number the collections in the menu, add a new "Materials Science" collection (14 tutorials with per-tutorial logos and descriptions, released incrementally as their text is finalized), and add a placeholder for a planned "Granular / DEM" collection</li>
+          <li>Make the snapshot-image color maps a single source of truth shared by the dump command builder and the preview swatches; correct Viridis, Plasma, and Inferno to canonical matplotlib values and add Magma, Cividis, and Turbo</li>
+          <li>Color bonds by a per-bond compute value with an independent bond color map and range, give bonds an independent opacity, and add a background gradient toggle to the snapshot viewer</li>
+          <li>Emit only the dump-image settings that differ from the LAMMPS defaults, producing cleaner and more portable image commands</li>
+          <li>Document the multi-collection tutorials and how to add or update a tutorial collection, the bond color/opacity options, and the color maps</li>
+          <li>Update internal data tables (help and image-style index) and packaging scripts</li>
+        </ul>
+      </description>
+    </release>
+    <release version="2.0.90" timestamp="1781728854">
+      <description>
+        <ul>
+          <li>Add a "Plot Data File..." import dialog and menu entry to plot external data files (whitespace/.dat, CSV, LAMMPS YAML, and JSON) in the chart window, with column selection and renaming at import time</li>
+          <li>Add chart display modes (lines, points, lines+points) and a per-chart style dialog, with independent styles for raw and processed series</li>
+          <li>Add a Postprocess dialog with autocorrelation, polynomial and Birch-Murnaghan equation-of-state curve fits with overlays, and custom-function plotting and nonlinear curve fitting via a vendored JIT-less subset of the Lepton expression parser</li>
+          <li>Extend the standalone plot mode with derived columns, multi-file overlay, fit x-range, reference lines, editable title and axis labels, and the base filename as the default title</li>
+          <li>Improve the Birch-Murnaghan EOS post-processing: number-of-atoms input, corrected lattice-constant formula, and clearer V/V0/a0 result labels</li>
+          <li>Add -c/--chart, -i/--image, and -t/--text command line flags to open files directly</li>
+          <li>View and convert image files in the snapshot viewer and via ImageMagick in the slideshow viewer, add a standalone slideshow mode, add Start/Stop range controls and a color-coded slider to the slideshow, and keep a stable window size when images have different dimensions</li>
+          <li>Reorganize and rename File menu entries, add keyboard shortcuts for View Image and Plot Data File, and warn when View Text File is given a binary or image file</li>
+          <li>Improve the YAML thermo parser to handle the sequence-of-maps format and tolerate trailing commas</li>
+          <li>Extensive internal refactoring for consistency and testability: short Cfg and Keys constant namespaces, QString-based interfaces, a pure dump-image command builder, and Qt-free least-squares, analysis, and fitting cores</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.0.6" timestamp="1777151498">
       <description>
-        more refactoring for more efficiency and consistency
-        move some more redundant functionality to helper functions
-        read and parse color/lights JSON files consistent with LAMMPS
-        updates and improvements for the documentation
+        <ul>
+          <li>more refactoring for more efficiency and consistency</li>
+          <li>move some more redundant functionality to helper functions</li>
+          <li>read and parse color/lights JSON files consistent with LAMMPS</li>
+          <li>updates and improvements for the documentation</li>
+        </ul>
       </description>
     </release>
     <release version="2.0.5" timestamp="1776131328">
       <description>
-        eliminate getMainWindow() function by passing pointer to main widget
-        add check-for-updates dialog to the About menu to download updated plugins
-        expand list of shared library locations to search for Ubuntu/Debian and include config dir
-        update list of test status badges in README and on homepage langing page
-        update list of commands for help and compute/fix support in dump image
-        add helper functions for information dialogs and shared library file names
-        disable access to plot range sliders and plot style while simulation is running
-        add new "Colors" dialog to ImageViewer that allows to edit, store, and load definitions for per-type colors
-        add support for new hull_points keyword of LAMMPS versions newer than 30 March 2026 for regions so that union and intersect regions can be approximated for draw styles frame, filled, and transparent
+        <ul>
+          <li>eliminate getMainWindow() function by passing pointer to main widget</li>
+          <li>add check-for-updates dialog to the About menu to download updated plugins</li>
+          <li>expand list of shared library locations to search for Ubuntu/Debian and include config dir</li>
+          <li>update list of test status badges in README and on homepage langing page</li>
+          <li>update list of commands for help and compute/fix support in dump image</li>
+          <li>add helper functions for information dialogs and shared library file names</li>
+          <li>disable access to plot range sliders and plot style while simulation is running</li>
+          <li>add new "Colors" dialog to ImageViewer that allows to edit, store, and load definitions for per-type colors</li>
+          <li>add support for new hull_points keyword of LAMMPS versions newer than 30 March 2026 for regions so that union and intersect regions can be approximated for draw styles frame, filled, and transparent</li>
+        </ul>
       </description>
     </release>
     <release version="2.0.1" timestamp="1776031328">
       <description>
-        do not attempt to use auto-completion of $-style variable
-        expansions which were often too disrupting and difficult to keep
-        up-to-date
-        update command help index
-        enable building flatpak bundles. these are missing the LAMMPS shared library, but this
-        will be offered to download on first use
-        add extensive compilation and integration testing using github workflows:
-        - Linux flatpak bundle with Qt 6.10
-        - macOS to build .dmg application bundle
-        - Windows Server with MSVC 2022 MinGW64
-        - Linux2Windows cross-compiler in Fedora container to build NSIS installer package
-        Further refactoring of the core code mostly using Claude Opus 4.6
+        <ul>
+          <li>do not attempt to use auto-completion of $-style variable expansions which were often too disrupting and difficult to keep up-to-date</li>
+          <li>update command help index</li>
+          <li>enable building flatpak bundles. these are missing the LAMMPS shared library, but this will be offered to download on first use</li>
+          <li>add extensive compilation and integration testing using github workflows:</li>
+          <li>Linux flatpak bundle with Qt 6.10</li>
+          <li>macOS to build .dmg application bundle</li>
+          <li>Windows Server with MSVC 2022 MinGW64</li>
+          <li>Linux2Windows cross-compiler in Fedora container to build NSIS installer package</li>
+          <li>Further refactoring of the core code mostly using Claude Opus 4.6</li>
+        </ul>
       </description>
     </release>
     <release version="2.0.0" timestamp="1775798011">
       <description>
-        Major refactor of the code base for consistency and maintainability:
-        - all widgets are created explicitly, QtDesigner created parts of the GUI are converted
-        - remove support for Qt 5.x
-        - remove support for LAMMPS versions before 30 March 2026
-        - use Qt style naming conventions (camel case) throughout
-        - move some more replicated functionality to helper functions
-        - new class URLDownloader to replace downloading of files with LAMMPS' geturl command
-        - support downloading LAMMPS shared library from download.lammps.org if reset of not valid
-        - add button to download LAMMPS shared library from download.lammps.org to preferences
-        - support SHA-256 checksum validation from SHA256SUMS file, if available
-        - updated docs and copilot instructions
+        <ul>
+          <li>Major refactor of the code base for consistency and maintainability:</li>
+          <li>all widgets are created explicitly, QtDesigner created parts of the GUI are converted</li>
+          <li>remove support for Qt 5.x</li>
+          <li>remove support for LAMMPS versions before 30 March 2026</li>
+          <li>use Qt style naming conventions (camel case) throughout</li>
+          <li>move some more replicated functionality to helper functions</li>
+          <li>new class URLDownloader to replace downloading of files with LAMMPS' geturl command</li>
+          <li>support downloading LAMMPS shared library from download.lammps.org if reset of not valid</li>
+          <li>add button to download LAMMPS shared library from download.lammps.org to preferences</li>
+          <li>support SHA-256 checksum validation from SHA256SUMS file, if available</li>
+          <li>updated docs and copilot instructions</li>
+        </ul>
       </description>
     </release>
     <release version="1.12.0" timestamp="1774663229">
       <description>
-        Final fixes for next LAMMPS-GUI major release and LAMMPS feature release
+        <ul>
+          <li>Final fixes for next LAMMPS-GUI major release and LAMMPS feature release</li>
+        </ul>
       </description>
     </release>
     <release version="1.11.4" timestamp="1774314764">
       <description>
-        Consistently use QCheckBox::isChecked() and QCheckBox::setChecked()
-        Add preferences settings to enable/disable major/minor grid lines in charts
-        Add contributing guidelines and a security statement
-        Reintroduce calls to helper functions to silence and restore stdout for all platforms
-        Improve Windows code path of StdCapture
-        Add tests for capture and silencing
-        Drop into a file selection dialog, if no LAMMPS shared library can be found in plugin mode
-        Improve error message when no suitable LAMMPS shared library is loaded in plugin mode
+        <ul>
+          <li>Consistently use QCheckBox::isChecked() and QCheckBox::setChecked()</li>
+          <li>Add preferences settings to enable/disable major/minor grid lines in charts</li>
+          <li>Add contributing guidelines and a security statement</li>
+          <li>Reintroduce calls to helper functions to silence and restore stdout for all platforms</li>
+          <li>Improve Windows code path of StdCapture</li>
+          <li>Add tests for capture and silencing</li>
+          <li>Drop into a file selection dialog, if no LAMMPS shared library can be found in plugin mode</li>
+          <li>Improve error message when no suitable LAMMPS shared library is loaded in plugin mode</li>
+        </ul>
       </description>
     </release>
     <release version="1.11.3" timestamp="1773985377">
       <description>
-        Small ChartWindow layout tweaks
-        Port ChartWindow to use QtGraphs API instead of QtCharts when compiling for Qt 6.10+
-        Remove "both" options for ellipsoid particles since it is no longer needed
-        Default settings for ellipsoids is now "triangles"
-        Use consistent validator instance for all diameter values in the atoms/bond dialog
-        Avoid accessing expired pointers when shutting down app
-        Updated documentation
-        Downloaded precompiled libraries now contain updated LAMMPS code with bugfixes
+        <ul>
+          <li>Small ChartWindow layout tweaks</li>
+          <li>Port ChartWindow to use QtGraphs API instead of QtCharts when compiling for Qt 6.10+</li>
+          <li>Remove "both" options for ellipsoid particles since it is no longer needed</li>
+          <li>Default settings for ellipsoids is now "triangles"</li>
+          <li>Use consistent validator instance for all diameter values in the atoms/bond dialog</li>
+          <li>Avoid accessing expired pointers when shutting down app</li>
+          <li>Updated documentation</li>
+          <li>Downloaded precompiled libraries now contain updated LAMMPS code with bugfixes</li>
+        </ul>
       </description>
     </release>
     <release version="1.11.2" timestamp="1773462703">
       <description>
-        Update citation of LAMMPS tutorial paper in menu description
-        Tweak width estimates and string data for "About LAMMPS-GUI" dialog some more
+        <ul>
+          <li>Update citation of LAMMPS tutorial paper in menu description</li>
+          <li>Tweak width estimates and string data for "About LAMMPS-GUI" dialog some more</li>
+        </ul>
       </description>
     </release>
     <release version="1.11.1" timestamp="1773263770">
       <description>
-        Remove hack to silence and restore stdout for non-run calls to LAMMPS
-        Refactor about dialog to include more info and use scrollable text fields with auto-scroll
-        Refactor font initialization to be more consistent across platforms and to avoid crashes
-        Update Programmer's Guide documentation
+        <ul>
+          <li>Remove hack to silence and restore stdout for non-run calls to LAMMPS</li>
+          <li>Refactor about dialog to include more info and use scrollable text fields with auto-scroll</li>
+          <li>Refactor font initialization to be more consistent across platforms and to avoid crashes</li>
+          <li>Update Programmer's Guide documentation</li>
+        </ul>
       </description>
     </release>
     <release version="1.11.0" timestamp="1772079977">
       <description>
-        Tweak some button names to be more suitable and intuitive
-        Add help buttons to provide specific online help for compute/fixes, dump image, or the LAMMPS-GUI homepage
-        Expand documentation of the snapshot image and slide show viewers
-        Update several screenshot images and add new ones
-        Add more color maps, add icons to selection list
-        Make image viewer dialogs more consistent and balanced. Set minimum size.
-        Rework special particle type selection dialogs
-        Implement customized dialogs for warnings and critical errors
-        Implement helper function for uniform export of images either directly or through ImageMagick
-        Small tweaks to dialog layouts, especially buttons and text field sizes
-        Add a couple more keyboard shortcuts and a stop button to slideshow viewer
-        Support by-attribute coloring for body, ellipsoid, line, and tri particles, if a suitable LAMMPS version is used
+        <ul>
+          <li>Tweak some button names to be more suitable and intuitive</li>
+          <li>Add help buttons to provide specific online help for compute/fixes, dump image, or the LAMMPS-GUI homepage</li>
+          <li>Expand documentation of the snapshot image and slide show viewers</li>
+          <li>Update several screenshot images and add new ones</li>
+          <li>Add more color maps, add icons to selection list</li>
+          <li>Make image viewer dialogs more consistent and balanced. Set minimum size.</li>
+          <li>Rework special particle type selection dialogs</li>
+          <li>Implement customized dialogs for warnings and critical errors</li>
+          <li>Implement helper function for uniform export of images either directly or through ImageMagick</li>
+          <li>Small tweaks to dialog layouts, especially buttons and text field sizes</li>
+          <li>Add a couple more keyboard shortcuts and a stop button to slideshow viewer</li>
+          <li>Support by-attribute coloring for body, ellipsoid, line, and tri particles, if a suitable LAMMPS version is used</li>
+        </ul>
       </description>
     </release>
     <release version="1.10.0" timestamp="1771473565">
       <description>
-        Add dialog to enable and configure atom / particle and bond visualization settings
-        Add dialog to enable and configure graphics objects from compute and fixes
-        Update layout of Image and SlideShow viewers
-        Update docs for changes to Image and SlideShow viewers
-        Update help index table
-        Silence output from calls to LAMMPS that are not part of a run (not on Windows, yet)
-        Make animated loop delay in slideshow window configurable
-        Add command line flag to select Qt-style and set to "Fusion" by default
-        Enforce that all "icon buttons" have a 4x3 shape (not 2x1 like on macOS) and consistent size
-        Enforce consistent layout spacings across platforms
-        Implement copy-current-image-to-clipboard functionality for image viewer, charts, and slideshow
-        Add table for known fixes and computes with graphics data
-        Update resource file syntax for better Windows compatibility
-        Fix several small glitches and avoid unexpected crashes
+        <ul>
+          <li>Add dialog to enable and configure atom / particle and bond visualization settings</li>
+          <li>Add dialog to enable and configure graphics objects from compute and fixes</li>
+          <li>Update layout of Image and SlideShow viewers</li>
+          <li>Update docs for changes to Image and SlideShow viewers</li>
+          <li>Update help index table</li>
+          <li>Silence output from calls to LAMMPS that are not part of a run (not on Windows, yet)</li>
+          <li>Make animated loop delay in slideshow window configurable</li>
+          <li>Add command line flag to select Qt-style and set to "Fusion" by default</li>
+          <li>Enforce that all "icon buttons" have a 4x3 shape (not 2x1 like on macOS) and consistent size</li>
+          <li>Enforce consistent layout spacings across platforms</li>
+          <li>Implement copy-current-image-to-clipboard functionality for image viewer, charts, and slideshow</li>
+          <li>Add table for known fixes and computes with graphics data</li>
+          <li>Update resource file syntax for better Windows compatibility</li>
+          <li>Fix several small glitches and avoid unexpected crashes</li>
+        </ul>
       </description>
     </release>
     <release version="1.9.1" timestamp="1766154745">
       <description>
-        Add support for mirroring and rotating images to slideshow viewer
-        Make image file name in slideshow selectable by mouse
-        Export to FFMpeg honors image mirroring and rotating settings
-        Display body, line, tri, and ellipsoid particles by their lines or faces, if detected
-        Add dialog for configuring most global image settings
-        Add support for rendering regions in style "transparent"
-        Fix issue with centering for 2d systems
-        Adjust window manager hints for several windows: remove dialog property and maximize button to windows can be on top or below
-        Try using ImageMagick, if available, when FFMpeg is not found for creating movies
-        Add option to save scaled/flipped image to slide show viewer
-        Try using ImageMagick, if available, to convert images when desired format is not available
-        Update docs for changes to Image and SlideShow viewers
-        Make image area in SlideShow viewer a scrollable area and auto-adjust window size up to a maximum
+        <ul>
+          <li>Add support for mirroring and rotating images to slideshow viewer</li>
+          <li>Make image file name in slideshow selectable by mouse</li>
+          <li>Export to FFMpeg honors image mirroring and rotating settings</li>
+          <li>Display body, line, tri, and ellipsoid particles by their lines or faces, if detected</li>
+          <li>Add dialog for configuring most global image settings</li>
+          <li>Add support for rendering regions in style "transparent"</li>
+          <li>Fix issue with centering for 2d systems</li>
+          <li>Adjust window manager hints for several windows: remove dialog property and maximize button to windows can be on top or below</li>
+          <li>Try using ImageMagick, if available, when FFMpeg is not found for creating movies</li>
+          <li>Add option to save scaled/flipped image to slide show viewer</li>
+          <li>Try using ImageMagick, if available, to convert images when desired format is not available</li>
+          <li>Update docs for changes to Image and SlideShow viewers</li>
+          <li>Make image area in SlideShow viewer a scrollable area and auto-adjust window size up to a maximum</li>
+        </ul>
       </description>
     </release>
     <release version="1.9.0" timestamp="1761171849">
       <description>
-        Improvements and corrections for tgz binary packaging on Linux
-        Updates to documentation configuration and remove unused Sphinx extensions
-        Checked for and enabled compatibility with Sphinx 9.0.x
-        Added missing Doxygen comments and corrections to Doxygen configuration file
-        Added packaging of standalone LAMMPS-GUI version for Windows using a pre-compiled basic LAMMPS dll file.
-        Switch away from system folders to home or desktop folder on Windows
+        <ul>
+          <li>Improvements and corrections for tgz binary packaging on Linux</li>
+          <li>Updates to documentation configuration and remove unused Sphinx extensions</li>
+          <li>Checked for and enabled compatibility with Sphinx 9.0.x</li>
+          <li>Added missing Doxygen comments and corrections to Doxygen configuration file</li>
+          <li>Added packaging of standalone LAMMPS-GUI version for Windows using a pre-compiled basic LAMMPS dll file.</li>
+          <li>Switch away from system folders to home or desktop folder on Windows</li>
+        </ul>
       </description>
     </release>
     <release version="1.8.5" timestamp="1761171849">
       <description>
-        Minor bug fixes
-        Add -x/-width and -y/-height command line flags to override the main window geometry
-        Add unit tests for the GUI using Xvfb and PyAutoGUI and some screen shooter wrapper
-        Bundle pre-compiled shared LAMMPS libraries without dependencies except for libcurl
-        Download pre-compiled shared LAMMPS library also for unit testing
+        <ul>
+          <li>Minor bug fixes</li>
+          <li>Add -x/-width and -y/-height command line flags to override the main window geometry</li>
+          <li>Add unit tests for the GUI using Xvfb and PyAutoGUI and some screen shooter wrapper</li>
+          <li>Bundle pre-compiled shared LAMMPS libraries without dependencies except for libcurl</li>
+          <li>Download pre-compiled shared LAMMPS library also for unit testing</li>
+        </ul>
       </description>
     </release>
     <release version="1.8.4" timestamp="1757684513">
       <description>
-        Block compiling LAMMPS-GUI in plugin mode on Windows
-        Add entries to run and stop LAMMPS to editor context menu
-        Update suggested citation to the published LAMMPS tutorial paper
-        Update copyright header
-        Update CodeQL workflow
-        Only enable and use autobond feature if a pair style is defined
-        and if the LAMMPS version (10 September 2025 and later) supports it
-        Only enable and use region visualization dialon if the
-        LAMMPS version (10 September 2025 and later) supports it
-        Make LAMMPS-GUI compatible with loading LAMMPS 22 July 2025
-        update 2 and later instead of requiring 10 September 2025 and later.
-        Clean up in case a previous write_dump command failed
-        Avoid segfault in image viewer when using per-atom masses
-        Add test folder with GoogleTest based testing framework with a few basic tests
-        Add doxygen style comments to source code and a Programmer's Guide importing them
-        Create and add Index and add index directives throughout the docs
+        <ul>
+          <li>Block compiling LAMMPS-GUI in plugin mode on Windows</li>
+          <li>Add entries to run and stop LAMMPS to editor context menu</li>
+          <li>Update suggested citation to the published LAMMPS tutorial paper</li>
+          <li>Update copyright header</li>
+          <li>Update CodeQL workflow</li>
+          <li>Only enable and use autobond feature if a pair style is defined and if the LAMMPS version (10 September 2025 and later) supports it</li>
+          <li>Only enable and use region visualization dialon if the LAMMPS version (10 September 2025 and later) supports it</li>
+          <li>Make LAMMPS-GUI compatible with loading LAMMPS 22 July 2025 update 2 and later instead of requiring 10 September 2025 and later.</li>
+          <li>Clean up in case a previous write_dump command failed</li>
+          <li>Avoid segfault in image viewer when using per-atom masses</li>
+          <li>Add test folder with GoogleTest based testing framework with a few basic tests</li>
+          <li>Add doxygen style comments to source code and a Programmer's Guide importing them</li>
+          <li>Create and add Index and add index directives throughout the docs</li>
+        </ul>
       </description>
     </release>
     <release version="1.8.3" timestamp="1756739129">
       <description>
-        Small tweaks to the theme colors in use
-        Update, correct, and reformat installation and compilation instructions
-        Use new library interface call to determine if LAMMPS supports OpenMP
-          remove all remaining ifdefs for _OPENMP
-        When loading library plugin, check if required recently added functions
-              are present and also check the version string.
-        LAMMPS version 10 September 2025 or later is required for LAMMPS-GUI 1.8
+        <ul>
+          <li>Small tweaks to the theme colors in use</li>
+          <li>Update, correct, and reformat installation and compilation instructions</li>
+          <li>Use new library interface call to determine if LAMMPS supports OpenMP</li>
+          <li>remove all remaining ifdefs for _OPENMP</li>
+          <li>When loading library plugin, check if required recently added functions are present and also check the version string.</li>
+          <li>LAMMPS version 10 September 2025 or later is required for LAMMPS-GUI 1.8</li>
+        </ul>
       </description>
     </release>
     <release version="1.8.2" timestamp="1756521771">
       <description>
-        Complete packaging for macOS, Linux tgz and flatpak
-        Corrections and improvements when building package on Windows
-        Fix frozen cursor on drag-n-drop bug
-        Implement drag and drop of text blocks
-        Remove (unused) support for OpenMP (avoids crashes when loading LAMMPS dynamically with macOS)
-        Add integration testing and static code analysis to repository, add dependabot support.
-        Small updates due to tests and dependencies
-        Update icons and background images for macOS to reflect LAMMPS-GUI
-        Update use of new icons in LAMMPS-GUI as well except for the LAMMPS status
-        No build support for WHAM. This is only included if LAMMPS is included
+        <ul>
+          <li>Complete packaging for macOS, Linux tgz and flatpak</li>
+          <li>Corrections and improvements when building package on Windows</li>
+          <li>Fix frozen cursor on drag-n-drop bug</li>
+          <li>Implement drag and drop of text blocks</li>
+          <li>Remove (unused) support for OpenMP (avoids crashes when loading LAMMPS dynamically with macOS)</li>
+          <li>Add integration testing and static code analysis to repository, add dependabot support.</li>
+          <li>Small updates due to tests and dependencies</li>
+          <li>Update icons and background images for macOS to reflect LAMMPS-GUI</li>
+          <li>Update use of new icons in LAMMPS-GUI as well except for the LAMMPS status</li>
+          <li>No build support for WHAM. This is only included if LAMMPS is included</li>
+        </ul>
       </description>
     </release>
     <release version="1.8.1" timestamp="1756257931">
       <description>
-        Add/Update files for a proper GitHub repository
-        Update lammps-gui website URL to https://lammps-gui.lammps.org/
-        Improve and adapt packaging for standalone packages
+        <ul>
+          <li>Add/Update files for a proper GitHub repository</li>
+          <li>Update lammps-gui website URL to the lammps-gui.lammps.org domain</li>
+          <li>Improve and adapt packaging for standalone packages</li>
+        </ul>
       </description>
     </release>
     <release version="1.8.0" timestamp="1755766131">
       <description>
-        Unbundle LAMMPS-GUI from LAMMPS and set it up to have its own git repository
-        Default to loading shared LAMMPS library dynamically when compiled outside LAMMPS
-        Search LD_LIBRARY_PATH and equivalent and a few fixed folders for a suitable library
-        Reorgenize documentation to be its own webpage and set it up during compilation.
-        Use GitHub Action to translate and deploy docs at online website.
-        Remove workarounds for compatibility with Qt 5.12 on Ubuntu 20.04LTS.
-        Qt 5.15LTS is now the minimum required version and thus Ubuntu 22.04LTS.
-        Support new "dump image autobond" feature in image viewer.
-        Support new "dump image region" feature in image viewer.
+        <ul>
+          <li>Unbundle LAMMPS-GUI from LAMMPS and set it up to have its own git repository</li>
+          <li>Default to loading shared LAMMPS library dynamically when compiled outside LAMMPS</li>
+          <li>Search LD_LIBRARY_PATH and equivalent and a few fixed folders for a suitable library</li>
+          <li>Reorgenize documentation to be its own webpage and set it up during compilation.</li>
+          <li>Use GitHub Action to translate and deploy docs at online website.</li>
+          <li>Remove workarounds for compatibility with Qt 5.12 on Ubuntu 20.04LTS.</li>
+          <li>Qt 5.15LTS is now the minimum required version and thus Ubuntu 22.04LTS.</li>
+          <li>Support new "dump image autobond" feature in image viewer.</li>
+          <li>Support new "dump image region" feature in image viewer.</li>
+        </ul>
       </description>
     </release>
     <release version="1.7.1" timestamp="1754346906">
       <description>
-        Fix bugs when using filenames or paths with blanks.
-        Add action to editor context menu to open the Commands_all.html manual page
-        Change color selections for dump image to text fields with completion and validation.
-        Update minimum required LAMMPS version.
+        <ul>
+          <li>Fix bugs when using filenames or paths with blanks.</li>
+          <li>Add action to editor context menu to open the Commands_all.html manual page</li>
+          <li>Change color selections for dump image to text fields with completion and validation.</li>
+          <li>Update minimum required LAMMPS version.</li>
+        </ul>
       </description>
     </release>
     <release version="1.7.0" timestamp="1751978344">
       <description>
-        Reset minor version number for upcoming stable release and tutorial session.
-        Refactor chartviewer title line to have two rows and add display of units and normalization
-        Replace rubberband-zoom feature and button to reset zoom with two range sliders
-        Update minimum required LAMMPS version.
+        <ul>
+          <li>Reset minor version number for upcoming stable release and tutorial session.</li>
+          <li>Refactor chartviewer title line to have two rows and add display of units and normalization</li>
+          <li>Replace rubberband-zoom feature and button to reset zoom with two range sliders</li>
+          <li>Update minimum required LAMMPS version.</li>
+        </ul>
       </description>
     </release>
     <release version="1.6.15" timestamp="1751751132">
       <description>
-        Address the issue of LAMMPS stalling on output by increasing
-          the buffersize for reading from the pipe to the maximum of 64k.
-        Add warning dialog at the end of a run if I/O buffer usage is high.
-        Apply fixes and code modernization suggested by clang-tidy
-        Make selection of accelerator and threads consistent
-        Cache and restore PATH and LD_LIBRARY_PATH in linux-wrapper.sh
-          so that xdg-open can work with native executables
-        Rename "Restart LAMMPS" to "Relaunch LAMMPS Instance" and document it.
-        Fix bug when recentering object in image viewer
-        Fix crash when editing partially quoted strings
-        Closing the editor window will close the entire app, even when
-          a simulation is still runnig. Prevent segfaults in that case.
-        Must delete variable when starting a new run, since we don't
-          always re-launch LAMMPS "clear" does not clear variables
-        Add support for some common accelerator package command options
-          GPU: neighbor list on host/device, accelerate only pair style
-          INTEL: choose double/mixed/single precision
-        Add support to set the "download solution" and "open tutorial
-          webpage in web browser" default in preferences
-        Redesign the general settings preferences tab
-        Display CPU utilization in % during runs
-        Display a LAMMPS-GUI banner image on new/empty editor windows
-          and clear it when editing or loading a file.
+        <ul>
+          <li>Address the issue of LAMMPS stalling on output by increasing the buffersize for reading from the pipe to the maximum of 64k.</li>
+          <li>Add warning dialog at the end of a run if I/O buffer usage is high.</li>
+          <li>Apply fixes and code modernization suggested by clang-tidy</li>
+          <li>Make selection of accelerator and threads consistent</li>
+          <li>Cache and restore PATH and LD_LIBRARY_PATH in linux-wrapper.sh so that xdg-open can work with native executables</li>
+          <li>Rename "Restart LAMMPS" to "Relaunch LAMMPS Instance" and document it.</li>
+          <li>Fix bug when recentering object in image viewer</li>
+          <li>Fix crash when editing partially quoted strings</li>
+          <li>Closing the editor window will close the entire app, even when a simulation is still running. Prevent segfaults in that case.</li>
+          <li>Must delete variable when starting a new run, since we don't always re-launch LAMMPS "clear" does not clear variables</li>
+          <li>Add support for some common accelerator package command options</li>
+          <li>GPU: neighbor list on host/device, accelerate only pair style</li>
+          <li>INTEL: choose double/mixed/single precision</li>
+          <li>Add support to set the "download solution" and "open tutorial webpage in web browser" default in preferences</li>
+          <li>Redesign the general settings preferences tab</li>
+          <li>Display CPU utilization in % during runs</li>
+          <li>Display a LAMMPS-GUI banner image on new/empty editor windows and clear it when editing or loading a file.</li>
+        </ul>
       </description>
     </release>
     <release version="1.6.14" timestamp="1747828753">
       <description>
-        Must set en_US.UTF-8 locale on macOS since it lacks support for C.UTF-8
-        Disable OpenMP processor affinity
-        Address performance regression with processing smoothed data
-        Code refactoring and optimization
+        <ul>
+          <li>Must set en_US.UTF-8 locale on macOS since it lacks support for C.UTF-8</li>
+          <li>Disable OpenMP processor affinity</li>
+          <li>Address performance regression with processing smoothed data</li>
+          <li>Code refactoring and optimization</li>
+        </ul>
       </description>
     </release>
     <release version="1.6.13" timestamp="1743734509">
       <description>
-        Change working directory to user's home dir if initial directory is "/" or the Application folder
-        Add preferences option to set https proxy, if not already set via environment variable
-        Add option to visualize molecules defined through the molecule command
-        Add text fields for editing plot title and axis labels for charts
-        Add option to automatically open tutorial websites (enabled by default)
-        Add citation reminder comment to empty documents and the About dialog currently pointing to arXiv.
-        Add preferences tab for charts to set default for title, plot colors, smooth/raw plot, smooth params
-        Highlight error URLs with pointers to additional explanations in log window
-        Double-click on highlighted URL opens it in web browser. Also available via context menu.
+        <ul>
+          <li>Change working directory to user's home dir if initial directory is "/" or the Application folder</li>
+          <li>Add preferences option to set https proxy, if not already set via environment variable</li>
+          <li>Add option to visualize molecules defined through the molecule command</li>
+          <li>Add text fields for editing plot title and axis labels for charts</li>
+          <li>Add option to automatically open tutorial websites (enabled by default)</li>
+          <li>Add citation reminder comment to empty documents and the About dialog currently pointing to arXiv.</li>
+          <li>Add preferences tab for charts to set default for title, plot colors, smooth/raw plot, smooth params</li>
+          <li>Highlight error URLs with pointers to additional explanations in log window</li>
+          <li>Double-click on highlighted URL opens it in web browser. Also available via context menu.</li>
+        </ul>
       </description>
     </release>
     <release version="1.6.12" timestamp="1734890080">
       <description>
-        Update Tutorial menu entries to cover all 8 tutorials
-        Highlight warnings and error messages in Output window
-        Make Tutorial wizards more compact
-        Include download and compilation of WHAM software from Alan Grossfield
-        Add entry to Run menu to restart the LAMMPS instance
-        Use mutex to avoid corruption of thermo data
+        <ul>
+          <li>Update Tutorial menu entries to cover all 8 tutorials</li>
+          <li>Highlight warnings and error messages in Output window</li>
+          <li>Make Tutorial wizards more compact</li>
+          <li>Include download and compilation of WHAM software from Alan Grossfield</li>
+          <li>Add entry to Run menu to restart the LAMMPS instance</li>
+          <li>Use mutex to avoid corruption of thermo data</li>
+        </ul>
       </description>
     </release>
     <release version="1.6.11" timestamp="1725080055">
       <description>
-        Move cursor to end of log buffer before inserting new text
-        Remove empirical filter to remove outliers from corrupted data
-        Change tutorial download URL to tutorial website
+        <ul>
+          <li>Move cursor to end of log buffer before inserting new text</li>
+          <li>Remove empirical filter to remove outliers from corrupted data</li>
+          <li>Change tutorial download URL to tutorial website</li>
+        </ul>
       </description>
     </release>
     <release version="1.6.10" timestamp="1724585189">
       <description>
-        Resolve plugin mode issues.
-        Add -p command line flag to override path to liblammps.so
+        <ul>
+          <li>Resolve plugin mode issues.</li>
+          <li>Add -p command line flag to override path to liblammps.so</li>
+        </ul>
       </description>
     </release>
     <release version="1.6.9" timestamp="1724308872">
       <description>
-        Added search and replace functionality
-        Converged command line argument parsing using Qt facilities
-        Added dark mode adjustments to syntax highlighting
-        Add field to enter Atom size, if not determined otherwise
+        <ul>
+          <li>Added search and replace functionality</li>
+          <li>Converged command line argument parsing using Qt facilities</li>
+          <li>Added dark mode adjustments to syntax highlighting</li>
+          <li>Add field to enter Atom size, if not determined otherwise</li>
+        </ul>
       </description>
     </release>
     <release version="1.6.8" timestamp="1723581926">
       <description>
-        Support plotting raw and smoothed data
+        <ul>
+          <li>Support plotting raw and smoothed data</li>
+        </ul>
       </description>
     </release>
     <release version="1.6.7" timestamp="1723394796">
       <description>
-        Add wizards for setting up LAMMPS tutorials and restart file inspector
+        <ul>
+          <li>Add wizards for setting up LAMMPS tutorials and restart file inspector</li>
+        </ul>
       </description>
     </release>
     <release version="1.6.6" timestamp="1722581799">
       <description>
-        First version packaged in flatpak format
+        <ul>
+          <li>First version packaged in flatpak format</li>
+        </ul>
       </description>
     </release>
   </releases>

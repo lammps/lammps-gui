@@ -67,6 +67,7 @@ Thumbs.db
 /.qmake.cache
 /.qmake.stash
 *.oldtable
+*.el
 
 # patch generated files
 *.rej
@@ -112,6 +113,9 @@ Thumbs.db
 # CodeQL build artifacts
 /_codeql_*
 
+# Claude's custom folders
+/.claude
+
 # tutorial folders
 /tutorial*
 
@@ -119,3 +123,14 @@ Thumbs.db
 /LAMMPS-GUI*
 /lammps-gui-src-*
 build-qt*
+
+# temporary generated or downloaded files
+/*.pdf
+/*.json
+/*.py
+
+/count-commits.sh
+/quarters.txt
+/year-vs-lines-of-code.sh
+
+

@@ -16,6 +16,17 @@
 !define MUI_HEADERIMAGE_BITMAP "lammps-gui-banner.bmp"
 !define MUI_HEADERIMAGE_RIGHT
 
+# sign the installer and uninstaller
+# %1 is substituted by makensis with the path of the produced file.
+
+# Sign the finished installer itself
+!finalize       '"${__FILEDIR__}\..\..\packaging\sign.sh" "%1"' = 0
+
+# Sign the uninstaller stub. NSIS extracts the uninstaller, hands it to this
+# command, then embeds the signed copy back into the installer. Without this
+# your uninstall.exe stays unsigned and can trip Defender on its own.
+!uninstfinalize '"${__FILEDIR__}\..\..\packaging\sign.sh" "%1"' = 0
+
 Unicode true
 XPStyle on
 
@@ -41,7 +52,7 @@ WriteINIStr "${FILENAME}.url" "InternetShortcut" "IconIndex" "${ICONINDEX}"
 !define StrContains '!insertmacro "_StrContainsConstructor"'
 
 !define LAMMPSGUI "LAMMPS-GUI ${VERSION}"
-OutFile "../LAMMPS-GUI-Win10-x86_64-${VERSION}.exe"
+OutFile "../LAMMPS-GUI-Win10-x86_64-v${VERSION}.exe"
 
 Name "${LAMMPSGUI}"
 InstallDir "$LOCALAPPDATA\${LAMMPSGUI}"

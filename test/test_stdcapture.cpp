@@ -117,6 +117,65 @@ TEST_F(StdCaptureTest, EndCaptureWithoutBegin)
     EXPECT_FALSE(capturer.endCapture());
 }
 
+// The self-test built into beginCapture(): a working capture verifies its
+// marker and stays usable, and the marker is fully drained again -- the
+// exact-match expectations of the tests above depend on that as well.
+
+TEST_F(StdCaptureTest, BeginCaptureVerifiesItselfAndStaysUsable)
+{
+    EXPECT_TRUE(capturer.isUsable());
+    capturer.beginCapture();
+    EXPECT_TRUE(capturer.isUsable());
+    EXPECT_TRUE(capturer.diagnostic().empty());
+
+    // nothing of the verification marker may leak into the captured output
+    printf("after the marker");
+    capturer.endCapture();
+    EXPECT_EQ(capturer.getCapture(), "after the marker");
+}
+
+TEST_F(StdCaptureTest, TotalReadCountsChunkBytes)
+{
+    capturer.beginCapture();
+    EXPECT_EQ(capturer.totalRead(), 0u); // the verification marker does not count
+
+    printf("12345");
+    (void)capturer.getChunk();
+    EXPECT_EQ(capturer.totalRead(), 5u);
+
+    capturer.endCapture();
+}
+
+// The end-of-run probe: on a working capture its marker comes back (an intact
+// redirect), it never leaks the marker, and real output drained along with the
+// marker is handed back through endCapture()/getCapture().
+
+TEST_F(StdCaptureTest, ProbeRunEndReportsAnIntactCapture)
+{
+    capturer.beginCapture();
+    const std::string report = capturer.probeRunEnd();
+    EXPECT_NE(report.find("intact"), std::string::npos);
+
+    capturer.endCapture();
+    EXPECT_TRUE(capturer.getCapture().empty());
+}
+
+TEST_F(StdCaptureTest, ProbeRunEndPreservesRealOutput)
+{
+    capturer.beginCapture();
+    printf("late output");
+    const std::string report = capturer.probeRunEnd();
+    EXPECT_NE(report.find("intact"), std::string::npos);
+
+    capturer.endCapture();
+    EXPECT_EQ(capturer.getCapture(), "late output");
+}
+
+TEST_F(StdCaptureTest, ProbeRunEndWithoutCaptureIsEmpty)
+{
+    EXPECT_TRUE(capturer.probeRunEnd().empty());
+}
+
 // Buffer use tracking
 
 TEST_F(StdCaptureTest, BufferUseInitiallyZero)

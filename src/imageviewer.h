@@ -19,6 +19,7 @@
 #include <QList>
 #include <QMap>
 #include <QPair>
+#include <QSize>
 #include <QString>
 #include <QStringList>
 #include <map>
@@ -32,11 +33,12 @@ class QLabel;
 class QObject;
 class QRadioButton;
 class QScrollArea;
-class QStatusBar;
+class QShowEvent;
 class LammpsWrapper;
 class LammpsGui;
 class ImageInfo;
 class RegionInfo;
+struct DumpImageParams;
 
 /**
  * @brief Dialog for viewing and manipulating LAMMPS snapshot images
@@ -81,8 +83,11 @@ private slots:
     void setBondSize();       ///< Set explicit bond display size
     void editSize();          ///< Edit image dimensions
     void resetView();         ///< Reset view to defaults
+    void resetWindowSize();   ///< Resize window to fit the configured image size
     void toggleSsao();        ///< Toggle screen-space ambient occlusion
-    void toggleAnti();        ///< Toggle antialiasing
+    void toggleAnti();        ///< Toggle anti-aliasing
+    void toggleDepthcue();    ///< Toggle depth cueing
+    void toggleDefocus();     ///< Toggle defocusing of distant objects
     void toggleShiny();       ///< Toggle shiny/specular rendering
     void toggleVdw();         ///< Toggle Van der Waals radii
     void toggleBond();        ///< Toggle bond display
@@ -121,6 +126,7 @@ public:
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override; ///< Intercept Alt-keystrokes
+    void showEvent(QShowEvent *event) override; ///< Redo the initial window fit once shown
 
 private:
     void createActions();     ///< Setup menu actions
@@ -131,6 +137,38 @@ private:
     void updateRegions();     ///< Update region information
     void updatePeratom();     ///< Update per-atom information
     bool hasAutobonds();      ///< Check if autobonds are enabled
+
+    /** @brief True when bond color-by-value applies: a bond/local attribute is
+     *  selected, the atom style has real bonds, and AutoBonds is off (compute
+     *  bond/local only works for real bonds) */
+    bool bondByValueActive();
+
+    /** @brief (Re)populate the bond Color selector; the compute bond/local
+     *  "color by value" choices are added only when @p allowByValue */
+    void rebuildBondColorChoices(QComboBox *bncolor, bool allowByValue);
+
+    /// @name dump-image command preparation used by createImage()
+    /// @{
+    /// Gather widget state and LAMMPS-derived data into a DumpImageParams snapshot
+    DumpImageParams gatherDumpImageParams(const QString &dumpfilename);
+    /// Show/hide the atom-size widgets to match the resolved element/diameter state
+    void syncAtomSizeWidgets();
+    /// @}
+
+    /// @name dialog row builders/readers used by the *Settings() slots
+    /// @{
+    /// Build one compute/fix table row per map entry (shared by fixSettings)
+    void buildFixComputeRows(QGridLayout *layout, int &idx,
+                             const std::map<std::string, ImageInfo *> &items,
+                             const QMap<QString, QString> &helpmap);
+    /// Read back a compute/fix table section starting at grid row @p offset
+    void readFixComputeRows(QGridLayout *layout, int offset,
+                            std::map<std::string, ImageInfo *> &items);
+    /// Read back the region table rows into the regions map
+    void readRegionRows(QGridLayout *layout);
+    /// Read back the atom-type color table rows into color_list
+    void readColorRows(QGridLayout *layout, int colorstart, int numtypes);
+    /// @}
 
     /**
      * @brief Create an "atom/type/index" color selection combo box for a shape style
@@ -158,6 +196,7 @@ private:
     QMenuBar *menuBar;       ///< Menu bar
     QLabel *imageLabel;      ///< Label displaying the image
     QScrollArea *scrollArea; ///< Scrollable area for image
+    QSize lastFitSize;       ///< Scroll area size applied by the last auto-resize
     double atomSize;         ///< Explicit atom display size (as radius)
     double bondSize;         ///< Explicit bond display size (as diameter)
 
@@ -175,7 +214,11 @@ private:
     QString group;                               ///< Current atom group
     QString molecule;                            ///< Current molecule selection
     QString filename;                            ///< Image filename
-    QString last_dump_cmd;                       ///< Last executed dump command
+    QString last_dumpargs;                       ///< Render args of the last image command
+    QString last_modifyargs;                     ///< dump_modify args of the last image command
+    QString renderdumpid = "WRITE_DUMP";         ///< Id of our render dump; renamed to a missing
+                                                 ///< "fix graphics/labels" colorscale dump and
+                                                 ///< cached so the detection runs only once
     int xsize, ysize;                            ///< Image dimensions in pixels
     int hrot, vrot;                              ///< Horizontal and vertical rotation angles
     int bodyflag;                                ///< bflag1 setting (triangle, cylinder or both)
@@ -197,11 +240,24 @@ private:
     double axesdiam;                             ///< Axes diameter
     double axestrans;                            ///< Axes transparency
     double ssaoval;                              ///< SSAO strength
-    double atomtrans;                            ///< Atom / Bond transparency
+    int ssaosamples;                             ///< SSAO sampling directions (0 = auto)
+    double depthcuefactor;                       ///< Depth cueing strength
+    QString depthcuecolor;                       ///< Depth cueing fog color or "auto"
+    QString depthcuestart;                       ///< Depth cueing start fraction or "auto"
+    double defocusfactor;                        ///< Defocus blur strength
+    QString defocusstart;                        ///< Defocus start fraction or "auto"
+    int outlinewidth;                            ///< Outline width in pixels
+    QString outlinecolor;                        ///< Outline color
+    QString specular;                            ///< Specular preset or "auto"
+    double metalfactor;                          ///< Metallic shading strength
+    QString metalfinish;                         ///< Metal surface finish preset
+    double atomtrans;                            ///< Atom transparency
+    double bondtrans;                            ///< Bond transparency
     double ambientlight;                         ///< ambient light setting
     double keylight;                             ///< key light setting
     double filllight;                            ///< fill light setting
     double backlight;                            ///< back light setting
+    double gammaval;                             ///< gamma adjustment (1.0 = unchanged)
     QString axesloc;                             ///< Axes location
     QString boxcolor;                            ///< Color for box and subbox
     QString backcolor;                           ///< (lower) background color
@@ -211,6 +267,11 @@ private:
     QString colormap;                            ///< Name of selected color map
     QString mapmin;                              ///< Choice of minimum value for colormap
     QString mapmax;                              ///< Choice of maximum value for colormap
+    bool revcolormap;                            ///< Reverse (mirror) the atom color map
+    QString bondcolormap;                        ///< Name of selected bond color map
+    QString bondmapmin;                          ///< Choice of minimum value for bond colormap
+    QString bondmapmax;                          ///< Choice of maximum value for bond colormap
+    bool revbondcolormap;                        ///< Reverse (mirror) the bond color map
     QString bondcolor;                           ///< Custom bond color property
     QString bonddiam;                            ///< Custom bond diameter property
     QString bodycolor;                           ///< Custom body color property
@@ -218,15 +279,22 @@ private:
     QString linecolor;                           ///< Custom line color property
     QString tricolor;                            ///< Custom triangle color property
     double xcenter, ycenter, zcenter;            ///< View center coordinates
+    bool dynamiccenter;                          ///< Use dynamic instead of static view center
+    double xup, yup, zup;                        ///< Camera up direction vector
     bool atomcustom;                             ///< Use custom atom color settings
+    bool usegradient;                            ///< Vertical background gradient
     bool showbox;                                ///< Show simulation box flag
     bool showsubbox;                             ///< Show subdomain boxes flag
     bool showaxes;                               ///< Show coordinate axes flag
-    bool antialias;                              ///< Antialiasing enabled flag
+    bool antialias;                              ///< Anti-aliasing enabled flag
     bool usessao;                                ///< SSAO enabled flag
+    bool usedepthcue;                            ///< Depth cueing enabled flag
+    bool usedefocus;                             ///< Defocus enabled flag
+    bool useoutline;                             ///< Outline drawing enabled flag
+    bool usemetal;                               ///< Metallic shading enabled flag
     bool showatoms;                              ///< Show atoms
     bool showbonds;                              ///< Show bonds if atom style supports it
-    bool autobond;                               ///< Dynamics bonds from cutoff flag
+    bool autobond;                               ///< Dynamic bonds from cutoff flag
     bool showbodies;                             ///< Show bodies if atom style supports it
     bool showellipsoids;                         ///< Show ellipsoids if atom style supports it
     bool showlines;                              ///< Show lines if atom style supports it

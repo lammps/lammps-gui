@@ -44,7 +44,7 @@ certain that it behaves consistently across multiple platforms, it is
 impossible to test for all possible use cases and activities.  Thus bugs
 do happen, and if you suspect, that you have encountered one, please try
 to document it and report it as an
-[Issue](https://github.com/akohlmey/lammps-gui/issues) on the LAMMPS-GUI
+[Issue](https://github.com/lammps/lammps-gui/issues) on the LAMMPS-GUI
 GitHub project web page.
 
 To be able to submit an issue on GitHub, you have to register for an
@@ -57,7 +57,7 @@ original author of LAMMPS-GUI, akohlmey@gmail.com.
 
 Suggestions for enhancements or new features are always welcome.  These
 should be submitted using the [GitHub Issue
-Tracker](https://github.com/akohlmey/lammps-gui/issues) of the
+Tracker](https://github.com/lammps/lammps-gui/issues) of the
 LAMMPS-GUI project.  This is particularly recommended, when you plan to
 implement the feature or enhancement yourself, as this allows to
 coordinate in case there are other similar or conflicting ongoing

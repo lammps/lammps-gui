@@ -11,6 +11,9 @@
 
 #include "setvariables.h"
 
+#include "constants.h"
+#include "helpers.h"
+
 #include <QDialogButtonBox>
 #include <QIcon>
 #include <QLabel>
@@ -23,23 +26,47 @@
 
 namespace {
 constexpr int LAYOUT_SPACING = 6;
-}
 
-SetVariables::SetVariables(QList<QPair<QString, QString>> &_vars, QWidget *parent) :
+// mark a value that overrides a differing definition in the input script:
+// bold text plus a tooltip showing the value assigned in the script
+void markOverride(QLineEdit *val)
+{
+    const QString scriptValue = val->property("scriptValue").toString();
+    const bool overridden     = isOverridden({QString(), val->text(), scriptValue});
+    val->setStyleSheet(overridden ? "font-weight: bold" : "");
+    if (overridden)
+        val->setToolTip(QString("Overrides the input script value: %1").arg(scriptValue));
+    else if (!scriptValue.isEmpty())
+        val->setToolTip("Value from the input script");
+    else
+        val->setToolTip(QString());
+}
+} // namespace
+
+SetVariables::SetVariables(QList<VariableEntry> &_vars, QWidget *parent) :
     QDialog(parent), vars(_vars), layout(new QVBoxLayout)
 {
     auto *top = new QLabel("Set Variables:");
     layout->addWidget(top, 0, Qt::AlignHCenter);
+    auto *hint = new QLabel("Bold values override the definition in the input script");
+    hint->setStyleSheet("font-style: italic");
+    layout->addWidget(hint, 0, Qt::AlignHCenter);
     layout->setSpacing(LAYOUT_SPACING);
 
-    int i = 1;
+    int i = 2;
     for (const auto &v : vars) {
         auto *row  = new QHBoxLayout;
-        auto *name = new QLineEdit(v.first);
-        auto *val  = new QLineEdit(v.second);
-        auto *del  = new QPushButton(QIcon(":/icons/edit-delete.png"), "");
-        name->setObjectName("varname");
-        val->setObjectName("varval");
+        auto *name = new QLineEdit(v.name);
+        auto *val  = new QLineEdit(v.value);
+        auto *del  = new QPushButton(QIcon(":/icons/edit-delete.svg"), "");
+        val->setProperty("scriptValue", v.scriptValue);
+        connect(val, &QLineEdit::textChanged, this, [val]() {
+            markOverride(val);
+        });
+        markOverride(val);
+        // show pre-filled fields from the beginning, not scrolled to the end
+        name->setCursorPosition(0);
+        val->setCursorPosition(0);
         del->setObjectName(QString::number(i));
         connect(del, &QPushButton::released, this, &SetVariables::delRow);
         row->addWidget(name);
@@ -52,7 +79,7 @@ SetVariables::SetVariables(QList<QPair<QString, QString>> &_vars, QWidget *paren
     layout->addSpacerItem(new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    auto *add       = new QPushButton("&Add Row");
+    auto *add       = new QPushButton(QIcon(":/icons/expand-text.svg"), "&Add Row");
     add->setObjectName("addRow");
     buttonBox->addButton(add, QDialogButtonBox::ActionRole);
     connect(add, &QPushButton::released, this, &SetVariables::addRow);
@@ -61,7 +88,9 @@ SetVariables::SetVariables(QList<QPair<QString, QString>> &_vars, QWidget *paren
 
     layout->addWidget(buttonBox);
     setLayout(layout);
-    setWindowIcon(QIcon(":/icons/lammps-gui-icon-128x128.png"));
+    setWindowIcon(QIcon(Cfg::MAIN_ICON));
+    styleDialogButtons(buttonBox);
+
     setWindowTitle("LAMMPS-GUI - Set Variables");
     resize(300, 200);
 }
@@ -71,11 +100,12 @@ void SetVariables::accept()
     // store all data in variables class and then confirm accepting
     vars.clear();
     int nrows = layout->count() - 2;
-    for (int i = 1; i < nrows; ++i) {
+    for (int i = 2; i < nrows; ++i) {
         auto *row = layout->itemAt(i)->layout();
         auto *var = qobject_cast<QLineEdit *>(row->itemAt(0)->widget());
         auto *val = qobject_cast<QLineEdit *>(row->itemAt(1)->widget());
-        if (var && val) vars.append(qMakePair(var->text(), val->text()));
+        if (var && val)
+            vars.append({var->text(), val->text(), val->property("scriptValue").toString()});
     }
 
     QDialog::accept();
@@ -87,9 +117,7 @@ void SetVariables::addRow()
     auto *row  = new QHBoxLayout;
     auto *name = new QLineEdit(QString());
     auto *val  = new QLineEdit(QString());
-    auto *del  = new QPushButton(QIcon(":/icons/edit-delete.png"), "");
-    name->setObjectName("varname");
-    val->setObjectName("varval");
+    auto *del  = new QPushButton(QIcon(":/icons/edit-delete.svg"), "");
     del->setObjectName(QString::number(nrows - 2));
     connect(del, &QPushButton::released, this, &SetVariables::delRow);
     row->addWidget(name);
@@ -109,18 +137,18 @@ void SetVariables::delRow()
         while (row->layout()->count() > 0) {
             auto *item = row->layout()->takeAt(0);
             if (item) {
-                row->layout()->removeItem(item);
-                delete item->widget();
+                // deleteLater(): one of these widgets is the button whose slot
+                // is executing right now; the sender must not be deleted here
+                if (item->widget()) item->widget()->deleteLater();
                 delete item;
             }
         }
-        layout->removeItem(row);
         delete row->layout();
 
         // renumber the delete pushbutton names
         for (int i = delrow; i < nrows - 3; ++i) {
-            auto *row    = layout->itemAt(i)->layout();
-            auto *widget = row->itemAt(2)->widget();
+            auto *rowlayout = layout->itemAt(i)->layout();
+            auto *widget    = rowlayout->itemAt(2)->widget();
             widget->setObjectName(QString::number(i));
         }
     }

@@ -14,10 +14,21 @@
 
 #include <QCompleter>
 #include <QFrame>
+#include <QStringList>
 #include <QValidator>
 #include <QWidget>
 
 class QPaintEvent;
+
+/**
+ * @brief List of color names accepted by the LAMMPS dump image command
+ *
+ * Shared between the color completers/validators of the Image Viewer
+ * dialogs and the editor's syntax registry.
+ *
+ * @return sorted list of the valid color names
+ */
+const QStringList &lammpsImageColors();
 
 /**
  * @brief Horizontal line widget for visual separation
@@ -53,8 +64,8 @@ public:
 /**
  * @brief Validator for color name inputs
  *
- * Ensures color inputs are valid color names or hex codes.
- * Provides fix-up functionality for common typos.
+ * Ensures color inputs are names from the LAMMPS color list.
+ * Fix-up trims whitespace and lowercases the input.
  */
 class QColorValidator : public QValidator {
 public:

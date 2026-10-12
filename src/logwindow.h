@@ -16,7 +16,11 @@
 
 class FlagWarnings;
 class LammpsGui;
+class QAction;
+class QEvent;
 class QLabel;
+class QMenuBar;
+class QResizeEvent;
 
 /**
  * @brief Text viewer for LAMMPS log output with warning/error detection
@@ -32,7 +36,7 @@ class LogWindow : public QPlainTextEdit {
 public:
     /**
      * @brief Constructor
-     * @param filename Path to log file to display
+     * @param filename Name of the input file the run belongs to (used for default save-file names)
      * @param lammpsgui Pointer to LammpsGui for sending signals
      * @param parent Parent widget
      */
@@ -43,6 +47,16 @@ public:
      */
     ~LogWindow() override;
 
+    /**
+     * @brief Clear the window for a new run
+     * @param filename Name of the input file the new run belongs to
+     *
+     * Discards the collected log text and the warning/error counters so the
+     * window can be reused instead of destroyed and recreated for every run.
+     * Keeps the position and size the window currently has on screen.
+     */
+    void reset(const QString &filename);
+
     LogWindow()                             = delete;
     LogWindow(const LogWindow &)            = delete;
     LogWindow(LogWindow &&)                 = delete;
@@ -51,7 +65,7 @@ public:
 
 private slots:
     void extractYaml();  ///< Extract YAML data to separate file
-    void quit();         ///< Close window
+    void quit();         ///< Quit the entire application (via LammpsGui::quit)
     void saveAs();       ///< Save log to file
     void stopRun();      ///< Stop running simulation
     void runBuffer();    ///< Start running simulation
@@ -78,12 +92,16 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 
     /**
-     * @brief Event filter for keyboard shortcuts
-     * @param watched Object being watched
-     * @param event Event to filter
-     * @return true if event handled, false otherwise
+     * @brief Keep the fixed-width document font when the inherited font changes
+     * @param event Change event
      */
-    bool eventFilter(QObject *watched, QEvent *event) override;
+    void changeEvent(QEvent *event) override;
+
+    /**
+     * @brief Keep the menu bar across the top of the viewport
+     * @param event Resize event
+     */
+    void resizeEvent(QResizeEvent *event) override;
 
     /**
      * @brief Check if log contains embedded YAML data
@@ -92,11 +110,29 @@ protected:
     bool checkYaml();
 
 private:
-    QString filename;       ///< Path to log file
-    LammpsGui *lammpsgui;   ///< Main widget pointer for receiving signals
-    QString errorurl;       ///< URL of last detected error
-    FlagWarnings *warnings; ///< Warning highlighter
-    QLabel *summary;        ///< Summary label for warning count
+    /// Create the window's actions, give them focus-scoped shortcuts and add
+    /// them to the widget.  Called once from the constructor; contextMenuEvent()
+    /// puts the same action objects into the menu it pops up, so every shortcut
+    /// has exactly one binding and works whether or not the menu is open.
+    void createActions();
+
+    /// Build the File menu from those actions, append the main window's shared
+    /// menus, and reserve the viewport margin the bar sits in.
+    void createMenuBar();
+
+    QString filename;            ///< Input file name used to derive default save-file names
+    LammpsGui *lammpsgui;        ///< Main widget pointer for receiving signals
+    QString errorurl;            ///< URL of last detected error
+    FlagWarnings *warnings;      ///< Warning highlighter
+    QLabel *summary;             ///< Summary label for warning count
+    QMenuBar *menubar = nullptr; ///< Own menu bar, in reserved viewport margin
+
+    QAction *saveAsAct;   ///< Save the log to a file
+    QAction *yamlAct;     ///< Export embedded YAML data to a file
+    QAction *urlAct;      ///< Open the error URL under the cursor in a browser
+    QAction *nextWarnAct; ///< Jump to the next warning or error
+    QAction *closeAct;    ///< Close the Output window
+    QAction *quitAct;     ///< Quit the application
 };
 
 #endif

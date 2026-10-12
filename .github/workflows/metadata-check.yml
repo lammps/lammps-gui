@@ -1,0 +1,40 @@
+name: Check Citation Metadata
+
+on:
+  push:
+    paths:
+      - CITATION.cff
+      - codemeta.json
+      - update-codemeta.sh
+      - .github/workflows/metadata-check.yml
+  pull_request:
+    paths:
+      - CITATION.cff
+      - codemeta.json
+      - update-codemeta.sh
+      - .github/workflows/metadata-check.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Install cffconvert
+      run: python3 -m pip install cffconvert
+
+    - name: Validate CITATION.cff and regenerate codemeta.json
+      run: ./update-codemeta.sh
+
+    - name: Check that the committed codemeta.json is current
+      run: |
+        if ! git diff --exit-code codemeta.json; then
+          echo "::error file=codemeta.json::codemeta.json is out of sync with CITATION.cff; run ./update-codemeta.sh and commit the result"
+          exit 1
+        fi

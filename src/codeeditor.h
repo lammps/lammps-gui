@@ -12,11 +12,15 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
+#include <QHash>
 #include <QMap>
 #include <QPlainTextEdit>
 #include <QString>
 #include <QStringList>
 
+#include "inputvariables.h"
+
+class QAbstractItemView;
 class QCompleter;
 class QContextMenuEvent;
 class QDragEnterEvent;
@@ -30,6 +34,8 @@ class QRect;
 class QResizeEvent;
 class QShortcut;
 class QWidget;
+
+class LammpsSyntax;
 
 /**
  * @brief Custom text editor with LAMMPS syntax support and auto-completion
@@ -65,6 +71,12 @@ public:
     CodeEditor &operator=(CodeEditor &&)      = delete;
 
     /**
+     * @brief Set the syntax registry used for completion and help lookups
+     * @param newsyntax Syntax registry (not owned)
+     */
+    void setSyntax(const LammpsSyntax *newsyntax) { syntax = newsyntax; }
+
+    /**
      * @brief Paint line numbers in the line number area
      * @param event Paint event to handle
      */
@@ -91,7 +103,7 @@ public:
     /**
      * @brief Highlight a specific line (used for error indication)
      * @param block Block number to highlight
-     * @param error true for error highlight, false to clear
+     * @param error true for the error (red) highlight, false for the normal (green) one
      */
     void setHighlight(int block, bool error);
 
@@ -217,22 +229,34 @@ public:
     void setExtraList(const QStringList &words);
 
     /**
-     * @brief Update group ID list from current LAMMPS instance
+     * @brief Set list of color names for completion
+     * @param words List of color names
+     */
+    void setColorList(const QStringList &words);
+
+    /**
+     * @brief Set list of dump image keywords for completion
+     * @param words List of dump image keywords
+     */
+    void setImageKwList(const QStringList &words);
+
+    /**
+     * @brief Update group ID list from the editor buffer
      */
     void setGroupList();
 
     /**
-     * @brief Update variable name list from current LAMMPS instance
+     * @brief Update variable name list from the editor buffer and LAMMPS instance
      */
     void setVarNameList();
 
     /**
-     * @brief Update compute ID list from current LAMMPS instance
+     * @brief Update compute ID list from the editor buffer
      */
     void setComputeIDList();
 
     /**
-     * @brief Update fix ID list from current LAMMPS instance
+     * @brief Update fix ID list from the editor buffer
      */
     void setFixIDList();
 
@@ -240,6 +264,17 @@ public:
      * @brief Update file list from current directory
      */
     void setFileList();
+
+    /**
+     * @brief Set the variables list used to mark overridden index variable values
+     *
+     * Entries whose value overrides the definition in the input script (see
+     * isOverridden()) get a thin frame drawn around the value text of their
+     * definition line and a tooltip showing the overriding value.
+     *
+     * @param vars Current variable entries (parse results plus dialog edits)
+     */
+    void setVariableOverrides(const QList<VariableEntry> &vars);
 
     /**
      * @brief Constant for disabled highlighting
@@ -252,6 +287,19 @@ protected:
      * @param event The resize event
      */
     void resizeEvent(QResizeEvent *event) override;
+
+    /**
+     * @brief Paint the editor and frame overridden index variable values
+     * @param event The paint event
+     */
+    void paintEvent(QPaintEvent *event) override;
+
+    /**
+     * @brief Handle tooltip events for overridden index variable values
+     * @param event The event to handle
+     * @return true if the event was handled
+     */
+    bool event(QEvent *event) override;
 
     /**
      * @brief Check if MIME data can be inserted (for drag-and-drop)
@@ -315,13 +363,6 @@ private slots:
     void getHelp();
 
     /**
-     * @brief Find help page and section for a command
-     * @param page Output parameter for help page name
-     * @param help Output parameter for help section
-     */
-    void findHelp(QString &page, QString &help);
-
-    /**
      * @brief Open help URL in browser
      */
     void openHelp();
@@ -378,16 +419,36 @@ private slots:
     void uncommentLine();
 
 private:
+    /**
+     * @brief Find help page and section for a command
+     * @param page Output parameter for help page name
+     * @param help Output parameter for help section
+     */
+    void findHelp(QString &page, QString &help);
+
+    /**
+     * @brief Pop up (or hide) the completion list of the active completer
+     * @param prefix   Word (prefix) under the cursor to complete
+     * @param oldPopup Popup of the previously active completer, hidden if different
+     */
+    void popupCompletion(const QString &prefix, QAbstractItemView *oldPopup);
+
     QWidget *lineNumberArea; ///< Widget for displaying line numbers
     QShortcut *helpAction;   ///< Keyboard shortcut for help
+
+    const LammpsSyntax *syntax = nullptr; ///< Syntax registry (not owned)
 
     /// @brief Auto-completion objects for different LAMMPS command contexts
     QCompleter *currentComp, *commandComp, *fixComp, *computeComp, *dumpComp, *atomComp, *pairComp,
         *bondComp, *angleComp, *dihedralComp, *improperComp, *kspaceComp, *regionComp,
         *integrateComp, *minimizeComp, *variableComp, *unitsComp, *groupComp, *varnameComp,
-        *fixidComp, *compidComp, *fileComp, *extraComp;
+        *fixidComp, *compidComp, *fileComp, *extraComp, *colorComp, *imagekwComp;
 
-    int highlight;            ///< Current highlighted line number
+    /// @brief Overridden index variables by name (only entries where isOverridden() is true)
+    QHash<QString, VariableEntry> variableOverrides;
+
+    int highlight;            ///< Current highlighted line number, NO_HIGHLIGHT if none
+    bool highlighterror;      ///< Highlighted line marks an error (red) instead of progress
     bool reformatOnReturn;    ///< Enable auto-reformatting on Enter
     bool automaticCompletion; ///< Enable auto-completion popup
     QString docver;           ///< LAMMPS documentation version string
@@ -401,7 +462,6 @@ private:
     QMap<QString, QString> angleMap;    ///< Angle style to help page mapping
     QMap<QString, QString> dihedralMap; ///< Dihedral style to help page mapping
     QMap<QString, QString> improperMap; ///< Improper style to help page mapping
-    QMap<QString, QString> dumpMap;     ///< Dump style to help page mapping
 };
 
 #endif

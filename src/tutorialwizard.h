@@ -29,11 +29,12 @@ class TutorialWizard : public QWizard {
 public:
     /**
      * @brief Construct a tutorial wizard
-     * @param ntutorial Tutorial number (1-8)
+     * @param collection Tutorial collection index
+     * @param ntutorial Tutorial number within the collection
      * @param lammpsgui Pointer to LammpsGui for sending signals
      * @param parent Parent widget
      */
-    TutorialWizard(int ntutorial, LammpsGui *lammpsgui, QWidget *parent = nullptr);
+    TutorialWizard(int collection, int ntutorial, LammpsGui *lammpsgui, QWidget *parent = nullptr);
 
     /**
      * @brief Accept the wizard and set up the tutorial
@@ -44,7 +45,8 @@ public:
     void accept() override;
 
 private:
-    int ntutorial;        ///< Tutorial number identifier
+    int collection;       ///< Tutorial collection index
+    int ntutorial;        ///< Tutorial number identifier within the collection
     LammpsGui *lammpsgui; ///< Main widget pointer for receiving signals
 };
 

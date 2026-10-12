@@ -52,7 +52,7 @@ private slots:
     void findNext();    ///< Find next occurrence of search text
     void replaceNext(); ///< Replace current match and find next
     void replaceAll();  ///< Replace all occurrences in document
-    void quit();        ///< Close the dialog
+    void quit();        ///< Quit the entire application (via LammpsGui::quit)
 
 private:
     CodeEditor *editor;                 ///< Editor to search in

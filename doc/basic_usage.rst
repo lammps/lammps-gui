@@ -6,6 +6,8 @@ Basic usage of LAMMPS-GUI
 .. index:: getting started
 .. index:: main window
 
+.. _command-line-options:
+
 Command-line options
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -26,18 +28,53 @@ LAMMPS-GUI supports the following command-line options:
 
    * - Option
      - Description
-   * - ``-x <width>``, ``--width <width>``
-     - Override the editor window width in pixels
-   * - ``-y <height>``, ``--height <height>``
-     - Override the editor window height in pixels
-   * - ``-s <style>``, ``--style <style>``
-     - Set the visual style of the application (default: ``Fusion``)
    * - ``-p <path>``, ``--pluginpath <path>``
      - Set the path to the LAMMPS shared library (plugin mode only)
-   * - ``-v``, ``--version``
-     - Print version information and exit
    * - ``-h``, ``--help``
      - Print usage information and exit
+   * - ``--help-all``
+     - Same as above but also show generic Qt command-line options
+   * - ``-v``, ``--version``
+     - Print version information and exit
+   * - ``-x <width>``, ``--width <width>``
+     - Override the editor/main window width in pixels
+   * - ``-y <height>``, ``--height <height>``
+     - Override the editor/main window height in pixels
+   * - ``-s <style>``, ``--style <style>``
+     - Set the visual style of the application (default: ``Fusion``)
+   * - ``-c <file>``, ``--chart <file>``
+     - Open ``file`` directly in a standalone :ref:`Charts window <charts>`;
+       a column-picker dialog is shown first
+   * - ``-i <file>``, ``--image <file>``
+     - Open ``file`` in the :ref:`slide show viewer <slideshow>`; may be given
+       multiple times to load several images at once
+   * - ``-t <file>``, ``--text <file>``
+     - Open ``file`` in a standalone text viewer
+   * - ``-j``, ``--joined``
+     - Selects the combined window mode for this run, whatever the
+       preferences say
+   * - ``-w``, ``--windows``
+     - Selects the individual window mode for this run, whatever the
+       preferences say
+
+The ``-j`` and ``-w`` flags select the window layout (see the
+:ref:`Preferences dialog <preferences>`)
+for the process they are given to and nothing else: the stored preference
+is not changed, so the next start without a flag is back to what the
+*Preferences* dialog shows, and so is a relaunch (which passes no
+arguments on).  Giving both at once is an error.
+
+On Linux and other Unix-like systems except macOS, LAMMPS-GUI checks at
+startup whether a graphical display is available, i.e. whether either of
+the ``DISPLAY`` or ``WAYLAND_DISPLAY`` environment variables is set.
+Without one, the ``-h``, ``--help-all``, and ``-v`` flags still print
+their text (``--help-all`` then lists only the generic Qt options that
+do not need a display) and ``-p`` still stores the library path, but
+LAMMPS-GUI itself cannot start: it prints an error message and exits.
+Selecting a Qt platform plugin explicitly, with ``-platform <name>`` or
+the ``QT_QPA_PLATFORM`` environment variable, skips this check.  For
+example, ``-platform vnc`` makes LAMMPS-GUI act as a VNC server, so it
+can be used from a VNC viewer on another machine.
 
 The optional ``file`` argument specifies a LAMMPS input file to open on
 startup.  If no file is provided, LAMMPS-GUI starts with an empty
@@ -45,6 +82,15 @@ editor buffer.  Available choices for the visual style depend on the
 platform and Qt configuration.  On most platforms, there is also the
 option ``Windows`` which is a visual style somewhat resembling
 `Windows 95 <https://en.wikipedia.org/wiki/Windows_95>`_.
+
+The ``-c``, ``-i``, and ``-t`` flags open a standalone viewer without
+the main editor window; they are mutually exclusive with each other and
+with the ``file`` positional argument.  Such a viewer is always an
+individual window with a menu bar of its own, since there is no main
+window for it to be a panel of, whatever the layout preference or
+``-j`` say.  The ``-i`` flag does not support
+wildcards via filename globbing, but that can be emulated; for example
+on a Bourne shell with: ``lammps-gui $(for f in image-*.png; do echo " -i $f"; done)``.
 
 Launching LAMMPS-GUI
 ^^^^^^^^^^^^^^^^^^^^
@@ -132,7 +178,7 @@ consistency, any unsaved changes in the buffer must be either saved to
 the file or undone before LAMMPS can be run from a file.
 
 The line number of the currently executed command is highlighted in
-green in the line number display for the *Editor* Window.
+green in the line number display for the *Editor* window.
 
 .. image:: JPG/lammps-gui-running.png
    :align: center
@@ -181,13 +227,17 @@ If an error occurs (in the example below the command `label
 <https://docs.lammps.org/label.html>`_ was incorrectly capitalized as
 "Label"), an error message dialog is shown and the line of the input
 which triggered the error is highlighted in red.  The state of LAMMPS in
-the status bar is set to "Failed." instead of "Ready."
+the status bar is set to "Failed." instead of "Ready."  Note that since
+version 3.0.6 the input is checked for problems before a run by default
+(see the :ref:`Run menu <run_menu>`); a typo like this is normally
+caught by that check first, and the dialog shown here appears when
+choosing to run anyway or when the pre-run check is disabled.
 
 .. image:: JPG/lammps-gui-run-error.png
    :align: center
    :scale: 75%
 
-.. admonition:: Up to three additional windows may open during a run:
+.. admonition:: Up to three additional windows or tabs may open during a run:
 
    - An :ref:`Output window <logfile>` with the captured screen output from LAMMPS
    - A :ref:`Charts window <charts>` with a line graph created from thermodynamic output of the run

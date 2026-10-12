@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <title>Kill the running command</title>
+  <!-- The classic arrangement: skull above, bones crossed beneath.  Every shape
+       is drawn twice, first as a dark silhouette and then slightly smaller in a
+       light fill, which leaves a dark rim around light shapes.  That way the
+       icon carries its own contrast and stays legible on a light and on a dark
+       toolbar alike, without a second copy of the file. -->
+
+  <!-- crossed bones: dark silhouette -->
+  <g stroke="#1e1e1e" fill="#1e1e1e" stroke-linecap="round">
+    <g stroke-width="9.6">
+      <line x1="9.5" y1="30.6" x2="38.5" y2="42.4"/>
+      <line x1="38.5" y1="30.6" x2="9.5" y2="42.4"/>
+    </g>
+    <g stroke-width="4.4">
+      <circle cx="9.5" cy="30.6" r="3.2"/>
+      <circle cx="38.5" cy="30.6" r="3.2"/>
+      <circle cx="9.5" cy="42.4" r="3.2"/>
+      <circle cx="38.5" cy="42.4" r="3.2"/>
+    </g>
+  </g>
+  <!-- crossed bones: light core, 2.2 units narrower all round -->
+  <g stroke="#f2f2f2" fill="#f2f2f2" stroke-linecap="round">
+    <g stroke-width="5.2">
+      <line x1="9.5" y1="30.6" x2="38.5" y2="42.4"/>
+      <line x1="38.5" y1="30.6" x2="9.5" y2="42.4"/>
+    </g>
+    <g stroke-width="0">
+      <circle cx="9.5" cy="30.6" r="4.4"/>
+      <circle cx="38.5" cy="30.6" r="4.4"/>
+      <circle cx="9.5" cy="42.4" r="4.4"/>
+      <circle cx="38.5" cy="42.4" r="4.4"/>
+    </g>
+  </g>
+
+  <!-- cranium and jaw, same treatment: dark outline, light face -->
+  <path d="M24 2.4 C31.2 2.4 37 8 37 14.8 C37 18 35.7 20.4 33.6 21.9
+           L33.6 23.6 C33.6 24.7 32.7 25.6 31.6 25.6 L16.4 25.6
+           C15.3 25.6 14.4 24.7 14.4 23.6 L14.4 21.9
+           C12.3 20.4 11 18 11 14.8 C11 8 16.8 2.4 24 2.4 Z"
+        fill="#f2f2f2" stroke="#1e1e1e" stroke-width="2.8" stroke-linejoin="round"/>
+
+  <!-- eye sockets, nose and teeth: solid, so the face reads at 22 pixels -->
+  <ellipse cx="19.4" cy="14" rx="3.9" ry="4.5" fill="#1e1e1e"/>
+  <ellipse cx="28.6" cy="14" rx="3.9" ry="4.5" fill="#1e1e1e"/>
+  <path d="M24 17.8 L21.6 22.2 L26.4 22.2 Z" fill="#1e1e1e"/>
+  <g stroke="#1e1e1e" stroke-width="2.2" stroke-linecap="butt">
+    <line x1="20.2" y1="25.6" x2="20.2" y2="23.2"/>
+    <line x1="24" y1="25.6" x2="24" y2="23.2"/>
+    <line x1="27.8" y1="25.6" x2="27.8" y2="23.2"/>
+  </g>
+</svg>

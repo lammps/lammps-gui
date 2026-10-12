@@ -18,20 +18,19 @@ concurrency:
 jobs:
   build:
     name: Build on macOS and create DMG
-    if: ${{ github.repository == 'akohlmey/lammps-gui' }}
+    if: ${{ github.repository == 'lammps/lammps-gui' }}
     runs-on: macos-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 20
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.*'
-        modules: 'qtcharts'
+        version: '6.10.*'
 
     - name: Building LAMMPS-GUI via CMake
       shell: bash
@@ -46,6 +45,11 @@ jobs:
       shell: bash
       run: |
         build/lammps-gui.app/Contents/MacOS/lammps-gui --platform offscreen -v
+
+    - name: Install dmgbuild
+      shell: bash
+      run: |
+        python3 -m pip install --user --break-system-packages dmgbuild
 
     - name: Create DMG installer
       shell: bash

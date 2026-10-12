@@ -14,8 +14,8 @@
 
 #include <QDialog>
 #include <QList>
-#include <QPair>
-#include <QString>
+
+#include "inputvariables.h"
 
 /**
  * @brief Dialog for editing LAMMPS index-style variable definitions
@@ -23,7 +23,9 @@
  * SetVariables provides a dialog for managing name-value pairs that
  * will be used as index-style variables in LAMMPS input scripts.
  * Users can add, delete, and edit variable definitions. The dialog
- * supports variable substitution using ${varname} syntax.
+ * shows the variables that the input script defines or uses; values
+ * that override a differing definition in the input script are shown
+ * in bold with a tooltip listing the script value.
  */
 class SetVariables : public QDialog {
     Q_OBJECT
@@ -31,10 +33,10 @@ class SetVariables : public QDialog {
 public:
     /**
      * @brief Constructor
-     * @param vars Reference to list of variable name-value pairs (modified in place)
+     * @param vars Reference to list of variable entries (modified in place)
      * @param parent Parent widget
      */
-    explicit SetVariables(QList<QPair<QString, QString>> &vars, QWidget *parent = nullptr);
+    explicit SetVariables(QList<VariableEntry> &vars, QWidget *parent = nullptr);
 
     /**
      * @brief Destructor
@@ -64,8 +66,8 @@ private slots:
     void delRow();
 
 private:
-    QList<QPair<QString, QString>> &vars; ///< Reference to variable list
-    class QVBoxLayout *layout;            ///< Dialog layout
+    QList<VariableEntry> &vars; ///< Reference to variable list
+    class QVBoxLayout *layout;  ///< Dialog layout
 };
 
 #endif

@@ -26,12 +26,13 @@ done
 
 touch image_style.table
 mv image_style.table image_style.oldtable
-touch image_style.table
+touch image_style.tmp
 
 for s in $STYLELIST
 do \
     sed -n -e '/^Compute/s/ComputeStyle(\(.*\),.*/compute \1/p' \
-        -e '/^Fix/s/FixStyle(\(.*\),.*/fix \1/p' $s >> image_style.table
+        -e '/^Fix/s/FixStyle(\(.*\),.*/fix \1/p' $s >> image_style.tmp
 done
-
+sort image_style.tmp > image_style.table
+rm image_style.tmp
 cmp image_style.table image_style.oldtable > /dev/null || touch lammpsgui.qrc

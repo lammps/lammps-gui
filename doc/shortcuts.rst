@@ -1,3 +1,5 @@
+.. _shortcuts:
+
 ******************
 Keyboard Shortcuts
 ******************
@@ -33,7 +35,7 @@ available (On macOS use the Command key instead of Ctrl/Control).
      - Ctrl+/
      - Stop Active Run
    * - Ctrl+Shift+F
-     - View File
+     - View Text File
      - Ctrl+C
      - Copy text
      - Ctrl+Shift+V
@@ -69,13 +71,13 @@ available (On macOS use the Command key instead of Ctrl/Control).
      - Ctrl+P
      - Preferences
    * - Ctrl+Shift+A
-     - About LAMMPS
+     - About GUI
      - Ctrl+Shift+H
      - Quick Help
      - Ctrl+Shift+G
      - LAMMPS-GUI Docs
    * - Ctrl+Shift+R
-     - Inspect Restart
+     - Inspect Restart File
      - Ctrl+Shift+O
      - View in OVITO
      - Ctrl+Shift+D
@@ -93,11 +95,23 @@ available (On macOS use the Command key instead of Ctrl/Control).
      - Ctrl+Shift+T
      - LAMMPS Tutorial
    * - Ctrl+Shift+U
-     - LAMMPS Update
+     - Update LAMMPS
      - Ctrl+Home
-     - Go to Beginning
+     - Go to Home
      - Ctrl+End
      - Go to End
+   * - Ctrl+Shift+J
+     - View Image or Movie File(s)
+     - Ctrl+Shift+P
+     - Plot Data File
+     - Ctrl+E
+     - Extend Run
+   * - Ctrl+K
+     - Check Input via Heuristics
+     - Ctrl+Shift+K
+     - Check Input via Dry Run
+     - Ctrl+Shift+X
+     - Command Window
 
 Further keybindings of the editor window `are documented with the Qt
 documentation
@@ -118,3 +132,23 @@ also rebind shortcuts for window-specific actions:
 - *Slide Show* window: `Ctrl-S` saves the currently displayed image,
   `Ctrl-C` copies it to the clipboard, `Ctrl-E` exports the
   image sequence to a movie file.
+
+With the *Combined Main Window* layout the sub-windows are panels
+docked into the main window, and a shortcut a panel shares with the
+main window (for example `Ctrl-S`) is left to the main window; the
+panel's own function remains available from its menu entry.
+
+That layout also has keyboard shortcuts for moving between the panels:
+
+- `F6` moves the keyboard focus to the next panel and `Shift-F6` to the
+  previous one, walking the editor, the group on the right and the group
+  across the bottom in turn and wrapping around at either end.  A panel
+  that shares a tab group with others is reached this way when its tab
+  is the one in front; the transient panels -- a text viewer, an
+  inspected file, a plot of a data file -- are walked like any other.
+- The shortcut that opens a panel also returns to it: pressing it while
+  the panel is on screen but is not the one being worked in moves the
+  focus there instead of hiding it, and pressing it again -- with the
+  focus in the panel by then -- hides it as before.  With individual
+  windows the shortcut toggles the window as it always has, since there
+  the stacking and the focus belong to the window manager.

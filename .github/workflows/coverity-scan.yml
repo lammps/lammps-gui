@@ -1,0 +1,127 @@
+# GitHub action to submit a build to Coverity Scan for static C++ analysis.
+# Runs once per week and only uploads when the develop branch saw a new commit
+# in the past week, so idle weeks do not consume a Coverity build credit.
+name: "Coverity Scan static analysis"
+
+on:
+  schedule:
+    # weekly on Thursday at 02:37 UTC (off the top of the hour to dodge scheduler contention)
+    - cron: '37 2 * * THU'
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  coverity:
+    name: Build and submit to Coverity Scan
+    if: ${{ github.repository == 'lammps/lammps-gui' }}
+    runs-on: ubuntu-latest
+
+    env:
+      COVERITY_PROJECT: akohlmey/lammps-gui
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v7
+      with:
+        ref: develop
+        fetch-depth: 0
+
+    - name: Decide whether there is anything new to scan
+      id: changes
+      shell: bash
+      run: |
+        # A manual run always proceeds; a scheduled run only proceeds when the
+        # newest commit on develop is younger than 8 days (the extra day over
+        # the 7 day cron period absorbs GitHub scheduler drift).
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "Manual dispatch -- forcing a scan."
+          echo "run=true" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        last=$(git log -1 --format=%ct)
+        now=$(date +%s)
+        age=$(( now - last ))
+        echo "Newest develop commit is ${age}s old."
+        if [ "$age" -lt 691200 ]; then
+          echo "run=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "run=false" >> "$GITHUB_OUTPUT"
+          echo "No new commits to develop in the last 8 days -- skipping Coverity submission."
+        fi
+
+    - name: Install extra packages
+      if: steps.changes.outputs.run == 'true'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+                                build-essential \
+                                cmake \
+                                libfontconfig1 \
+                                libglu1-mesa-dev \
+                                libomp-dev \
+                                mesa-common-dev \
+                                ninja-build \
+                                qt6-base-dev \
+                                qt6-svg-dev
+
+    - name: Download the Coverity build tool
+      if: steps.changes.outputs.run == 'true'
+      shell: bash
+      env:
+        COVERITY_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+      run: |
+        curl -sS -L https://scan.coverity.com/download/cxx/linux64 \
+             --data-urlencode "token=${COVERITY_TOKEN}" \
+             --data-urlencode "project=${COVERITY_PROJECT}" \
+             -o cov-analysis-linux64.tar.gz
+        mkdir cov-analysis
+        tar -xzf cov-analysis-linux64.tar.gz --strip-components 1 -C cov-analysis
+        echo "${GITHUB_WORKSPACE}/cov-analysis/bin" >> "$GITHUB_PATH"
+
+    - name: Configure with CMake
+      if: steps.changes.outputs.run == 'true'
+      shell: bash
+      run: |
+        cmake -S . -B build \
+              -D LAMMPS_GUI_USE_PLUGIN=yes \
+              -D BUILD_DOC=no \
+              -D CMAKE_CXX_STANDARD=23 \
+              -D CMAKE_BUILD_TYPE=Debug \
+              -D CMAKE_CXX_FLAGS_DEBUG="-Og -g"
+
+    - name: Build under cov-build
+      if: steps.changes.outputs.run == 'true'
+      shell: bash
+      run: |
+        cov-build --dir cov-int cmake --build build --parallel 2
+        # cov-build prints a per-translation-unit capture summary; fail loudly if
+        # it captured nothing (a sign the wrap did not see the compiler).
+        grep -q "compilation units (100%)" cov-int/build-log.txt \
+          || cat cov-int/build-log.txt
+
+    - name: Submit the result to Coverity Scan
+      if: steps.changes.outputs.run == 'true'
+      shell: bash
+      env:
+        COVERITY_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+        COVERITY_EMAIL: ${{ secrets.COVERITY_SCAN_EMAIL }}
+      run: |
+        tar -czf cov-int.tgz cov-int
+        # --tags also accepts lightweight tags, --always falls back to a bare
+        # commit hash: never fail the upload over the version string alone
+        version="$(git describe --tags --always HEAD)"
+        project_enc="$(jq -rn --arg v "$COVERITY_PROJECT" '$v|@uri')"
+        curl -sS --fail-with-body \
+             --form token="${COVERITY_TOKEN}" \
+             --form email="${COVERITY_EMAIL}" \
+             --form file=@cov-int.tgz \
+             --form version="${version}" \
+             --form description="scheduled develop scan ${version}" \
+             "https://scan.coverity.com/builds?project=${project_enc}"

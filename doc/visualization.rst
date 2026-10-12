@@ -33,9 +33,9 @@ Automatic settings
 
 When possible, LAMMPS-GUI tries to detect which elements the atoms
 correspond to (via their mass) and then colorizes them in the image and
-sets their atom diameters accordingly.  If this is not possible - for
+sets their atom diameters accordingly.  If this is not possible -- for
 instance when using reduced (= 'lj') `units
-<https://docs.lammps.org/units.html>`_ - then LAMMPS-GUI will check the
+<https://docs.lammps.org/units.html>`_ -- then LAMMPS-GUI will check the
 current pair style and if it is a Lennard-Jones type potential, it will
 extract the *sigma* parameter for each atom type and assign atom
 diameters from those numbers.  When using an atom style where the atom
@@ -48,8 +48,8 @@ lattice spacing.
 For particles that use `atom styles
 <https://docs.lammps.org/atom_style.html>`_ "body", "ellipsoid", "line",
 or "tri" LAMMPS will visualize the particles according to their atom
-style information by default.  Other particles types will be visualized
-as sphere.  In the *Atom/Bond* settings dialog, this can be further
+style information by default.  Other particle types will be visualized
+as spheres.  In the *Atom/Bond* settings dialog, this can be further
 customized (or disabled).
 
 .. |gui-image1| image:: JPG/lammps-gui-image-water.png
@@ -225,13 +225,22 @@ there are:
 
 - **SSAO** (toggle): Enable or disable `Screen Space Ambient Occlusion
   <https://en.wikipedia.org/wiki/Screen_space_ambient_occlusion>`_
-  rendering for a more spatial, depth-shaded appearance images at the
+  rendering for a more spatial, depth-shaded appearance, at the
   expense of more CPU time.
 - **Anti-aliasing** (toggle): Render the image at double resolution and
   scale down for smoother edges.  `Full Scene Anti-Aliasing (FSAA)
   <https://en.wikipedia.org/wiki/Spatial_anti-aliasing#Super_sampling_/_full-scene_anti-aliasing>`_
   produces higher quality images at the expense of more CPU time.  It is
   particularly recommended in combination with any transparent objects.
+- **Depth cueing** (toggle): Enable or disable depth cueing, which
+  fades distant objects toward a fog color for a stronger sense of
+  depth.  The intensity, fog color, and start position are configured
+  in the :ref:`Global image settings dialog <global_settings>`.
+- **Defocus** (toggle): Enable or disable defocusing, which blurs
+  distant objects as if the camera were focused on the front of the
+  scene, while leaving their colors untouched.  This can be combined
+  with depth cueing.  The intensity and start position are configured
+  in the :ref:`Global image settings dialog <global_settings>`.
 - **Shininess** (toggle): Switch between shiny and matte surface
   rendering of graphics objects like atoms and bonds.
 - **VDW style** (toggle): Switch between space-filling (Van der Waals)
@@ -248,7 +257,7 @@ there are:
 - **Box** (toggle): Show or hide the simulation box drawn as colored
   cylinders.
 - **Axes** (toggle): Show or hide the labeled coordinate axes arrows.
-- **Zoom in** / **Zoom out**: Adjust the zoom level between in 10
+- **Zoom in** / **Zoom out**: Adjust the zoom level in 10
   percent increments between 0.1x and 10.0x.
 - **Rotate left** / **Rotate right**: Rotate the view horizontally by
   10 degrees per click.
@@ -257,6 +266,10 @@ there are:
 - **Recenter**: Recenter the view on the center of mass of the currently
   selected group.
 - **Reset**: Reset the view to the default orientation and zoom level.
+- **Fit window**: Resize the window so the image is shown at its full
+  size, without scroll bars or unused space.  This undoes a manual
+  resize of the window; the window is never grown beyond a fraction of
+  the screen, so scroll bars remain for very large images.
 
 The default image size, some default image quality settings, the view
 style and some colors can be changed in the :doc:`Preferences <dialogs>`
@@ -278,7 +291,7 @@ additional controls (most are explained in detail below):
   "none" restores normal group-based display.
 - **Global**: Opens the :ref:`Global image settings <global_settings>`
   dialog for fine-grained control of axes, box, background, quality,
-  and center settings.
+  view, center, and camera settings.
 - **Atoms/Bonds**: Opens the :ref:`Atom and bond settings
   <atom_settings>` dialog for detailed atom, bond, VDW, and special atom
   style visualization options.
@@ -322,11 +335,11 @@ settings panel or by using the `Alt-L` keyboard shortcut.  The settings
 in this dialog correspond to options of the LAMMPS `dump image and
 dump_modify commands <https://docs.lammps.org/dump_image.html>`_.
 
-.. |global|  image:: JPG/lammps-gui-image-settings.png
-                     :width: 61%
-
 .. |boxaxes| image:: JPG/lammps-gui-image-box-axes.png
-                     :width: 29%
+                     :width: 40%
+
+.. |global|  image:: JPG/lammps-gui-image-settings.png
+                     :width: 59%
 
 |boxaxes|  |global|
 
@@ -367,6 +380,11 @@ The dialog is organized into the following sections:
      box.
    - **Diameter**: The diameter of the sub-domain box edge sticks as
      fraction of the box size (range: 0.00001 -- 5.0).
+   - **View theta**: The viewing angle in degrees away from the
+     positive z-axis (default: 60).  Disabled for 2d systems, where
+     LAMMPS always looks down the z-axis.
+   - **View phi**: The azimuthal viewing angle in degrees around the
+     z-axis (default: 30).  Disabled for 2d systems.
 
 **Background**
    Sets the background color(s) of the rendered image.
@@ -375,6 +393,50 @@ The dialog is organized into the following sections:
    - **Topcolor**: The background color at the top of the image.  If
      the two colors differ, a vertical gradient is applied from bottom
      to top.
+   - **Zoom**: The zoom factor of the view (range: 0.1 -- 10.0, where
+     values larger than 1.0 zoom in).  This is the same setting that
+     the zoom in/out buttons of the settings panel change in steps of
+     10 percent.
+
+**Depth Cueing**
+   Controls depth cueing, which fades distant objects toward a fog
+   color, similar to looking through fog.  This is perceived as depth
+   and helps to visually untangle dense systems.
+
+   - **Depth Cueing** (checkbox): Enable or disable depth cueing.
+     This is the same setting that the depth cueing toolbar button
+     toggles.
+   - **Intensity**: The strength of the fading (range: 0.0 -- 1.0).
+     At 1.0 the most distant objects blend completely into the fog
+     color.
+   - **Color**: The fog color.  Accepts `named colors
+     <https://docs.lammps.org/dump_image.html>`_ or "auto" (the
+     default), which fades toward the background color, following the
+     background gradient when one is set.
+   - **Start**: Where the fading starts, as a fraction of the
+     simulation box along the view direction (0.0 = side nearest to
+     the camera, 1.0 = far side), or "auto" (the default) to start at
+     the nearest rendered object.
+
+**Defocus**
+   Controls defocusing, which blurs distant objects as if the camera
+   were focused on the front of the scene.  Like depth cueing this
+   draws the attention to the objects in front, but it leaves their
+   colors untouched, and the two effects may be combined.  There is no
+   color setting for this effect, so that field is left empty.
+
+   - **Defocus** (checkbox): Enable or disable defocusing.  This is
+     the same setting that the defocus toolbar button toggles.
+   - **Intensity**: The strength of the blur (range: 0.0 -- 1.0).  At
+     1.0 the most distant objects are blurred over a radius of 1
+     percent of the image height.  Blurring over much more than the
+     size of the rendered particles turns them into a uniform haze,
+     so moderate values usually give the best result.
+   - **Start**: Where the blurring starts, as a fraction of the
+     simulation box along the view direction (0.0 = side nearest to
+     the camera, 1.0 = far side), or "auto" (the default) to start at
+     the nearest rendered object, which keeps the front of the scene
+     sharp.
 
 **Quality**
    Controls rendering quality options.
@@ -384,20 +446,70 @@ The dialog is organized into the following sections:
      Occlusion for depth-shaded rendering.
    - **SSAO strength**: The strength of the SSAO effect (range: 0.0 --
      1.0).
+   - **Samples**: The number of SSAO sampling directions (range: 4 --
+     64).  More samples produce smoother shading; fewer samples render
+     proportionally faster.  With "auto" (the default) the number is
+     derived from the SSAO strength in the copied ``dump image``
+     command, while interactive renders in the Image Viewer use a
+     reduced, fixed sample count to stay responsive.  An explicitly
+     set number applies to both, so a high-quality image can be saved
+     directly from the viewer without going through a simulation run.
+   - **Outline** (checkbox): Enable or disable drawing outlines along
+     the visible edges of rendered objects for a flat,
+     illustration-like appearance.  The two fields to the right of the
+     checkbox set the width of the outlines in pixels (range: 1 -- 16)
+     and their color.
    - **Shiny**: The shininess factor for surface rendering (range: 0.0
      -- 1.0, where 0.0 is matte and 1.0 is fully shiny).
+   - **Specular**: The width of the specular highlights: *auto* (the
+     default, derived from the shiny factor), *none* (highlights off
+     for a matte appearance), *wide*, *narrow*, or *tight* (small
+     sharp highlights with a plastic-like appearance).
+
+**Metal Effect**
+   Controls metallic shading, which renders objects as if they were
+   made of metal rather than of colored plastic.  Metal reflects light
+   back directly and colors it in the process, so the rendering
+   approximates the surroundings with a bright sky above and a dark
+   ground below; a dark background makes the effect look the most
+   convincing.  The color assigned to an object tints its reflections.
+
+   - **Metal Effect** (checkbox): Enable or disable metallic shading.
+   - **Intensity**: How metallic the objects appear (range: 0.0 --
+     1.0).  At 1.0 the objects are rendered as bare metal, smaller
+     values blend toward the default appearance.
+   - **Metal Finish**: The surface finish of metallic objects: *satin*
+     (the default) has a broad soft sheen and resembles brushed metal,
+     *polished* concentrates the sheen into a narrower streak, and
+     *mirror* reflects the surroundings the way a curved mirror does,
+     making spheres look like polished ball bearings.
 
 **Center**
-   Adjusts the center point of the rendered view.
+   Adjusts the center point of the rendered view.  The drop-down list
+   selects between **Center (static)**, where the center fractions refer
+   to the simulation box, and **Center (dynamic)**, where they refer to
+   the bounding box of the currently displayed atoms in each frame.
+   The dynamic setting is mainly useful for the copied ``dump image``
+   command when creating a movie of a system that drifts or expands.
 
    - **X-direction**, **Y-direction**, **Z-direction**: Fractional
      coordinates (range: 0.0 -- 1.0) specifying the center of the
-     view relative to the simulation box.
+     view relative to the simulation box (static) or the bounding
+     box of the displayed atoms (dynamic).
+
+**Camera up**
+   Sets the direction that points up in the rendered image.
+
+   - **X-direction**, **Y-direction**, **Z-direction**: The components
+     of the camera's up vector.  The vector does not need to be
+     normalized, but it must not be all zeros, or the values are
+     ignored.  The default is 0 0 1 for 3d systems and 0 1 0 for 2d
+     systems, where the Z-direction entry is disabled.
 
 **Lighting**
-   Adjusts the settings for the four light sources used in the
-   rendering.  Each value is a floating point number (range: 0.0 -- 1.0)
-   representing the intensity of the respective light source.
+   Adjusts the settings for the four light sources used in the rendering
+   and the tonal balance of the result.  The intensity of each light
+   source is a floating point number in the range 0.0 -- 1.0.
 
    - **Ambient**: The intensity of the uniform, non-directional base
      lighting that illuminates all parts of the scene equally.
@@ -408,6 +520,13 @@ The dialog is organized into the following sections:
    - **Back**: The intensity of the tertiary directional light source
      that illuminates the back of the objects, helping to separate
      them from the background.
+   - **Gamma**: The gamma adjustment applied to the summed up light
+     contributions of the rendered objects (range: 0.1 -- 10.0, default
+     1.0 = unchanged).  Values above 1.0 lighten the image, most
+     strongly in the darker regions, and thus can bring out shading
+     detail on the dimly lit side of objects; values below 1.0 darken
+     the image and increase its contrast.  The background colors are
+     not affected.
 
 Press **Apply** to apply the current settings and re-render the image,
 or **Cancel** to discard changes.  The **Help** button opens the LAMMPS
@@ -431,10 +550,10 @@ Viewer toolbar.  It is opened by pressing the "Atoms/Bonds" button in
 the settings panel or by using the `Alt-A` keyboard shortcut.
 
 .. |atombond|  image:: JPG/lammps-gui-image-atom.png
-                     :width: 63%
+                     :width: 62%
 
 .. |autobond| image:: JPG/lammps-gui-autobond.png
-                     :width: 31%
+                     :width: 36%
 
 |autobond|  |atombond|
 
@@ -454,36 +573,69 @@ The dialog contains the following sections:
      selecting *type* or *element* the colors are fixed and can be only
      changed manually for ``dump_image`` output in the input using
      ``dump_modify acolor`` or ``dump_modify element``, respectively.
-     Otherwise, the colors are determined by the colormap selection
+     Otherwise, the colors are determined by the color map selection
      described below.
    - **Size**: Select the property used for atom sizing.  Options
      include *auto* (when element, diameter, or sigma data is
-     available), *type*, *element*, and a few pre-defined choices for
-     custom atom diameters.  The text field can be edited and a
-     different custom diameter entered.
-   - **Opacity**: The transparency of atoms *and* bonds (range: 0.0 --
-     1.0, where 1.0 is fully opaque and 0.0 is fully transparent).
-   - **VDW style** (checkbox): Enable or disable space-filling sphere
-     rendering.  When unchecked, the ball-and-stick style is used.
-   - **Colormap**: Select the colormap used for coloring by a per-atom
+     available), *type*, *element*, atom-style variables (`v_<name>`)
+     defined in the current simulation state, and a few pre-defined
+     choices for custom atom diameters.  The text field can be edited
+     and a different custom diameter entered.  Selecting an atom-style
+     variable uses its per-atom value directly as the atom diameter;
+     this allows, for example, to apply a scaling factor to a per-atom
+     property.  Per-atom data from computes and fixes are not offered
+     directly, but they can be referenced from an atom-style variable,
+     which then also allows to scale them to suitable diameters.
+   - **Opacity**: The transparency of atoms (range: 0.0 -- 1.0, where 1.0
+     is fully opaque and 0.0 is fully transparent).  Bonds have their own
+     Opacity setting in the **Bonds** section below.
+   - **Map**: Select the color map used for coloring by a per-atom
      property.  This option is *not* available for atom color selections
-     *type* and *element*\ .  Currently available continuous colormaps
-     are: *BWR* (blue-white-red), *RWB* (red-white-blue), *PWT*
+     *type* and *element*\ .  Currently available continuous color maps
+     are: *RWB* (red-white-blue), *PWT*
      (purple-white-teal), *BWG* (blue-white-green), *BGR*
      (blue-green-red), *Grayscale* (black-white), *Viridis* (from
      matplotlib), *Plasma* (from matplotlib), *Inferno* (from
-     matplotlib), *Teal*, and *Rainbow*.  *Sequential*, *Landscape*, and
-     *Basic* are maps with discrete colors.  These are pre-defined
-     colormap settings and currently cannot be adjusted from LAMMPS-GUI
+     matplotlib), *Magma* (from matplotlib), *Cividis* (from matplotlib),
+     *Turbo* (from matplotlib), *Teal*, and *Rainbow*.  *Sequential*,
+     *Landscape*, and *Basic* are maps with discrete colors.  These are pre-defined
+     color map settings and currently cannot be adjusted from LAMMPS-GUI
      directly.  As for *all* image settings, further customizations can
      be realized by copying the dump image command line as customized by
      the Image Viewer to the editor and then run LAMMPS and observe the
-     resulting images in the Slideshow Viewer window.  Then the color
+     resulting images in the Slide Show window.  Then the color
      map setting can be fully customized according to the `dump_modify
      colormap documentation <https://docs.lammps.org/dump_image.html>`_.
-   - **Min** / **Max**: Set the range of the colormap.  Use *auto* to
+   - **Reverse** (checkbox): Mirror the selected color map so its low and
+     high ends are swapped (for example, *RWB* becomes blue-white-red).
+     This replaces the former *BWR* entry, which is exactly *RWB*
+     reversed.  Enabled together with the **Map** selector.
+   - **Min** / **Max**: Set the range of the color map.  Use *auto* to
      have LAMMPS determine the range automatically or specify an
      explicit numeric value.
+   - **VDW style** (checkbox): Enable or disable space-filling sphere
+     rendering.  When unchecked, the ball-and-stick style is used.  This
+     toggle shares a line with the **AutoBonds** control of the **Bonds**
+     section below; the two are mutually exclusive.
+
+.. index:: color map
+.. index:: reversible color map
+
+The color maps available for coloring atoms and bonds by value are shown
+below; the continuous maps are interpolated between color stops, while
+*Sequential*, *Landscape*, and *Basic* use discrete colors.
+
+.. _colormap_preview:
+
+.. figure:: JPG/lammps-gui-colormaps.png
+   :align: center
+   :width: 60%
+
+   The dump-image color maps offered for coloring atoms and bonds by value.
+
+These color maps are defined in a single table in the C++ source, which makes
+them simple to add or modify; see :ref:`add_colormap` in the Programmer's
+Guide for step-by-step instructions.
 
 **Bonds**
    Controls bond visualization.
@@ -491,12 +643,21 @@ The dialog contains the following sections:
    - **Bonds** (checkbox): Enable or disable bond rendering.  This
      option is only available when the atom style supports explicit
      bonds.
-   - **Color**: Select bond coloring mode -- *atom* (colored by the
-     atom type at each end) or *type* (uniform color per bond type).
+   - **Color**: Select the bond coloring mode.  The basic choices are
+     *atom* (each bond half is colored by the atom type at its end) and
+     *type* (a uniform color per bond type).  The list also offers a set
+     of per-bond properties computed by ``compute bond/local`` -- *dist*,
+     *dx*, *dy*, *dz*, *engpot*, *force*, *fx*, *fy*, *fz*, *engvib*,
+     *engrot*, *engtrans*, *omega*, and *velvib*.  Selecting one of these
+     colors the bonds by that per-bond value using the bond color map (see
+     **Map** below); LAMMPS-GUI creates the required ``compute
+     bond/local`` automatically.
    - **Size**: Select bond diameter mode.  Options include *atom*,
      *type*, and a few pre-defined choices for custom bond diameters.
      The text field can be edited and a different custom diameter
      entered.
+   - **Opacity**: The transparency of bonds (range: 0.0 -- 1.0), set
+     independently from the atom opacity.
    - **AutoBonds** (checkbox): Automatically determine bonds from atom
      distances, useful for many-body force fields with implicit bonds
      like `AIREBO <https://docs.lammps.org/pair_airebo.html>`_ or
@@ -507,8 +668,15 @@ The dialog contains the following sections:
      the `special_bonds settings
      <https://docs.lammps.org/special_bonds.html>`_
    - **Cutoff**: The distance cutoff used for automatic bond detection
-     (range: 0.001 -- 10.0 in distance units).  Only available when
-     auto-bonds are enabled.
+     (range: 0.001 -- 10.0 in distance units), in the text field next to
+     the AutoBonds checkbox.  Only available when auto-bonds are enabled.
+   - **Reverse** / **Map** / **Min** / **Max**: Select the color map and
+     value range used when coloring bonds by a per-bond value (see
+     **Color** above).  The same color maps as the atom **Map** are
+     offered, and the **Reverse** checkbox mirrors the chosen map exactly
+     like its atom counterpart.  These fields are only enabled when a
+     per-bond property is selected as the bond color.  Use *auto* for
+     **Min** / **Max** to let LAMMPS determine the range automatically.
 
 **Bodies**
    Controls visualization of `body particles
@@ -521,8 +689,8 @@ The dialog contains the following sections:
    - **Color** (selection): Use coloring by the *atom* color choice, the
      body *index*, or the atom *type* of the body particles.
    - **Style** (radio buttons): Select the body rendering style --
-     *Cylinders*, *Triangles*, or *Both*.  For cylinders - when used for
-     body particle rendering - also their diameter can be set (range:
+     *Cylinders*, *Triangles*, or *Both*.  For cylinders -- when used for
+     body particle rendering -- their diameter can also be set (range:
      0.1 -- 10.0).
 
 **Ellipsoids**
@@ -537,8 +705,8 @@ The dialog contains the following sections:
    - **Color** (selection): Use coloring by the *atom* color choice, the
      ellipsoid *index*, or the atom *type* of the ellipsoid particles.
    - **Style** (radio buttons): Select the ellipsoid rendering style --
-     *Cylinders*, *Triangles*, or *Both*.  For cylinders - when used for
-     ellipsoid particle rendering - also their diameter can be set (range:
+     *Cylinders*, *Triangles*, or *Both*.  For cylinders -- when used for
+     ellipsoid particle rendering -- their diameter can also be set (range:
      0.1 -- 10.0).
    - **Refine** (spinbox): Level of triangle mesh refinement.  At level
      1 the ellipsoids are represented by a deformed octahedron.  With a
@@ -573,8 +741,8 @@ The dialog contains the following sections:
      triangulated particle *index*, or the atom *type* of the
      triangulated particles.
    - **Style** (radio buttons): Select the particle rendering style --
-     *Cylinders*, *Triangles*, or *Both*.  For cylinders - when used for
-     triangle particle rendering - also their diameter can be set
+     *Cylinders*, *Triangles*, or *Both*.  For cylinders -- when used for
+     triangle particle rendering -- their diameter can also be set
      (range: 0.1 -- 10.0).
 
 Press **Apply** to apply the settings and re-render the image, or
@@ -654,10 +822,10 @@ using the `Alt-C` keyboard shortcut.  The dialog only appears when at
 least one compute or fix with graphics capabilities is defined.
 
 .. |fixsetting|  image:: JPG/lammps-gui-image-fix-graphics.png
-                     :width: 61%
+                     :width: 67%
 
 .. |hbonds| image:: JPG/lammps-gui-image-hbonds.png
-                     :width: 32%
+                     :width: 31%
 
 |hbonds|  |fixsetting|
 
@@ -728,6 +896,9 @@ edited list of definitions to a file.  The list may be loaded later to
 restore a previous color assignment.
 
 .. _json_format:
+
+.. index:: JSON format
+.. index:: JSON color file
 
 .. admonition:: JSON file format for colors and lighting definitions
 
@@ -800,13 +971,101 @@ monitor the progress of the simulation.  It also can be used as an
 effective way to refine visualizations created with the :ref:`Snapshot
 Image Viewer <snapshot_viewer>`.
 
+.. warning::
+
+   When two or more ``dump image`` commands are active at the same time,
+   the slide show picks up the images from all of them and displays them
+   interleaved in the order they are written.  This is usually not
+   intended, but cannot be detected by LAMMPS-GUI before the run has
+   started and the images have already been mixed.  To avoid it, make
+   sure that only one ``dump image`` command is active at any time
+   during a run, for example by removing a no longer needed dump with an
+   `undump command <https://docs.lammps.org/undump.html>`_.
+
+The same window can also display existing image files that were not
+created by the current session: select one or more files with *File* ->
+*View Image or Movie File(s)...* (see :ref:`the File menu <files>`) to
+review images produced by an external (for example large parallel)
+simulation, or to revisit images from an earlier run without rerunning
+it.  Image formats that Qt cannot read natively are converted on demand
+with `ImageMagick <https://imagemagick.org/>`_ if it is available.  Each
+such file is converted only once and the converted copy is reused while
+the window is open, so displaying it repeatedly neither repeats the
+conversion nor repeats any complaint its format may provoke from Qt (the
+Targa/TGA decoder is a common source of those).  A file that can be read
+by neither is reported once on the console and then skipped.  When the
+slide show is opened this way, the controls that act on a running
+simulation (such as stopping the run or sending images to the trash) are
+hidden.
+
+To load many imagefiles from the command line, you can use on Linux and
+macOS a command line like the following:
+
+.. code-block:: bash
+
+   lammps-gui $(for f in image-*.png; do echo -n " -i $f"; done)
+
+Movie files can be selected in the same dialog; their frames are then
+extracted into individual images as described in :ref:`Importing movie
+files <movie_import>` below.
+
 From the slide show window the following global keyboard shortcuts are
 supported: `Ctrl-W`: close window, `Ctrl-Q`: quit application, `Ctrl-/`:
 stop running simulation.  Other keyboard shortcuts are connected to some
 of the controls and listed in their documentation below.
 
+The visualization shown below is created by the
+`in.breakable GRAPHICS package example <https://github.com/lammps/lammps/blob/develop/examples/GRAPHICS/in.breakable>`_
+
 .. image:: JPG/lammps-gui-slideshow.png
    :align: center
+
+.. _movie_import:
+
+Importing movie files
+---------------------
+
+.. index:: movie import
+
+.. image:: JPG/lammps-gui-movie-import.png
+   :align: right
+   :scale: 66%
+
+Movie files (``.mp4``, ``.mkv``, ``.webm``, ``.avi``, ``.mov``, and so on,
+as well as animated GIF files) can be opened with *File* -> *View Image or
+Movie File(s)...* just like image files.  Since the slide show viewer
+displays individual images, the frames of a movie must first be
+decompressed into a sequence of image files.  This requires the `FFmpeg
+<https://ffmpeg.org/>`_ programs ``ffmpeg`` and ``ffprobe``; it is the
+inverse of the movie export described below.
+
+When a movie file is selected, a dialog reports its properties and asks
+for confirmation before any frames are extracted:
+
+- **First frame** and **Last frame** select the range of the movie to
+  extract.
+- **Frame interval** thins out that range: an interval of 1 extracts every
+  frame, 2 every other frame, and so on.  This is useful to skim a long
+  movie without decompressing all of it.
+- **Estimated size** is how much temporary disk space the extracted
+  images are expected to need.  It is obtained by decoding a single
+  sample frame near the middle of the selected range and multiplying its
+  size by the number of selected frames, so it is an approximation.  The
+  sample frame is shown as a thumbnail next to the movie properties.
+  When the middle of the selected range moves away from the sampled
+  frame by more than a tenth of the movie, a new sample frame is decoded
+  after a moment, and the thumbnail and the estimate are refreshed from
+  it.  A highlighted warning appears when the estimate exceeds one
+  gigabyte, when it would use up most of the free space on the volume
+  holding the temporary folder, or when more than 1000 images would be
+  extracted.
+
+Because the frames are stored as individual images and not as a
+compressed video stream, they usually take up substantially more space
+than the movie file itself.  The extracted frames are written to a
+temporary folder and are deleted again when the slide show window is
+closed.  Below the navigation slider each extracted image is labeled with
+the name of the movie and its frame number in it.
 
 Slide show controls
 -------------------
@@ -820,9 +1079,9 @@ cursor on top of it and a descriptive tooltip will appear.
 The **toolbar** at the top of the Slide Show window provides the
 following controls, organized from left to right:
 
-- **Export to movie** (`Ctrl-E`): Export the entire image sequence to a
-  movie file or `animated GIF file
-  <https://en.wikipedia.org/wiki/GIF#Animated_GIF>`_.  This requires
+- **Export to movie** (`Ctrl-E`): Export the active range of images (see
+  the **Start** and **Stop** controls below) to a movie file or `animated
+  GIF file <https://en.wikipedia.org/wiki/GIF#Animated_GIF>`_.  This requires
   that either the `FFmpeg program <https://ffmpeg.org/>`_ or the
   `ImageMagick software <https://imagemagick.org/>`_ are installed.
   Supported output formats include MP4, MKV, AVI, MPG, MPEG, WEBM, and
@@ -840,14 +1099,27 @@ following controls, organized from left to right:
   clipboard for pasting it into another application.  This requires
   support from the receiving application, which is the case for many
   common applications like document editors and web browsers.
-- **Delete all images**: Remove all image files associated with the
-  slide show.  Since the number of image files can be large for long
-  simulations, this provides a safe way to clean up the working
-  directory without risk of accidentally deleting other files.  This
-  will, however, only delete the images of the last run.  If that was
+- **Delete selected images**: Remove the image files in the currently
+  selected range (see the **Start** and **Stop** controls below) from
+  disk.  A confirmation dialog reports how many files will be removed
+  before they are deleted.  With the default range (first to last image)
+  this removes the entire sequence.  Since the number of image files can
+  be large for long simulations, this provides a safe way to clean up the
+  working directory without risk of accidentally deleting other files.
+  This will, however, only delete images of the last run.  If that was
   stopped before completion or the output filename has changed, older
-  images created by previous runs will not be deleted.
-
+  images created by previous runs will not be deleted.  Deleting an image
+  also discards its converted copy from the image cache described next.
+- **Image cache**: An indicator that is grayed out while the image cache
+  is empty and shown in color once it holds anything.  Its tooltip reports
+  how many converted images and extracted movie frames are cached and how
+  much temporary disk space they occupy.  Pressing it discards the
+  converted images after a confirmation; they are converted again the next
+  time they are displayed, so nothing is lost but time.  Extracted movie
+  frames are never discarded this way, since re-creating them requires
+  running FFmpeg over the movie again, and the button is therefore
+  disabled when the cache holds nothing but frames.  The entire cache is
+  removed when the Slide Show window is closed.
 - **Zoom in**: Increase the displayed image size by scaling it up. Every
   click on the button increases the zoom factor by 10 percent.
 - **Zoom out**: Decrease the displayed image size by scaling it
@@ -862,26 +1134,46 @@ following controls, organized from left to right:
   axis.
 - **Reset image**: Reset the displayed image to the original image. This
   reverts all zoom, rotate, and mirror operations.
-
+- **Fit window**: Resize the window so the displayed image is shown at
+  its full size, without scroll bars or unused space.  This undoes a
+  manual resize of the window; the window is never grown beyond a
+  fraction of the screen, so scroll bars remain for very large images.
 - **Stop Simulation** (`Ctrl-/`): Stop a running simulation.
 
 These image transformations are useful when the simulation images need
 to be adjusted for presentation purposes.  The same transformations are
 also applied when exporting images or movies.
 
-The **playback controls** below the image allow to select the displayed
-image and control the slideshow settings:
+The **playback controls** below the image let you select the displayed
+image, restrict the active range, and control the slideshow settings:
 
-- **Play**: Start playing the animation from the current frame to the
-  last frame.
+- **Play**: Start playing the animation, advancing through the active
+  range defined by the **Start** and **Stop** controls.
 - **Loop**: Toggle continuous looping of the animation.  When enabled,
-  playback wraps around from the last image back to the first.
+  playback wraps around from the last image of the active range back to
+  the first.
 - **Delay**: Set the delay in milliseconds between frames
   during animation playback.
+- **Start**: First image of the active range.  Animation, single
+  stepping, movie export, and image deletion are all restricted to
+  images at or after this position.  Defaults to the first image.
+- **Stop**: Last image of the active range.  Defaults to the last image
+  and keeps following the growing sequence while a simulation produces
+  new images, unless it has been set to a specific value.
+- At the right end of the row, a counter gives the position of the
+  displayed image in the sequence, followed by its file name.  Only the
+  name is shown and not the directory holding it: the directory is the
+  same for every image of a sequence and says nothing about which image
+  this is, while a long path would hold the window open to its width.
+  Hovering over the name shows the full path.  Frames extracted from a
+  movie file are named after the movie and their frame number in it
+  instead.
 
-- **First**: Jump to the first image in the sequence.
+- **First**: Jump to the first image of the active range.
 - **Previous**: Step back to the previous image.
-- The **slider control** allows selecting a frame in the image sequence
-  by by moving the slider position.
+- The **slider control** selects a frame in the image sequence by moving
+  the slider position.  Its track is colored to indicate the active
+  range: positions inside the **Start** to **Stop** range are drawn in
+  blue, while the skipped images outside it are drawn in red.
 - **Next**: Step forward to the next image.
-- **Last**: Jump to the last image in the sequence.
+- **Last**: Jump to the last image of the active range.

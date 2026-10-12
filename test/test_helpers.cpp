@@ -9,6 +9,7 @@
 // This software is distributed under the GNU General Public License version 2 or later.
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#include "constants.h"
 #include "helpers.h"
 #include "stdcapture.h"
 
@@ -17,12 +18,13 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
+#include <QImage>
 #include <QString>
+#include <QTemporaryDir>
 
 #include <cstdio>
-#include <cstring>
 #include <string>
-#include <vector>
 
 // Fixture for tests that need Qt application
 class HelpersTest : public ::testing::Test {
@@ -113,55 +115,55 @@ TEST_F(HelpersTest, DateCompareAllMonths)
 
 TEST_F(HelpersTest, SplitLineSimple)
 {
-    std::string input                 = "one two three";
-    auto result                       = splitLine(input);
-    std::vector<std::string> expected = {"one", "two", "three"};
+    QString input        = "one two three";
+    auto result          = splitLine(input);
+    QStringList expected = {"one", "two", "three"};
     EXPECT_EQ(result, expected);
 }
 
 TEST_F(HelpersTest, SplitLineEmpty)
 {
-    std::string input = "";
-    auto result       = splitLine(input);
+    QString input = "";
+    auto result   = splitLine(input);
     EXPECT_TRUE(result.empty());
 }
 
 TEST_F(HelpersTest, SplitLineWhitespaceOnly)
 {
-    std::string input = "   \t\n  ";
-    auto result       = splitLine(input);
+    QString input = "   \t\n  ";
+    auto result   = splitLine(input);
     EXPECT_TRUE(result.empty());
 }
 
 TEST_F(HelpersTest, SplitLineSingleQuotes)
 {
-    std::string input                 = "one 'two three' four";
-    auto result                       = splitLine(input);
-    std::vector<std::string> expected = {"one", "'two three'", "four"};
+    QString input        = "one 'two three' four";
+    auto result          = splitLine(input);
+    QStringList expected = {"one", "'two three'", "four"};
     EXPECT_EQ(result, expected);
 }
 
 TEST_F(HelpersTest, SplitLineDoubleQuotes)
 {
-    std::string input                 = "one \"two three\" four";
-    auto result                       = splitLine(input);
-    std::vector<std::string> expected = {"one", "\"two three\"", "four"};
+    QString input        = "one \"two three\" four";
+    auto result          = splitLine(input);
+    QStringList expected = {"one", "\"two three\"", "four"};
     EXPECT_EQ(result, expected);
 }
 
 TEST_F(HelpersTest, SplitLineEscapedQuotes)
 {
-    std::string input                 = "one \\'test\\' two";
-    auto result                       = splitLine(input);
-    std::vector<std::string> expected = {"one", "\\'test\\'", "two"};
+    QString input        = "one \\'test\\' two";
+    auto result          = splitLine(input);
+    QStringList expected = {"one", "\\'test\\'", "two"};
     EXPECT_EQ(result, expected);
 }
 
 TEST_F(HelpersTest, SplitLineMixedQuotes)
 {
-    std::string input                 = "word1 'single' \"double\" word2";
-    auto result                       = splitLine(input);
-    std::vector<std::string> expected = {"word1", "'single'", "\"double\"", "word2"};
+    QString input        = "word1 'single' \"double\" word2";
+    auto result          = splitLine(input);
+    QStringList expected = {"word1", "'single'", "\"double\"", "word2"};
     EXPECT_EQ(result, expected);
 }
 
@@ -171,8 +173,8 @@ TEST_F(HelpersTest, SplitLineTripleQuotes)
     // The implementation shows that """ at start triggers special parsing
     // but the exact behavior can be complex. We'll test that it at least
     // parses without crashing and returns some tokens.
-    std::string input = "word1 \"\"\"triple quoted text\"\"\" word2";
-    auto result       = splitLine(input);
+    QString input = "word1 \"\"\"triple quoted text\"\"\" word2";
+    auto result   = splitLine(input);
     // Just verify basic parsing works - we got some results
     EXPECT_GT(result.size(), 0);
     EXPECT_EQ(result[0], "word1");
@@ -182,17 +184,17 @@ TEST_F(HelpersTest, SplitLineTripleQuotes)
 
 TEST_F(HelpersTest, SplitLineMultipleSpaces)
 {
-    std::string input                 = "one    two\t\tthree\n\nfour";
-    auto result                       = splitLine(input);
-    std::vector<std::string> expected = {"one", "two", "three", "four"};
+    QString input        = "one    two\t\tthree\n\nfour";
+    auto result          = splitLine(input);
+    QStringList expected = {"one", "two", "three", "four"};
     EXPECT_EQ(result, expected);
 }
 
 TEST_F(HelpersTest, SplitLineLeadingTrailingWhitespace)
 {
-    std::string input                 = "  \t one two  \n";
-    auto result                       = splitLine(input);
-    std::vector<std::string> expected = {"one", "two"};
+    QString input        = "  \t one two  \n";
+    auto result          = splitLine(input);
+    QStringList expected = {"one", "two"};
     EXPECT_EQ(result, expected);
 }
 
@@ -212,6 +214,103 @@ TEST_F(HelpersTest, HasExeNonExistent)
 {
     // Test with a command that definitely doesn't exist
     EXPECT_FALSE(hasExe("this_command_does_not_exist_12345"));
+}
+
+// Tests for findExe function
+
+TEST_F(HelpersTest, FindExeReturnsFullPath)
+{
+#if defined(_WIN32)
+    const QString path = findExe("cmd");
+#else
+    const QString path = findExe("ls");
+#endif
+    EXPECT_FALSE(path.isEmpty());
+    EXPECT_TRUE(QFileInfo(path).isAbsolute());
+    EXPECT_TRUE(QFileInfo(path).isExecutable());
+}
+
+TEST_F(HelpersTest, FindExeNonExistent)
+{
+    EXPECT_TRUE(findExe("this_command_does_not_exist_12345").isEmpty());
+}
+
+TEST_F(HelpersTest, FindExeConsistentWithHasExe)
+{
+#if defined(_WIN32)
+    const QString exe = "cmd";
+#else
+    const QString exe = "ls";
+#endif
+    EXPECT_EQ(hasExe(exe), !findExe(exe).isEmpty());
+}
+
+// Tests for renameToBackup function
+
+TEST_F(HelpersTest, RenameToBackupCreatesBackup)
+{
+    QTemporaryDir tmp;
+    ASSERT_TRUE(tmp.isValid());
+    const QString file = tmp.filePath("sample.txt");
+    {
+        QFile f(file);
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly));
+        f.write("payload");
+    }
+
+    const QString backup = renameToBackup(file);
+    EXPECT_EQ(backup, file + Cfg::BACKUP_SUFFIX);
+    EXPECT_FALSE(QFile::exists(file));
+
+    QFile bf(backup);
+    ASSERT_TRUE(bf.open(QIODevice::ReadOnly));
+    EXPECT_EQ(bf.readAll(), QByteArray("payload"));
+}
+
+TEST_F(HelpersTest, RenameToBackupReplacesStaleBackup)
+{
+    QTemporaryDir tmp;
+    ASSERT_TRUE(tmp.isValid());
+    const QString file = tmp.filePath("sample.txt");
+    {
+        QFile f(file);
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly));
+        f.write("new");
+    }
+    {
+        QFile f(file + Cfg::BACKUP_SUFFIX);
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly));
+        f.write("stale");
+    }
+
+    // the removable stale backup is replaced, not given a numbered name
+    const QString backup = renameToBackup(file);
+    EXPECT_EQ(backup, file + Cfg::BACKUP_SUFFIX);
+
+    QFile bf(backup);
+    ASSERT_TRUE(bf.open(QIODevice::ReadOnly));
+    EXPECT_EQ(bf.readAll(), QByteArray("new"));
+}
+
+TEST_F(HelpersTest, RenameToBackupMissingFile)
+{
+    QTemporaryDir tmp;
+    ASSERT_TRUE(tmp.isValid());
+    EXPECT_TRUE(renameToBackup(tmp.filePath("does_not_exist")).isEmpty());
+}
+
+// Tests for getLammpsLibName function
+
+TEST_F(HelpersTest, LammpsLibNameIsKnownPlatformName)
+{
+    // empty in linked mode; otherwise it must be one of the fixed
+    // per-platform names that the preferences reset deletes
+    const QString name = getLammpsLibName();
+    if (!name.isEmpty()) {
+        const QStringList known = {Cfg::LAMMPS_LIB_MACOS, Cfg::LAMMPS_LIB_WINDOWS,
+                                   Cfg::LAMMPS_LIB_LINUX};
+        EXPECT_TRUE(known.contains(name));
+    }
 }
 
 // Tests for isLightTheme function
@@ -251,17 +350,21 @@ TEST_F(HelpersTest, RestoreStdoutWhenNotSilenced)
     EXPECT_FALSE(isStdoutSilenced());
 }
 
-TEST_F(HelpersTest, SilenceStdoutIdempotent)
+TEST_F(HelpersTest, SilenceStdoutNested)
 {
-    // Silencing twice should not cause issues
+    // nested silence requests are counted, so stdout stays silenced until the
+    // outermost request is released (StdoutSilencer guards pair calls 1:1)
     silenceStdout();
     EXPECT_TRUE(isStdoutSilenced());
-    silenceStdout(); // second call should be a no-op
+    silenceStdout();
     EXPECT_TRUE(isStdoutSilenced());
 
-    restoreStdout();
+    restoreStdout(); // releases only the inner request
+    EXPECT_TRUE(isStdoutSilenced());
+    restoreStdout(); // releasing the outermost request restores stdout
     EXPECT_FALSE(isStdoutSilenced());
-    // restoring a second time should not make a difference
+
+    // restoring with no pending silence request is a safe no-op
     restoreStdout();
     EXPECT_FALSE(isStdoutSilenced());
 }
@@ -400,8 +503,7 @@ TEST_F(HelpersTest, DateCompareBothInvalid)
 
 TEST_F(HelpersTest, DateCompareWithUpdateSuffix)
 {
-    // LAMMPS dates can have "update N" suffix like "22 July 2025 update 2"
-    // dateCompare should handle the date part correctly
+    // dates with the same day-of-month but different months must compare by month
     QString date1 = "22 Jul 2025";
     QString date2 = "22 Aug 2025";
     EXPECT_EQ(dateCompare(date1, date2), -1);
@@ -411,27 +513,27 @@ TEST_F(HelpersTest, DateCompareWithUpdateSuffix)
 
 TEST_F(HelpersTest, SplitLineSingleWord)
 {
-    std::string input                 = "word";
-    auto result                       = splitLine(input);
-    std::vector<std::string> expected = {"word"};
+    QString input        = "word";
+    auto result          = splitLine(input);
+    QStringList expected = {"word"};
     EXPECT_EQ(result, expected);
 }
 
 TEST_F(HelpersTest, SplitLineHashComment)
 {
     // In LAMMPS, # starts a comment - splitLine should handle this
-    std::string input = "fix 1 all nve # this is a comment";
-    auto result       = splitLine(input);
+    QString input = "fix 1 all nve # this is a comment";
+    auto result   = splitLine(input);
     // After #, everything is ignored
-    EXPECT_GE(result.size(), 1u);
+    EXPECT_GE(result.size(), 1);
     EXPECT_EQ(result[0], "fix");
 }
 
 TEST_F(HelpersTest, SplitLineSpecialCharacters)
 {
-    std::string input = "pair_coeff * * 1.0 2.5";
-    auto result       = splitLine(input);
-    EXPECT_EQ(result.size(), 5u);
+    QString input = "pair_coeff * * 1.0 2.5";
+    auto result   = splitLine(input);
+    EXPECT_EQ(result.size(), 5);
     EXPECT_EQ(result[0], "pair_coeff");
     EXPECT_EQ(result[1], "*");
     EXPECT_EQ(result[2], "*");
@@ -452,4 +554,204 @@ TEST_F(HelpersTest, HasExeBash)
     // bash should exist on Linux/macOS
     EXPECT_TRUE(hasExe("bash"));
 #endif
+}
+
+// isImageFile recognizes images by extension (case-insensitive), including
+// ImageMagick-only formats; non-image / unknown extensions are rejected
+TEST_F(HelpersTest, IsImageFileByExtension)
+{
+    EXPECT_TRUE(isImageFile("snapshot.png"));
+    EXPECT_TRUE(isImageFile("/path/to/Render.JPEG"));
+    EXPECT_TRUE(isImageFile("dump.0.ppm"));
+    EXPECT_TRUE(isImageFile("frame.tga")); // ImageMagick-only
+    EXPECT_TRUE(isImageFile("a.tiff"));
+
+    EXPECT_FALSE(isImageFile("in.peptide"));
+    EXPECT_FALSE(isImageFile("log.lammps"));
+    EXPECT_FALSE(isImageFile("data.yaml"));
+    EXPECT_FALSE(isImageFile("noextension"));
+}
+
+TEST(QtMessageSilencer, CollectsWarningsInsteadOfPrintingThem)
+{
+    QString captured;
+    {
+        QtMessageSilencer silencer;
+        qWarning("first complaint");
+        qWarning("second complaint");
+        captured = silencer.messages();
+    }
+    // one message per line, in the order they were emitted. Note that qDebug()
+    // is not tested here: the default logging category drops debug output
+    // before it can reach any message handler.
+    EXPECT_EQ(captured, QString("first complaint\nsecond complaint"));
+}
+
+TEST(QtMessageSilencer, CollectsNothingWhenNothingIsEmitted)
+{
+    QtMessageSilencer silencer;
+    EXPECT_TRUE(silencer.messages().isEmpty());
+}
+
+TEST(QtMessageSilencer, RestoresThePreviousHandlerAndNests)
+{
+    {
+        QtMessageSilencer outer;
+        {
+            QtMessageSilencer inner;
+            qWarning("inner only");
+            EXPECT_EQ(inner.messages(), QString("inner only"));
+        }
+        // the inner guard swallowed its own message, not the outer one's
+        EXPECT_TRUE(outer.messages().isEmpty());
+        qWarning("outer only");
+        EXPECT_EQ(outer.messages(), QString("outer only"));
+    }
+    // after the outermost guard is gone, messages are no longer collected
+    QtMessageSilencer fresh;
+    EXPECT_TRUE(fresh.messages().isEmpty());
+}
+
+TEST(GrayscaleImage, RemovesColorAndPreservesAlpha)
+{
+    QImage img(2, 1, QImage::Format_ARGB32);
+    img.setPixel(0, 0, qRgba(255, 0, 0, 255)); // opaque red
+    img.setPixel(1, 0, qRgba(0, 255, 0, 64));  // translucent green
+    const QImage out = grayscaleImage(img);
+
+    for (int x = 0; x < 2; ++x) {
+        const QRgb px = out.pixel(x, 0);
+        EXPECT_EQ(qRed(px), qGreen(px));
+        EXPECT_EQ(qGreen(px), qBlue(px));
+    }
+    EXPECT_EQ(qAlpha(out.pixel(0, 0)), 255);
+    EXPECT_EQ(qAlpha(out.pixel(1, 0)), 64);
+}
+
+TEST(GrayscaleImage, FadesTowardsTheMidpoint)
+{
+    QImage img(2, 1, QImage::Format_ARGB32);
+    img.setPixel(0, 0, qRgba(0, 0, 0, 255));       // black
+    img.setPixel(1, 0, qRgba(255, 255, 255, 255)); // white
+    const QImage out = grayscaleImage(img);
+
+    const int dark  = qRed(out.pixel(0, 0));
+    const int light = qRed(out.pixel(1, 0));
+    // both ends move towards the midpoint, keeping only a fraction of the span
+    EXPECT_GT(dark, 0);
+    EXPECT_LT(light, 255);
+    EXPECT_LT(light - dark, 255 * Cfg::GRAYSCALE_CONTRAST + 1);
+    EXPECT_GT(light - dark, 255 * Cfg::GRAYSCALE_CONTRAST - 1);
+    // a desaturation-only conversion would have left the full black-to-white span
+    EXPECT_LT(light - dark, 200);
+}
+
+// Tests for viewerFitSize (deterministic viewer window auto-resize)
+
+TEST(ViewerFitSize, ContentFitsBudget)
+{
+    // content plus frame fits: natural size, no scroll bar allowance
+    EXPECT_EQ(viewerFitSize(QSize(400, 300), QSize(1000, 800), 2, 16), QSize(402, 302));
+}
+
+TEST(ViewerFitSize, ExactFitAddsNoScrollBarRoom)
+{
+    EXPECT_EQ(viewerFitSize(QSize(998, 798), QSize(1000, 800), 2, 16), QSize(1000, 800));
+}
+
+TEST(ViewerFitSize, WidthOverflowAddsHorizontalBarRoom)
+{
+    // width is clamped; the horizontal scroll bar consumes viewport height
+    EXPECT_EQ(viewerFitSize(QSize(2000, 300), QSize(1000, 800), 2, 16), QSize(1000, 318));
+}
+
+TEST(ViewerFitSize, HeightOverflowAddsVerticalBarRoom)
+{
+    // height is clamped; the vertical scroll bar consumes viewport width
+    EXPECT_EQ(viewerFitSize(QSize(400, 2000), QSize(1000, 800), 2, 16), QSize(418, 800));
+}
+
+TEST(ViewerFitSize, BothOverflowClampsToBudget)
+{
+    EXPECT_EQ(viewerFitSize(QSize(2000, 2000), QSize(1000, 800), 2, 16), QSize(1000, 800));
+}
+
+TEST(ViewerFitSize, ScrollBarRoomStaysWithinBudget)
+{
+    // the extra scroll bar room must not push the other axis past its budget
+    EXPECT_EQ(viewerFitSize(QSize(2000, 790), QSize(1000, 800), 2, 16), QSize(1000, 800));
+}
+
+TEST(ViewerFitSize, NegativeBudgetClampsToZero)
+{
+    // tiny screens can make the budget negative; never return a negative size
+    EXPECT_EQ(viewerFitSize(QSize(400, 300), QSize(-10, -5), 2, 16), QSize(0, 0));
+}
+
+// Tests for defaultFileStem function
+
+TEST(DefaultFileStem, LeadingInPrefix)
+{
+    EXPECT_EQ(defaultFileStem("in.melt"), QString("melt"));
+}
+
+TEST(DefaultFileStem, TrailingInputExtensions)
+{
+    EXPECT_EQ(defaultFileStem("melt.lmp"), QString("melt"));
+    EXPECT_EQ(defaultFileStem("melt.txt"), QString("melt"));
+    EXPECT_EQ(defaultFileStem("melt.lmp.txt"), QString("melt"));
+    EXPECT_EQ(defaultFileStem("in.melt.lmp"), QString("melt"));
+}
+
+TEST(DefaultFileStem, EverythingElseRemains)
+{
+    EXPECT_EQ(defaultFileStem("melt"), QString("melt"));
+    EXPECT_EQ(defaultFileStem("melt-2d"), QString("melt-2d"));
+    EXPECT_EQ(defaultFileStem("melt.2d"), QString("melt.2d"));
+    EXPECT_EQ(defaultFileStem("melt.data"), QString("melt.data"));
+    EXPECT_EQ(defaultFileStem("in.melt (ACF)"), QString("melt (ACF)"));
+}
+
+TEST(DefaultFileStem, StripsDirectoryPart)
+{
+    EXPECT_EQ(defaultFileStem("/some/path/in.melt"), QString("melt"));
+    EXPECT_EQ(defaultFileStem("path/to/melt.lmp"), QString("melt"));
+}
+
+TEST(DefaultFileStem, KnownDerivedExtensions)
+{
+    // data, log, restart, image, and movie files fed to the viewers
+    EXPECT_EQ(defaultFileStem("thermo.csv"), QString("thermo"));
+    EXPECT_EQ(defaultFileStem("thermo.dat"), QString("thermo"));
+    EXPECT_EQ(defaultFileStem("thermo.yaml"), QString("thermo"));
+    EXPECT_EQ(defaultFileStem("melt.log"), QString("melt"));
+    EXPECT_EQ(defaultFileStem("melt.restart"), QString("melt"));
+    EXPECT_EQ(defaultFileStem("snap.png"), QString("snap"));
+    EXPECT_EQ(defaultFileStem("movie.mp4"), QString("movie"));
+    EXPECT_EQ(defaultFileStem("MELT.LMP"), QString("MELT"));
+}
+
+TEST(DefaultFileStem, EmptyFallsBackToLammps)
+{
+    EXPECT_EQ(defaultFileStem(""), QString("lammps"));
+    EXPECT_EQ(defaultFileStem("in."), QString("lammps"));
+}
+
+// Tests for ensureFileSuffix function
+
+TEST(EnsureFileSuffix, AppendsWhenMissing)
+{
+    EXPECT_EQ(ensureFileSuffix("melt", "log"), QString("melt.log"));
+    EXPECT_EQ(ensureFileSuffix("/some/path/melt", "png"), QString("/some/path/melt.png"));
+}
+
+TEST(EnsureFileSuffix, KeepsExistingSuffix)
+{
+    EXPECT_EQ(ensureFileSuffix("melt.out", "log"), QString("melt.out"));
+    EXPECT_EQ(ensureFileSuffix("in.melt", "lmp"), QString("in.melt"));
+}
+
+TEST(EnsureFileSuffix, EmptyStaysEmpty)
+{
+    EXPECT_EQ(ensureFileSuffix("", "log"), QString(""));
 }

@@ -19,13 +19,14 @@
 #include <QIcon>
 #include <QLineEdit>
 
-TutorialWizard::TutorialWizard(int _ntutorial, LammpsGui *_lammpsgui, QWidget *parent) :
-    QWizard(parent), ntutorial(_ntutorial), lammpsgui(_lammpsgui)
+TutorialWizard::TutorialWizard(int _collection, int _ntutorial, LammpsGui *_lammpsgui,
+                               QWidget *parent) :
+    QWizard(parent), collection(_collection), ntutorial(_ntutorial), lammpsgui(_lammpsgui)
 {
     setWindowIcon(QIcon(":/icons/tutorial-logo.png"));
 }
 
-// actions to perform when the wizard for tutorial 1 is complete
+// actions to perform when the wizard for a tutorial is complete
 // and the user has clicked on "Finish"
 
 void TutorialWizard::accept()
@@ -64,7 +65,8 @@ void TutorialWizard::accept()
     // tell main widget to set up the tutorial
     if (dirname) {
         if (lammpsgui)
-            lammpsgui->setupTutorial(ntutorial, curdir, purgedir, getsolution, openwebpage);
+            lammpsgui->setupTutorial(collection, ntutorial, curdir, purgedir, getsolution,
+                                     openwebpage);
     }
 }
 

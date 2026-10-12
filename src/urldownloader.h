@@ -12,9 +12,12 @@
 #ifndef URLDOWNLOADER_H
 #define URLDOWNLOADER_H
 
+#include <QByteArray>
+#include <QPointer>
 #include <QString>
 
 class QNetworkAccessManager;
+class QNetworkReply;
 class QWidget;
 
 /**
@@ -52,23 +55,22 @@ public:
      * HTTPS proxy setting.  Optionally display a dialog with the downloaded
      * URL and the location of the downloaded file.
      *
+     * When a SHA256SUMS file is available in the same remote directory, the
+     * checksum of the downloaded data is verified *before* it replaces an
+     * existing file, so a corrupted download never clobbers a working file.
+     *
      * @param url   The HTTPS URL to download from
      * @param file  The local file path to write to
      * @param showDialog  Display a dialog with the downloaded URL and target file location while
      * downloading
+     * @param keepBackup  Rename an existing target file to a backup name instead of replacing
+     * it in place; required to update a shared library that is currently loaded on Windows,
+     * where a loaded library can be renamed but not deleted or overwritten.  The caller is
+     * responsible for removing the backup file eventually (LAMMPS-GUI does this at launch).
      * @return true if the download completed successfully, false otherwise
      */
-    bool download(const QString &url, const QString &file, bool showDialog = false);
-
-    /**
-     * @brief Check if a website can be accessed over the network
-     *
-     * Attempts an HTTP HEAD request to www.lammps.org to verify that the
-     * network is reachable.
-     *
-     * @return true if the site can be reached, false otherwise
-     */
-    bool checkNetwork();
+    bool download(const QString &url, const QString &file, bool showDialog = false,
+                  bool keepBackup = false);
 
     /**
      * @brief Return the last error message
@@ -77,15 +79,17 @@ public:
     QString errorString() const { return lastError; }
 
     /**
-     * @brief Fetch raw content from a given HTTPS URL
+     * @brief Abort the current download and any further ones on this instance
      *
-     * Performs a synchronous (blocking) GET request to the given URL and
-     * returns the response body as a QByteArray.
-     *
-     * @param url  The HTTPS URL to fetch from
-     * @return     Response body or empty QByteArray on error
+     * Safe to call from a slot triggered while download() blocks in its event
+     * loop (e.g. the Cancel button of a progress dialog).  The in-flight
+     * request is aborted and all subsequent download() calls on this instance
+     * fail immediately, so one cancellation stops a whole batch of downloads.
      */
-    QByteArray fetchRawContent(const QString &url);
+    void abort();
+
+    /** @brief Return whether the download was canceled via abort() */
+    bool wasAborted() const { return aborted; }
 
     /**
      * @brief Return the remote SHA-256 checksum for a given URL
@@ -108,11 +112,25 @@ public:
 
 private:
     void configureProxy();
-    bool verifyChecksum(const QString &url, const QString &file);
+    bool verifyChecksum(const QString &url, const QByteArray &data);
 
-    QNetworkAccessManager *manager; ///< Qt network access manager
-    QWidget *parentWidget;          ///< Parent widget for dialogs
-    QString lastError;              ///< Last error message
+    /**
+     * @brief Fetch raw content from a given HTTPS URL
+     *
+     * Performs a synchronous (blocking) GET request to the given URL and
+     * returns the response body as a QByteArray. Used by getRemoteChecksum().
+     *
+     * @param url  The HTTPS URL to fetch from
+     * @return     Response body or empty QByteArray on error
+     */
+    QByteArray fetchRawContent(const QString &url);
+
+    QNetworkAccessManager *manager;       ///< Qt network access manager
+    QWidget *parentWidget;                ///< Parent widget for dialogs
+    QString lastError;                    ///< Last error message
+    QPointer<QNetworkReply> currentReply; ///< In-flight request, for abort()
+    bool aborted     = false;             ///< Set by abort(); never reset
+    int stallTimeout = 0;                 ///< Stall timeout in seconds, from the preferences
 };
 
 #endif // URLDOWNLOADER_H

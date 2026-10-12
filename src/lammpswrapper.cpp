@@ -21,6 +21,22 @@
 #endif
 
 #include <cstdio>
+#include <cstring>
+
+#include <QFile>
+
+#if defined(LAMMPS_GUI_USE_PLUGIN) && defined(Q_OS_LINUX)
+#include <elf.h>
+#endif
+
+// Dispatch a LAMMPS C-library function by its base name.  In plugin mode this
+// resolves to the dynamically loaded function table; in linked mode to the
+// matching lammps_* symbol.  Usage: LMPFN(version)(lammps_handle).
+#if defined(LAMMPS_GUI_USE_PLUGIN)
+#define LMPFN(fn) (((liblammpsplugin_t *)plugin_handle)->fn)
+#else
+#define LMPFN(fn) (lammps_##fn)
+#endif
 
 LammpsWrapper::LammpsWrapper() : lammps_handle(nullptr)
 {
@@ -29,26 +45,26 @@ LammpsWrapper::LammpsWrapper() : lammps_handle(nullptr)
 #endif
 }
 
+LammpsWrapper::~LammpsWrapper()
+{
+#if defined(LAMMPS_GUI_USE_PLUGIN)
+    liblammpsplugin_release(static_cast<liblammpsplugin_t *>(plugin_handle));
+    plugin_handle = nullptr;
+#endif
+}
+
 void LammpsWrapper::open(int narg, char **args)
 {
     // since there may only be one LAMMPS instance in LAMMPS-GUI we don't open a second one
     if (lammps_handle) return;
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    lammps_handle = ((liblammpsplugin_t *)plugin_handle)->open_no_mpi(narg, args, nullptr);
-#else
-    lammps_handle = lammps_open_no_mpi(narg, args, nullptr);
-#endif
+    lammps_handle = LMPFN(open_no_mpi)(narg, args, nullptr);
 }
 
 int LammpsWrapper::version()
 {
     int val = 0;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->version(lammps_handle);
-#else
-        val = lammps_version(lammps_handle);
-#endif
+        val = LMPFN(version)(lammps_handle);
     }
     return val;
 }
@@ -57,11 +73,7 @@ int LammpsWrapper::extractSetting(const char *keyword)
 {
     int val = 0;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->extract_setting(lammps_handle, keyword);
-#else
-        val = lammps_extract_setting(lammps_handle, keyword);
-#endif
+        val = LMPFN(extract_setting)(lammps_handle, keyword);
     }
     return val;
 }
@@ -69,11 +81,9 @@ int LammpsWrapper::extractSetting(const char *keyword)
 void *LammpsWrapper::extractGlobal(const char *keyword)
 {
     void *val = nullptr;
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    val = ((liblammpsplugin_t *)plugin_handle)->extract_global(lammps_handle, keyword);
-#else
-    val = lammps_extract_global(lammps_handle, keyword);
-#endif
+    if (lammps_handle) {
+        val = LMPFN(extract_global)(lammps_handle, keyword);
+    }
     return val;
 }
 
@@ -81,11 +91,7 @@ void *LammpsWrapper::extractPair(const char *keyword)
 {
     void *val = nullptr;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->extract_pair(lammps_handle, keyword);
-#else
-        val = lammps_extract_pair(lammps_handle, keyword);
-#endif
+        val = LMPFN(extract_pair)(lammps_handle, keyword);
     }
     return val;
 }
@@ -94,16 +100,12 @@ void *LammpsWrapper::extractAtom(const char *keyword)
 {
     void *val = nullptr;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->extract_atom(lammps_handle, keyword);
-#else
-        val = lammps_extract_atom(lammps_handle, keyword);
-#endif
+        val = LMPFN(extract_atom)(lammps_handle, keyword);
     }
     return val;
 }
 
-void *LammpsWrapper::extractCompute(const char *id, int style, int type)
+void *LammpsWrapper::extractCompute(const QString &id, int style, int type)
 {
     int mystyle = -1;
     int mytype  = -1;
@@ -144,17 +146,12 @@ void *LammpsWrapper::extractCompute(const char *id, int style, int type)
     }
 
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        return ((liblammpsplugin_t *)plugin_handle)
-            ->extract_compute(lammps_handle, id, mystyle, mytype);
-#else
-        return lammps_extract_compute(lammps_handle, id, mystyle, mytype);
-#endif
+        return LMPFN(extract_compute)(lammps_handle, id.toLocal8Bit(), mystyle, mytype);
     }
     return nullptr;
 }
 
-void *LammpsWrapper::extractFix(const char *id, int style, int type, int nrow, int ncol)
+void *LammpsWrapper::extractFix(const QString &id, int style, int type, int nrow, int ncol)
 {
     int mystyle = -1;
     int mytype  = -1;
@@ -195,40 +192,26 @@ void *LammpsWrapper::extractFix(const char *id, int style, int type, int nrow, i
     }
 
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        return ((liblammpsplugin_t *)plugin_handle)
-            ->extract_fix(lammps_handle, id, mystyle, mytype, nrow, ncol);
-#else
-        return lammps_extract_fix(lammps_handle, id, mystyle, mytype, nrow, ncol);
-#endif
+        return LMPFN(extract_fix)(lammps_handle, id.toLocal8Bit(), mystyle, mytype, nrow, ncol);
     }
     return nullptr;
 }
 
-int LammpsWrapper::extractVariableDatatype(const char *keyword)
+int LammpsWrapper::extractVariableDatatype(const QString &keyword)
 {
     int type = -1;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        type =
-            ((liblammpsplugin_t *)plugin_handle)->extract_variable_datatype(lammps_handle, keyword);
-#else
-        type = lammps_extract_variable_datatype(lammps_handle, keyword);
-#endif
+        type = LMPFN(extract_variable_datatype)(lammps_handle, keyword.toLocal8Bit());
     }
     switch (type) {
         case LMP_VAR_EQUAL:
             return EQUAL_STYLE;
-            break;
         case LMP_VAR_ATOM:
             return ATOM_STYLE;
-            break;
         case LMP_VAR_VECTOR:
             return VECTOR_STYLE;
-            break;
         case LMP_VAR_STRING:
             return STRING_STYLE;
-            break;
         default:
             type = -1;
             break;
@@ -241,19 +224,10 @@ double LammpsWrapper::extractVariable(const char *keyword)
 {
     void *ptr = nullptr;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        ptr =
-            ((liblammpsplugin_t *)plugin_handle)->extract_variable(lammps_handle, keyword, nullptr);
-#else
-        ptr = lammps_extract_variable(lammps_handle, keyword, nullptr);
-#endif
+        ptr = LMPFN(extract_variable)(lammps_handle, keyword, nullptr);
     }
-    double val = (ptr) ? *((double *)ptr) : 0.0;
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    ((liblammpsplugin_t *)plugin_handle)->free(ptr);
-#else
-    lammps_free(ptr);
-#endif
+    double val = (ptr) ? *(static_cast<double *>(ptr)) : 0.0;
+    LMPFN(free)(ptr);
     return val;
 }
 
@@ -261,11 +235,7 @@ int LammpsWrapper::idCount(const char *idtype)
 {
     int val = 0;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->id_count(lammps_handle, idtype);
-#else
-        val = lammps_id_count(lammps_handle, idtype);
-#endif
+        val = LMPFN(id_count)(lammps_handle, idtype);
     }
     return val;
 }
@@ -274,11 +244,7 @@ int LammpsWrapper::hasId(const char *idtype, const char *id)
 {
     int val = 0;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->has_id(lammps_handle, idtype, id);
-#else
-        val = lammps_has_id(lammps_handle, idtype, id);
-#endif
+        val = LMPFN(has_id)(lammps_handle, idtype, id);
     }
     return val;
 }
@@ -287,24 +253,23 @@ int LammpsWrapper::idName(const char *keyword, int idx, char *buf, int len)
 {
     int val = 0;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->id_name(lammps_handle, keyword, idx, buf, len);
-#else
-        val = lammps_id_name(lammps_handle, keyword, idx, buf, len);
-#endif
+        val = LMPFN(id_name)(lammps_handle, keyword, idx, buf, len);
     }
     return val;
+}
+
+QString LammpsWrapper::idName(const char *keyword, int idx)
+{
+    char buf[Cfg::DEFAULT_BUFLEN];
+    if (idName(keyword, idx, buf, Cfg::DEFAULT_BUFLEN)) return QString::fromLocal8Bit(buf);
+    return {};
 }
 
 int LammpsWrapper::styleCount(const char *keyword)
 {
     int val = 0;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->style_count(lammps_handle, keyword);
-#else
-        val = lammps_style_count(lammps_handle, keyword);
-#endif
+        val = LMPFN(style_count)(lammps_handle, keyword);
     }
     return val;
 }
@@ -313,38 +278,39 @@ int LammpsWrapper::styleName(const char *keyword, int idx, char *buf, int len)
 {
     int val = 0;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val =
-            ((liblammpsplugin_t *)plugin_handle)->style_name(lammps_handle, keyword, idx, buf, len);
-#else
-        val = lammps_style_name(lammps_handle, keyword, idx, buf, len);
-#endif
+        val = LMPFN(style_name)(lammps_handle, keyword, idx, buf, len);
     }
     return val;
+}
+
+QString LammpsWrapper::styleName(const char *keyword, int idx)
+{
+    char buf[Cfg::DEFAULT_BUFLEN];
+    if (styleName(keyword, idx, buf, Cfg::DEFAULT_BUFLEN)) return QString::fromLocal8Bit(buf);
+    return {};
 }
 
 int LammpsWrapper::variableInfo(int idx, char *buf, int len)
 {
     int val = 0;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->variable_info(lammps_handle, idx, buf, len);
-#else
-        val = lammps_variable_info(lammps_handle, idx, buf, len);
-#endif
+        val = LMPFN(variable_info)(lammps_handle, idx, buf, len);
     }
     return val;
+}
+
+QString LammpsWrapper::variableInfo(int idx)
+{
+    char buf[Cfg::DEFAULT_BUFLEN];
+    if (variableInfo(idx, buf, Cfg::DEFAULT_BUFLEN)) return QString::fromLocal8Bit(buf);
+    return {};
 }
 
 double LammpsWrapper::getThermo(const char *keyword)
 {
     double val = 0.0;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->get_thermo(lammps_handle, keyword);
-#else
-        val = lammps_get_thermo(lammps_handle, keyword);
-#endif
+        val = LMPFN(get_thermo)(lammps_handle, keyword);
     }
     return val;
 }
@@ -353,11 +319,7 @@ void *LammpsWrapper::lastThermo(const char *keyword, int index)
 {
     void *ptr = nullptr;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        ptr = ((liblammpsplugin_t *)plugin_handle)->last_thermo(lammps_handle, keyword, index);
-#else
-        ptr = lammps_last_thermo(lammps_handle, keyword, index);
-#endif
+        ptr = LMPFN(last_thermo)(lammps_handle, keyword, index);
     }
     return ptr;
 }
@@ -366,83 +328,55 @@ bool LammpsWrapper::isRunning()
 {
     int val = 0;
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        val = ((liblammpsplugin_t *)plugin_handle)->is_running(lammps_handle);
-#else
-        val = lammps_is_running(lammps_handle);
-#endif
+        val = LMPFN(is_running)(lammps_handle);
     }
     return val != 0;
 }
 
-void LammpsWrapper::command(const char *input)
+void LammpsWrapper::command(const QString &input)
 {
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        ((liblammpsplugin_t *)plugin_handle)->command(lammps_handle, input);
-#else
-        lammps_command(lammps_handle, input);
-#endif
+        LMPFN(command)(lammps_handle, input.toLocal8Bit());
     }
 }
 
-void LammpsWrapper::file(const char *filename)
+void LammpsWrapper::file(const QString &filename)
 {
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        ((liblammpsplugin_t *)plugin_handle)->file(lammps_handle, filename);
-#else
-        lammps_file(lammps_handle, filename);
-#endif
+        LMPFN(file)(lammps_handle, filename.toLocal8Bit());
     }
 }
 
-void LammpsWrapper::commandsString(const char *input)
+void LammpsWrapper::commandsString(const QString &input)
 {
     if (lammps_handle) {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-        ((liblammpsplugin_t *)plugin_handle)->commands_string(lammps_handle, input);
-#else
-        lammps_commands_string(lammps_handle, input);
-#endif
+        LMPFN(commands_string)(lammps_handle, input.toLocal8Bit());
     }
 }
 
 // may be called with null handle. returns global error then.
 bool LammpsWrapper::hasError() const
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    return ((liblammpsplugin_t *)plugin_handle)->has_error(lammps_handle) != 0;
-#else
-    return lammps_has_error(lammps_handle) != 0;
-#endif
+    return LMPFN(has_error)(lammps_handle) != 0;
 }
 
 // may be called with null handle. returns global error then.
 int LammpsWrapper::getLastErrorMessage(char *buf, int buflen)
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    return ((liblammpsplugin_t *)plugin_handle)->get_last_error_message(lammps_handle, buf, buflen);
-#else
-    return lammps_get_last_error_message(lammps_handle, buf, buflen);
-#endif
+    return LMPFN(get_last_error_message)(lammps_handle, buf, buflen);
 }
 
 QString LammpsWrapper::lastErrorMessage()
 {
     if (!hasError()) return {};
-    char buf[GuiConstants::DEFAULT_BUFLEN];
-    getLastErrorMessage(buf, GuiConstants::DEFAULT_BUFLEN);
+    char buf[Cfg::DEFAULT_BUFLEN];
+    getLastErrorMessage(buf, Cfg::DEFAULT_BUFLEN);
     return QString::fromLocal8Bit(buf);
 }
 
 void LammpsWrapper::forceTimeout()
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    if (lammps_handle) ((liblammpsplugin_t *)plugin_handle)->force_timeout(lammps_handle);
-#else
-    if (lammps_handle) lammps_force_timeout(lammps_handle);
-#endif
+    if (lammps_handle) LMPFN(force_timeout)(lammps_handle);
 }
 
 void LammpsWrapper::close()
@@ -457,88 +391,54 @@ void LammpsWrapper::close()
 
 void LammpsWrapper::finalize()
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
     if (lammps_handle) {
-        auto *lammps = (liblammpsplugin_t *)plugin_handle;
-        lammps->close(lammps_handle);
-        lammps->mpi_finalize();
-        lammps->kokkos_finalize();
-        lammps->python_finalize();
+        LMPFN(close)(lammps_handle);
+        LMPFN(mpi_finalize)();
+        LMPFN(kokkos_finalize)();
+        LMPFN(python_finalize)();
+        // otherwise isOpen() reports an instance that no longer exists and a
+        // later close() would close the stale handle a second time
+        lammps_handle = nullptr;
     }
-#else
-    if (lammps_handle) {
-        lammps_close(lammps_handle);
-        lammps_mpi_finalize();
-        lammps_kokkos_finalize();
-        lammps_python_finalize();
-    }
-#endif
 }
 
 bool LammpsWrapper::configHasPackage(const char *package) const
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    return ((liblammpsplugin_t *)plugin_handle)->config_has_package(package) != 0;
-#else
-    return lammps_config_has_package(package) != 0;
-#endif
+    return LMPFN(config_has_package)(package) != 0;
 }
 
 bool LammpsWrapper::configAccelerator(const char *package, const char *category,
                                       const char *setting) const
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    return ((liblammpsplugin_t *)plugin_handle)->config_accelerator(package, category, setting) !=
-           0;
-#else
-    return lammps_config_accelerator(package, category, setting) != 0;
-#endif
+    return LMPFN(config_accelerator)(package, category, setting) != 0;
 }
 
 bool LammpsWrapper::configHasCurlSupport() const
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    return ((liblammpsplugin_t *)plugin_handle)->config_has_curl_support() != 0;
-#else
-    return lammps_config_has_curl_support() != 0;
-#endif
+    return LMPFN(config_has_curl_support)() != 0;
 }
 
 bool LammpsWrapper::configHasOmpSupport() const
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    return ((liblammpsplugin_t *)plugin_handle)->config_has_omp_support() != 0;
-#else
-    return lammps_config_has_omp_support() != 0;
-#endif
+    return LMPFN(config_has_omp_support)() != 0;
 }
 
 bool LammpsWrapper::configHasPngSupport() const
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    return ((liblammpsplugin_t *)plugin_handle)->config_has_png_support() != 0;
-#else
-    return lammps_config_has_png_support() != 0;
-#endif
+    return LMPFN(config_has_png_support)() != 0;
 }
 
 bool LammpsWrapper::configHasJpegSupport() const
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    return ((liblammpsplugin_t *)plugin_handle)->config_has_jpeg_support() != 0;
-#else
-    return lammps_config_has_jpeg_support() != 0;
-#endif
+    return LMPFN(config_has_jpeg_support)() != 0;
 }
 
 bool LammpsWrapper::hasGpuDevice() const
 {
-#if defined(LAMMPS_GUI_USE_PLUGIN)
-    return ((liblammpsplugin_t *)plugin_handle)->has_gpu_device() != 0;
-#else
-    return lammps_has_gpu_device() != 0;
-#endif
+    return LMPFN(has_gpu_device)() != 0;
 }
+
+#undef LMPFN
 
 #if defined(LAMMPS_GUI_USE_PLUGIN)
 bool LammpsWrapper::hasPlugin() const
@@ -546,31 +446,99 @@ bool LammpsWrapper::hasPlugin() const
     return true;
 }
 
-bool LammpsWrapper::loadLib(const char *libfile)
+// Detect an obviously truncated or corrupt ELF shared object before it is
+// handed to dlopen().  A partial file -- for example from an interrupted
+// download -- makes the dynamic linker dereference relocation data past the end
+// of the file and crash the entire process instead of failing cleanly.  The
+// check is deliberately fail-safe: it returns true only on positive evidence of
+// truncation and otherwise lets the loader proceed.
+static bool pluginFileLooksTruncated(const QString &libfile)
 {
-    if (plugin_handle) {
-        close();
-        liblammpsplugin_release((liblammpsplugin_t *)plugin_handle);
-    }
-    plugin_handle = liblammpsplugin_load(libfile);
-    if (!plugin_handle) return false;
-    liblammpsplugin_t *lmp = (liblammpsplugin_t *)plugin_handle;
+#if defined(Q_OS_LINUX)
+    QFile f(libfile);
+    if (!f.open(QIODevice::ReadOnly)) return false;
+    const qint64 filesize = f.size();
 
-    // check if ABI matches
-    if (lmp->abiversion != LAMMPSPLUGIN_ABI_VERSION) {
-        liblammpsplugin_release(lmp);
-        plugin_handle = nullptr;
-        fprintf(stderr, "LAMMPS library file %s rejected.\nIncompatible ABI: %d vs %d\n", libfile,
-                lmp->abiversion, LAMMPSPLUGIN_ABI_VERSION);
+    Elf64_Ehdr ehdr;
+    if (f.read(reinterpret_cast<char *>(&ehdr), sizeof(ehdr)) != sizeof(ehdr)) return false;
+
+    // only validate native 64-bit little-endian ELF objects; anything else the
+    // dynamic loader rejects on its own without crashing
+    if (memcmp(ehdr.e_ident, ELFMAG, SELFMAG) != 0) return false;
+    if ((ehdr.e_ident[EI_CLASS] != ELFCLASS64) || (ehdr.e_ident[EI_DATA] != ELFDATA2LSB))
+        return false;
+
+    // the section header table is conventionally at the very end of the file, so
+    // a table that runs past EOF is a reliable indication of truncation
+    if (ehdr.e_shoff != 0) {
+        const qint64 shend = static_cast<qint64>(ehdr.e_shoff) +
+                             static_cast<qint64>(ehdr.e_shnum) * ehdr.e_shentsize;
+        if (shend > filesize) return true;
+    }
+
+    // every loadable segment must lie entirely within the file
+    if ((ehdr.e_phoff != 0) && (ehdr.e_phnum > 0)) {
+        const qint64 phend = static_cast<qint64>(ehdr.e_phoff) +
+                             static_cast<qint64>(ehdr.e_phnum) * ehdr.e_phentsize;
+        if (phend > filesize) return true;
+        if (!f.seek(ehdr.e_phoff)) return false;
+        for (unsigned i = 0; i < ehdr.e_phnum; ++i) {
+            Elf64_Phdr phdr;
+            if (f.read(reinterpret_cast<char *>(&phdr), sizeof(phdr)) != sizeof(phdr)) return true;
+            if (phdr.p_type != PT_LOAD) continue;
+            const qint64 segend =
+                static_cast<qint64>(phdr.p_offset) + static_cast<qint64>(phdr.p_filesz);
+            if (segend > filesize) return true;
+        }
+    }
+    return false;
+#else
+    Q_UNUSED(libfile);
+    return false;
+#endif
+}
+
+bool LammpsWrapper::loadLib(const QString &libfile)
+{
+    // reject an obviously truncated or corrupt library up front; handing such a
+    // file to dlopen() would crash the process inside the dynamic linker
+    if (pluginFileLooksTruncated(libfile)) {
+        fprintf(stderr,
+                "LAMMPS library file %s rejected.\n"
+                "The file appears truncated or corrupted (e.g. from an incomplete "
+                "download). Please remove it and install the library again.\n",
+                libfile.toLocal8Bit().constData());
         return false;
     }
 
-    // check if all required recently added library functions are present
-#define CHECKSYM(symbol)                                                                   \
-    if (lmp->symbol == NULL) {                                                             \
-        fprintf(stderr, "LAMMPS library file %s is missing lammps_%s function\n", libfile, \
-                #symbol);                                                                  \
-        return false;                                                                      \
+    if (plugin_handle) {
+        close();
+        liblammpsplugin_release(static_cast<liblammpsplugin_t *>(plugin_handle));
+    }
+    plugin_handle = liblammpsplugin_load(libfile.toLocal8Bit());
+    if (!plugin_handle) return false;
+    auto *lmp = static_cast<liblammpsplugin_t *>(plugin_handle);
+
+    // check if ABI matches
+    if (lmp->abiversion != LAMMPSPLUGIN_ABI_VERSION) {
+        // cache the ABI version before releasing lmp; the release frees it
+        const int abiversion = lmp->abiversion;
+        liblammpsplugin_release(lmp);
+        plugin_handle = nullptr;
+        fprintf(stderr, "LAMMPS library file %s rejected.\nIncompatible ABI: %d vs %d\n",
+                libfile.toLocal8Bit().constData(), abiversion, LAMMPSPLUGIN_ABI_VERSION);
+        return false;
+    }
+
+    // check if all required recently added library functions are present; on
+    // failure unload the library again so no unusable handle stays behind
+#define CHECKSYM(symbol)                                                          \
+    if (lmp->symbol == NULL) {                                                    \
+        fprintf(stderr, "LAMMPS library file %s is missing lammps_%s function\n", \
+                libfile.toLocal8Bit().constData(), #symbol);                      \
+        liblammpsplugin_release(lmp);                                             \
+        plugin_handle = nullptr;                                                  \
+        return false;                                                             \
     }
 
     CHECKSYM(get_thermo);
@@ -581,13 +549,17 @@ bool LammpsWrapper::loadLib(const char *libfile)
 
     // check minimum required version
     QString lmpversion;
-    auto *ptr = (const char *)lmp->extract_global(nullptr, "lammps_version");
+    auto *ptr = static_cast<const char *>(lmp->extract_global(nullptr, "lammps_version"));
     if (ptr) lmpversion = ptr;
 
     // found a suitable version
-    if (!lmpversion.isEmpty() &&
-        (dateCompare(lmpversion, GuiConstants::MIN_LAMMPS_VERSION_STR) >= 0))
+    if (!lmpversion.isEmpty() && (dateCompare(lmpversion, Cfg::MIN_LAMMPS_VERSION_STR) >= 0))
         return true;
+
+    // the library loads but is too old: unload it again for consistency with
+    // the other failure paths
+    liblammpsplugin_release(lmp);
+    plugin_handle = nullptr;
     return false;
 }
 #else
@@ -596,7 +568,7 @@ bool LammpsWrapper::hasPlugin() const
     return false;
 }
 
-bool LammpsWrapper::loadLib(const char *)
+bool LammpsWrapper::loadLib(const QString &)
 {
     return true;
 }

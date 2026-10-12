@@ -1,2 +1,6 @@
-paths:
- - src
+# paths / paths-ignore are intentionally omitted: CodeQL ignores them for
+# compiled languages that are built (this workflow compiles via CMake), so they
+# cannot scope analysis to src/ or exclude thirdparty/, plugin/, and generated
+# build artifacts. Those alerts are dismissed in the code-scanning UI instead.
+queries:
+ - uses: security-and-quality

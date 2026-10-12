@@ -18,7 +18,7 @@
 
 namespace {
 // clang-format off
-QStringList imagecolors = {
+const QStringList imagecolors = {
     "aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black",
     "blanchedalmond", "blue", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse",
     "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue", "darkcyan",
@@ -44,6 +44,11 @@ QStringList imagecolors = {
 // clang-format on
 } // namespace
 
+const QStringList &lammpsImageColors()
+{
+    return imagecolors;
+}
+
 QHline::QHline(QWidget *parent) : QFrame(parent)
 {
     setGeometry(QRect(0, 0, 100, 3));
@@ -65,7 +70,7 @@ QValidator::State QColorValidator::validate(QString &input, int &) const
     QString match;
 
     // find if input string is contained in list of colors
-    for (auto color : imagecolors) {
+    for (const auto &color : imagecolors) {
         if (color.startsWith(input)) {
             match = color;
             break;

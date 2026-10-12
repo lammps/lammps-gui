@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 48 48"
+   width="48"
+   height="48"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="process-stop.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs6" />
+  <sodipodi:namedview
+     id="namedview6"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="10"
+     inkscape:cx="24"
+     inkscape:cy="24"
+     inkscape:window-width="1087"
+     inkscape:window-height="1045"
+     inkscape:window-x="1341"
+     inkscape:window-y="163"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g5" />
+  <g
+     transform="matrix(1.3048 0 0 1.3048 -7.315 -7.315)"
+     id="g6">
+    <defs
+       id="defs4">
+      <filter
+         id="sh"
+         x="-0.095180721"
+         y="-0.095180721"
+         width="1.2054217"
+         height="1.223494">
+        <feGaussianBlur
+           in="SourceAlpha"
+           stdDeviation="0.9"
+           id="feGaussianBlur1" />
+        <feOffset
+           dx="0.5"
+           dy="1.1"
+           result="offsetblur"
+           id="feOffset1" />
+        <feFlood
+           flood-color="#000"
+           flood-opacity="0.38"
+           id="feFlood1" />
+        <feComposite
+           in2="offsetblur"
+           operator="in"
+           id="feComposite1" />
+        <feMerge
+           id="feMerge2">
+          <feMergeNode
+             id="feMergeNode1" />
+          <feMergeNode
+             in="SourceGraphic"
+             id="feMergeNode2" />
+        </feMerge>
+      </filter>
+      <linearGradient
+         id="ps"
+         x1="0"
+         y1="8"
+         x2="0"
+         y2="40"
+         gradientUnits="userSpaceOnUse">
+        <stop
+           offset="0"
+           stop-color="#FFE7E2"
+           id="stop2" />
+        <stop
+           offset="0.5"
+           stop-color="#F0664A"
+           id="stop3" />
+        <stop
+           offset="1"
+           stop-color="#CC3A22"
+           id="stop4" />
+      </linearGradient>
+    </defs>
+    <g
+       filter="url(#sh)"
+       id="g5">
+      <path
+         d="M 40.6 30.9 L 30.9 40.6 L 17.1 40.6 L 7.4 30.9 L 7.4 17.1 L 17.1 7.4 L 30.9 7.4 L 40.6 17.1 Z"
+         fill="url(#ps)"
+         stroke="#7E2012"
+         stroke-width="2"
+         stroke-linejoin="round"
+         id="path4" />
+      <g
+         transform="matrix(0.82 0 0 1 4.32 0)"
+         id="g4">
+        <text
+           x="27.88187"
+           y="25.977375"
+           text-anchor="middle"
+           font-family="'DejaVu Sans'"
+           font-weight="bold"
+           font-size="15.0561px"
+           fill="#ffffff"
+           id="text4"
+           transform="scale(0.85774533,1.1658472)"
+           style="stroke-width:1.11527">STOP</text>
+        <ellipse
+           cx="18"
+           cy="14"
+           rx="8"
+           ry="4"
+           fill="#fff"
+           opacity="0.25"
+           id="ellipse4"
+           transform="matrix(1.2195122,0,0,1,-5.2682927,0)" />
+      </g>
+    </g>
+  </g>
+</svg>

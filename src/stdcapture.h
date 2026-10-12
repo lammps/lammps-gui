@@ -34,9 +34,9 @@ public:
     StdCapture &operator=(StdCapture &&)      = delete;
 
     /**
-     * @brief Destructor - restores stdout and frees buffers
+     * @brief Destructor - closes the capture pipe descriptors
      */
-    virtual ~StdCapture();
+    ~StdCapture();
 
     /**
      * @brief Start capturing stdout
@@ -69,18 +69,78 @@ public:
      */
     double getBufferUse() const;
 
+    /**
+     * @brief Whether stdout could be redirected at all
+     * @return true when captured output can reach the caller
+     *
+     * False means nothing the library writes can ever be shown, and
+     * @ref diagnostic() says why.  Worth asking: the failure is otherwise
+     * completely silent, because printf() reports success either way and the
+     * runtime simply drops the bytes.
+     */
+    bool isUsable() const { return m_usable; }
+
+    /**
+     * @brief Why capture is not available
+     * @return One line naming the step that failed, empty while capture works
+     */
+    const std::string &diagnostic() const { return m_diagnostic; }
+
+    /**
+     * @brief Bytes retrieved through getChunk() since the capture began
+     * @return Byte count; zero after a whole run means the output was lost
+     */
+    size_t totalRead() const { return m_totalread; }
+
+    /**
+     * @brief Decide which side lost the output of a run that captured nothing
+     * @return One line stating whether the redirect still worked at run end,
+     *         empty when there is no active, usable capture to probe
+     *
+     * Performs one more marker round trip while the capture is still active:
+     * a marker that comes back proves the redirect held for the whole run
+     * (the library's output went elsewhere), one that does not means stdout
+     * was re-pointed while the run was underway.  Call before endCapture();
+     * any real output drained alongside the marker is preserved and delivered
+     * through the following endCapture()/getCapture().
+     */
+    std::string probeRunEnd();
+
 private:
     /**
      * @brief Pipe file descriptors for capturing output
      */
     enum PIPES { READ, WRITE, PIPE_COUNT };
-    int m_pipe[PIPE_COUNT]; ///< Pipe file descriptors
-    int m_oldStdOut;        ///< Original stdout file descriptor
-    bool m_capturing;       ///< Flag indicating if capture is active
-    std::string m_captured; ///< Buffer for captured output
-    int maxread;            ///< Maximum bytes to read at once
+    // -1, not 0: a process without a console leaves the standard descriptors
+    // free, so 0 is one a pipe can legitimately be given.  Initialized here
+    // rather than in the constructor body, which has paths that return early.
+    int m_pipe[PIPE_COUNT] = {-1, -1}; ///< Pipe file descriptors
+    int m_oldStdOut;                   ///< Original stdout file descriptor
+    bool m_capturing;                  ///< Flag indicating if capture is active
+    std::string m_captured;            ///< Buffer for captured output
+    int maxread; ///< High-water mark of bytes read per chunk (for getBufferUse)
 
     std::vector<char> buf; ///< Internal read buffer
+
+    /// Build a diagnostic carrying the descriptor numbers behind it.
+    std::string describe(const char *what) const;
+
+    /// One non-blocking read of the pipe into the buffer.  Returns the number
+    /// of bytes read, 0 when there was nothing, or what read() returns on an
+    /// error (-1, with errno set).  The one place for the platform difference:
+    /// on Windows the pipe cannot be made non-blocking, so it is only read
+    /// when it is known to hold data.
+    int readPipe();
+
+    /// Prove a freshly set up capture: write a marker through stdout, read it
+    /// back out of the pipe, and mark the capture unusable when it does not
+    /// return.  Runs from beginCapture(), before anything else writes.
+    void verifyCapture();
+
+    bool m_usable = false;       ///< stdout could be redirected into the pipe
+    std::string m_diagnostic;    ///< Why it could not, for reporting to the user
+    size_t m_totalread = 0;      ///< Bytes handed out via getChunk() this capture
+    std::string m_probeleftover; ///< Output drained by probeRunEnd() with its marker
 };
 
 #endif

@@ -46,6 +46,8 @@ document.  Clicking on the *Done* button will dismiss the dialog.
 
 ------
 
+.. _preferences:
+
 Preferences
 -----------
 
@@ -75,8 +77,8 @@ displayed within a tab.
 
 |guiprefs1|  |guiprefs2|  |guiprefs3|  |guiprefs4|  |guiprefs5|
 
-General Settings:
-^^^^^^^^^^^^^^^^^
+General Settings
+^^^^^^^^^^^^^^^^
 
 .. index:: general settings
 .. index:: preferences; general
@@ -85,9 +87,36 @@ General Settings:
 
    - **Echo input to output buffer:** when checked, all input commands,
      including variable expansions, are echoed to the :ref:`Output window
-     <logfile>`. This is equivalent to using ``-echo screen`` at the
+     <logfile>`. This is equivalent to using ``-echo screen`` on the
      command-line.  There is no log *file* produced by default, since
      LAMMPS-GUI uses ``-log none``.
+   - **Individual Windows** / **Combined Main Window:** selects how the
+     Output, Charts, Image, Slide Show, Variables, and Command window
+     views are presented.
+     With *Individual Windows* each of them is a window of its own, placed
+     and stacked freely.  With *Combined Main Window* they become panels
+     docked around the editor: the editor keeps the center, the Charts,
+     Image, and Slide Show views share a tabbed group on the right, and
+     the Output, Variables, and Command window views share a group across
+     the full width at the bottom.  The panels have fixed places and are not dragged around;
+     they are shown and hidden from the *View* menu, and the splitters
+     between them can be moved to change their proportions.  The windows
+     opened on demand join them rather than floating above: a text viewer,
+     an inspected data file or image, a slide show of image or movie files
+     opened with *View Image or Movie File(s)...*, and a plot made with
+     *Plot Data File...* all become further tabs of the group on the
+     right, and are closed from their own *File* menu.  A panel that
+     shares its area with another is named by its tab, one that is alone
+     by a title bar.  The proportions are kept when the main window is
+     resized and restored in the next session, and the main window
+     remembers a size of its own for each of the two layouts.  Changing
+     this setting relaunches LAMMPS-GUI.  A single session can be started
+     in either layout without changing this setting, with the ``-j`` or
+     ``-w`` :ref:`command-line flag <command-line-options>`.
+     In the combined window the views
+     do not remember individual window sizes, and a keyboard shortcut that
+     a view shares with the main window (for example ``Ctrl+S``) is left to
+     the main window, so only its menu entry remains for the view.
    - **Include citation details:** when checked, full citation info will be
      included in the Output window.  This is equivalent to using ``-cite
      screen`` on the command-line.
@@ -99,15 +128,11 @@ General Settings:
    - **Show Slide Show window by default:** when checked, a Slide Show
      window will be shown with images from a dump image command, if
      present, in the LAMMPS input.
-   - **Replace Output window on new run:** when checked, an existing
-     Output window will be replaced on a new LAMMPS run; otherwise each
-     run will create a new Output window.
-   - **Replace Charts window on new run:** when checked, an existing
-     Charts window will be replaced on a new LAMMPS run; otherwise each
-     run will create a new Charts window.
-   - **Replace Image window on new render:** when checked, an existing
-     Image window will be replaced when a new snapshot image is requested;
-     otherwise each command will create a new Image window.
+   - **Open main window maximized:** when checked, LAMMPS-GUI starts with
+     its main window filling the screen instead of restoring the size it
+     had when it was last closed.  This applies to the combined main window
+     only and is disabled for individual windows, where a maximized main
+     window would cover the very windows it is meant to sit beside.
    - **Download tutorial solutions enabled:** this controls whether the
      "Download solutions" option is enabled by default when setting up
      a tutorial.
@@ -140,18 +165,39 @@ General Settings:
      tutorial files from the *Tutorials* menu.  If the ``https_proxy``
      environment variable was set externally, its value is displayed but
      cannot be changed.
+   - **Download timeout:** Sets the time, in seconds, after which a
+     download (of tutorial files or the LAMMPS shared library) is aborted
+     with an error message when no data has arrived.  The default is 10
+     seconds.  Users with a slow internet connection may want to increase
+     this value so that the download of larger files, for example the
+     LAMMPS shared library, is not canceled prematurely.
    - **Path to LAMMPS Shared Library File:** this option is only visible
-     when LAMMPS-GUI was compiled to load the LAMMPS library at run-time
+     when LAMMPS-GUI was compiled to load the LAMMPS library at runtime
      instead of being linked to it directly.  Using the *Browse...* button
      or by changing the text, a different shared library file with a
      different compilation of LAMMPS with different settings or from a
      different version can be loaded.  The accompanying *Download LAMMPS
      shared library...* button retrieves a pre-built LAMMPS shared library
      from the LAMMPS web server.  After changing this setting, LAMMPS-GUI
-     needs to be re-launched.
+     needs to be re-launched.  This setting is remembered separately for
+     each compiler toolchain LAMMPS-GUI was built with, so for example an
+     MSVC build and a MinGW build on the same machine each keep their own
+     library: a library built against a different C runtime loads and runs,
+     but its screen output would silently bypass the Output window.
+   - **Command window shell:** selects the command interpreter that the
+     :ref:`Command window <commandwindow>` starts, from a list of the
+     shells installed on the machine: on Unix-like systems the entries of
+     ``/etc/shells`` that are actual shells (not ``nologin`` or a
+     terminal multiplexer), on Windows ``cmd.exe``, PowerShell, and a
+     ``bash.exe`` from an installation such as Git for Windows, when
+     present.  A shell listed under more than one path (for example under
+     both ``/bin`` and ``/usr/bin``) is offered only once.  The default is the user's default shell (``SHELL`` on
+     Unix-like systems, ``COMSPEC`` on Windows).  A change takes effect
+     when the next shell starts: when the Command window is first opened,
+     or on its *File* > *Restart Shell*.
 
-Accelerators:
-^^^^^^^^^^^^^
+Accelerators
+^^^^^^^^^^^^
 
 .. index:: accelerators
 .. index:: preferences; accelerators
@@ -176,8 +222,8 @@ changed depends on which accelerator package is chosen (or "None").
 
 .. _image_preferences:
 
-Snapshot Image:
-^^^^^^^^^^^^^^^
+Snapshot Image
+^^^^^^^^^^^^^^
 
 .. index:: snapshot image settings
 .. index:: preferences; snapshot image
@@ -216,8 +262,8 @@ These settings correspond to the available settings for the LAMMPS `dump
 image and corresponding dump_modify commands
 <https://docs.lammps.org/dump_image.html>`_.
 
-Editor Settings:
-^^^^^^^^^^^^^^^^
+Editor Settings
+^^^^^^^^^^^^^^^
 
 .. index:: editor settings
 .. index:: preferences; editor
@@ -235,8 +281,15 @@ the completion pop-up window, and whether auto-save mode is enabled.
 In auto-save mode, the editor buffer is saved before a run or before
 exiting LAMMPS-GUI.
 
-Charts Settings:
-^^^^^^^^^^^^^^^^
+The last setting enables or disables (default: enabled) the static
+input check (see the *Check Input via Heuristics* entry of the
+:ref:`Run menu <run_menu>`) that runs automatically before every run.
+Only error-level findings, which would make LAMMPS reject the input,
+open a dialog asking whether to run anyway; warnings are only noted in
+the status bar.
+
+Charts Settings
+^^^^^^^^^^^^^^^
 
 .. index:: charts settings
 .. index:: preferences; charts
@@ -246,6 +299,16 @@ This tab allows adjusting settings of the :ref:`Charts window <charts>`.
 Specifically, one can set the default chart title (if the title contains
 '%f' it will be replaced with the name of the current input file), one
 can select whether by default the raw data, the smoothed data, or both
-will be plotted, one can set the colors for the two lines, the default
-smoothing parameters, the default size of the chart graph in pixels, and
-whether you want to display major and minor grid lines.
+will be plotted, the default smoothing parameters, the default size of
+the chart graph in pixels, and whether you want to display major and
+minor grid lines.
+
+The *Raw data*, *Processed data*, and *Error bars* groups hold the
+defaults of the per-chart *Chart Style...* dialog (see :ref:`Adjust chart
+style <charts>`): the display style (*Lines*, *Points*, or *Lines +
+Points*), the color (one of ten preset colors), the line width, and the
+point size of the two data series, plus the color and line width of the
+error bars that imported data can carry.  Changing a color here also applies to charts that are
+already open, since a chart only stores a color of its own once one is
+picked in its *Chart Style...* dialog; the widths and display styles are
+picked up by charts created afterwards.

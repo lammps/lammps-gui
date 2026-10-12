@@ -283,7 +283,6 @@ typedef struct _liblammpsplugin liblammpsplugin_t;
 liblammpsplugin_t *liblammpsplugin_load(const char *);
 int liblammpsplugin_release(liblammpsplugin_t *);
 
-#undef LAMMPS
 #ifdef __cplusplus
 }
 #endif

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 48 48"
+   width="48"
+   height="48"
+   version="1.1"
+   id="svg11"
+   sodipodi:docname="document-check.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs11">
+    <linearGradient
+       id="ok"
+       x1="0"
+       y1="8"
+       x2="0"
+       y2="40"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.91406217,0,0,0.91406217,7.5585958,11.307149)">
+      <stop
+         offset="0"
+         stop-color="#EFFBD6"
+         id="stop2-3" />
+      <stop
+         offset="0.5"
+         stop-color="#84CB3E"
+         id="stop3-6" />
+      <stop
+         offset="1"
+         stop-color="#46901A"
+         id="stop4-7" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="namedview11"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="10"
+     inkscape:cx="24"
+     inkscape:cy="24"
+     inkscape:window-width="1087"
+     inkscape:window-height="1045"
+     inkscape:window-x="760"
+     inkscape:window-y="294"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g10" />
+  <g
+     transform="matrix(1.1580 0 0 1.1580 -5.529 -3.792)"
+     id="g11">
+    <defs
+       id="defs7">
+      <filter
+         id="sh"
+         x="-0.098666665"
+         y="-0.077894736"
+         width="1.214"
+         height="1.1847368">
+        <feGaussianBlur
+           in="SourceAlpha"
+           stdDeviation="0.9"
+           id="feGaussianBlur1" />
+        <feOffset
+           dx="0.5"
+           dy="1.1"
+           result="offsetblur"
+           id="feOffset1" />
+        <feFlood
+           flood-color="#000"
+           flood-opacity="0.38"
+           id="feFlood1" />
+        <feComposite
+           in2="offsetblur"
+           operator="in"
+           id="feComposite1" />
+        <feMerge
+           id="feMerge2">
+          <feMergeNode
+             id="feMergeNode1" />
+          <feMergeNode
+             in="SourceGraphic"
+             id="feMergeNode2" />
+        </feMerge>
+      </filter>
+      <linearGradient
+         id="pg"
+         x1="0"
+         y1="5"
+         x2="0"
+         y2="43"
+         gradientUnits="userSpaceOnUse">
+        <stop
+           offset="0"
+           stop-color="#FFFFFF"
+           id="stop2" />
+        <stop
+           offset="0.5"
+           stop-color="#EDF1F5"
+           id="stop3" />
+        <stop
+           offset="1"
+           stop-color="#CFD8E1"
+           id="stop4" />
+      </linearGradient>
+      <linearGradient
+         id="pl"
+         x1="0"
+         y1="28"
+         x2="0"
+         y2="44"
+         gradientUnits="userSpaceOnUse"
+         gradientTransform="matrix(1.3304431,0,0,1.3304431,-11.465933,-14.300694)">
+        <stop
+           offset="0"
+           stop-color="#D8F3B0"
+           id="stop5" />
+        <stop
+           offset="0.5"
+           stop-color="#5BB12F"
+           id="stop6" />
+        <stop
+           offset="1"
+           stop-color="#3C7E18"
+           id="stop7" />
+      </linearGradient>
+    </defs>
+    <g
+       filter="url(#sh)"
+       id="g10">
+      <path
+         d="M9 5 H27 L39 17 V43 H9 Z"
+         fill="url(#pg)"
+         stroke="#3E4854"
+         stroke-width="1.6"
+         stroke-linejoin="round"
+         id="path7" />
+      <rect
+         x="14.014681"
+         y="11.046632"
+         width="18"
+         height="2.4000001"
+         rx="1.2"
+         fill="#aeb8c4"
+         id="rect8-6" />
+      <rect
+         x="14"
+         y="15"
+         width="18"
+         height="2.4"
+         rx="1.2"
+         fill="#AEB8C4"
+         id="rect8" />
+      <path
+         d="M27 5 L27 17 L39 17 Z"
+         fill="#D2DAE3"
+         stroke="#3E4854"
+         stroke-width="1.3"
+         stroke-linejoin="round"
+         id="path8" />
+      <rect
+         x="14"
+         y="19"
+         width="18"
+         height="2.4"
+         rx="1.2"
+         fill="#AEB8C4"
+         id="rect9" />
+      <rect
+         x="14"
+         y="23"
+         width="14"
+         height="2.4"
+         rx="1.2"
+         fill="#AEB8C4"
+         id="rect10" />
+    </g>
+  </g>
+  <path
+     d="m 18.527342,34.158704 8.226559,8.226559 15.539057,-20.109367"
+     fill="none"
+     stroke="#244f0d"
+     stroke-width="10.0547"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     id="path4" />
+  <path
+     d="m 18.527342,34.158704 8.226559,8.226559 15.539057,-20.109367"
+     fill="none"
+     stroke="url(#ok)"
+     stroke-width="6.85547"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     id="path5"
+     style="stroke:url(#ok)" />
+  <path
+     d="m 20.355466,33.244642 5.941404,5.941404"
+     stroke="#ffffff"
+     stroke-width="1.82812"
+     stroke-linecap="round"
+     opacity="0.5"
+     id="path6" />
+</svg>

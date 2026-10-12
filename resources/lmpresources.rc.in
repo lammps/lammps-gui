@@ -1,0 +1,43 @@
+#include <winver.h>
+
+// Binary (fixed) version fields: these are what Explorer, Defender, and
+// reputation systems read. Keep them in sync with the project version via
+// CMake configure_file(). The 4th component can stay 0 or carry a build/
+// tweak number if you have one.
+1 VERSIONINFO
+FILEVERSION     @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+PRODUCTVERSION  @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       0x0L
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName",      "The LAMMPS Developers"
+      VALUE "FileDescription",  "@PROJECT_DESCRIPTION@"
+      VALUE "FileVersion",      "@PROJECT_VERSION@"
+      VALUE "InternalName",     "lammps-gui"
+      VALUE "LegalCopyright",   "Copyright (C) 2023-2026 Axel Kohlmeyer"
+      VALUE "OriginalFilename", "lammps-gui.exe"
+      VALUE "ProductName",      "LAMMPS-GUI"
+      VALUE "ProductVersion",   "@PROJECT_VERSION@"
+      VALUE "Comments",         "https://lammps-gui.lammps.org"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END
+
+// Application manifest: declares no-elevation, Win8.1/10/11 compatibility,
+// long path support and UTF-8 as the active code page.
+2 24 "lammps-gui.manifest"
+
+// embed icon files
+3 ICON "lammps-gui.ico"
+4 ICON "lmpfile.ico"

@@ -1,0 +1,11 @@
+[Icon Theme]
+Name=lammpsgui
+Comment=LAMMPS-GUI bundled action icons used to override the desktop theme for Qt standard context-menu actions (undo/redo/cut/copy/paste/delete/select-all)
+Directories=scalable/actions
+
+[scalable/actions]
+Context=Actions
+Size=24
+MinSize=8
+MaxSize=512
+Type=Scalable

@@ -2,7 +2,7 @@
 Overview
 ********
 
-LAMMPS-GUI is built using C++17 and the Qt framework (Qt 6.2+).  The
+LAMMPS-GUI is built using C++17 and the Qt Framework (Qt 6.2+).  The
 application follows object-oriented design principles with separation of
 concerns between different components:
 
@@ -51,14 +51,15 @@ LAMMPS-GUI makes extensive use of Qt features:
   components and background threads.
 
 **Qt Resource System**
-  Icons and resources embedded via ``resources/lammpsgui.qrc``.
+  Icons and resources embedded via ``resources/lammpsgui.qrc``.  The icons
+  are SVG and are rendered through the Qt6 Svg module (``Qt6::Svg``).
 
 **Qt Models**
   Used for data display in various viewers and inspectors.
 
 LAMMPS-GUI requires the Qt application development and GUI framework
-version 6.2 or later.  See the `Qt Documentation <https://doc.qt.io/>`_
-for more details.
+version 6.2 or later, including the Widgets, Network, and Svg modules.
+See the `Qt Documentation <https://doc.qt.io/>`_ for more details.
 
 ------------------
 
@@ -145,31 +146,36 @@ Visualization Components
   - **RegionInfo** - Stores settings for displaying a region in snapshot images.
 
 **ChartWindow (chartviewer.h/.cpp)**
-  Window for displaying thermodynamic data as charts using QtGraphs or QtCharts.
-  Supports line plots and multiple data series.  See
-  :cpp:class:`ChartWindow`
+  Window for displaying thermodynamic data as charts.  Supports line plots
+  and multiple data series.  It owns one ``ChartColumn`` per thermo column,
+  which holds the neutral ``PlotSeries`` data objects of that column, and a
+  single :cpp:class:`ChartViewer` that is rebound to whichever column is
+  selected.  See :cpp:class:`ChartWindow`
 
-**ChartViewer (chartviewer.h/.cpp)** Custom chart view widget that
-  provides interactive features like zooming, smoothing, and panning for
-  data visualization.  ChartViewer delegates rendering to a
-  :cpp:class:`ChartBackend` interface, with concrete implementations for
-  the QtGraphs module (:cpp:class:`QtGraphsBackend`) and the QtCharts
-  module (:cpp:class:`QtChartsBackend`).  See :cpp:class:`ChartViewer`.
-  Using the QtCharts module can be enforced by setting
-  ``-D LAMMPS_GUI_USE_QTCHARTS=yes``.
+**ChartViewer (chartviewer.h/.cpp)**
+  Custom chart view widget that provides interactive features like zooming,
+  smoothing, and panning for data visualization.  ChartViewer is a view over
+  the active ``ChartColumn`` of its window and renders it with
+  :cpp:class:`PlotWidget`.  See :cpp:class:`ChartViewer`.
 
-**ChartBackend (chartbackend.h)** Abstract interface for chart rendering
-  backends.  Provides a common API for axis management, series display,
-  zoom control, and label management.  See :cpp:class:`ChartBackend`.
+**PlotDataDialog (plotdatadialog.h/.cpp)**
+  Column picker for data files opened for plotting: selects the x and the y
+  columns, renames columns, adds derived columns computed from expressions,
+  and, for block-structured files, reduces the blocks to a single one or to
+  the average of a range.  ``PlotDataDialog::fromFile()`` reads a file and
+  builds the dialog matching its format.  See :cpp:class:`PlotDataDialog`
 
-**QtGraphsBackend (qtgraphsbackend.h/.cpp)** QtGraphs-based implementation
-  of :cpp:class:`ChartBackend`.  Uses QML-based QGraphsView via QQuickWidget
-  for rendering, with external labels for axis titles.
-  See :cpp:class:`QtGraphsBackend`.
+**PlotBlockData (plotblockdata.h/.cpp)**
+  Parsers for the block-structured output files of the ``fix ave/*`` styles
+  and their reduction to a flat :cpp:class:`PlotData` table.  The helpers
+  shared with the flat-file parsers of ``plotdata.cpp`` are declared in
+  ``plotdata_internal.h``.  See :cpp:class:`PlotBlockData`
 
-**QtChartsBackend (qtchartsbackend.h/.cpp)** QtCharts-based implementation
-  of :cpp:class:`ChartBackend`.  Uses QChart and QChartView for widget-based
-  rendering.  See :cpp:class:`QtChartsBackend`.
+**PlotWidget (plotwidget.h/.cpp)**
+  Native ``QWidget`` + ``QPainter`` 2D line/scatter chart renderer.  It is
+  the only chart backend and depends only on Qt Widgets -- no Qt Charts, Qt
+  Graphs, or QML.  Axis-layout math (nice ticks, label formatting) lives in
+  the Qt-free ``plotaxismath`` helpers.  See :cpp:class:`PlotWidget`.
 
 **SlideShow (slideshow.h/.cpp)**
   Dialog for viewing multiple images as a slideshow or animation with
@@ -177,12 +183,17 @@ Visualization Components
   when `FFmpeg <https://ffmpeg.org/>`_ or `ImageMagick
   <https://imagemagick.org/>`_ is available.  See :cpp:class:`SlideShow`
 
-**RangeSlider (rangeslider.h/.cpp)**
-  Custom slider widget with two handles for selecting a range of
-  values. This is code written by Hoyoung Lee and distributed under the
-  CeCILL-A license as circulated by CEA, CNRS and INRIA at the following
-  URL: "http://www.cecill.info".  Used in :cpp:class:`ChartWindow` for
-  selecting x- and y-direction plot ranges.  See :cpp:class:`RangeSlider`
+**RangeSlider (thirdparty/rangeslider/rangeslider.h/.cpp)** Custom
+  slider widget with two handles for selecting a range of values. This
+  is code written by Hoyoung Lee and distributed under the `CeCILL Free
+  Software License <https://choosealicense.com/licenses/cecill-2.1/>`_.
+  Used in :cpp:class:`ChartWindow` for selecting x- and y-direction plot
+  ranges.  See :cpp:class:`RangeSlider`
+
+**RangeBandSlider (rangebandslider.h/.cpp)**
+  Horizontal ``QSlider`` that paints an active sub-range on its track,
+  distinct from the third-party :cpp:class:`RangeSlider`.  See
+  :cpp:class:`RangeBandSlider`
 
 Dialog and Utility Components
 -----------------------------
@@ -217,6 +228,19 @@ Dialog and Utility Components
   viewing auxiliary files without allowing modifications.  See
   :cpp:class:`FileViewer`
 
+**CommandWindow (commandwindow.h/.cpp)**
+  Shell prompt with scrollback next to the simulation.  It runs one
+  persistent shell process without a terminal, frames each command with a
+  sentinel line that reports the exit status and the working directory,
+  and offers commands that hand files to the slide show, the editor, or a
+  plot.  See :cpp:class:`CommandWindow`.  It uses two helper classes:
+
+  - :cpp:class:`ShellPrompt` - The input line with Tab completion of
+    commands, file names, and earlier command lines.
+  - :cpp:class:`ShellAliases` - The configurable aliases, which are
+    defined in the shell at start since a non-interactive shell reads no
+    startup files.
+
 **TutorialWizard (tutorialwizard.h/.cpp)**
   Wizard dialog for interactive LAMMPS tutorials. Guides users through
   setting up tutorial directories and files, providing a structured
@@ -231,6 +255,13 @@ Dialog and Utility Components
 
 Support Components
 ------------------
+
+**WindowLayout (windowlayout.h/.cpp)**
+  Mediator between the main window and its output views that implements
+  the two window layouts: individual windows, or docked panels in a single
+  main window with their proportions kept across resizes and sessions.
+  The views themselves do not know which layout they are in.  See
+  :cpp:class:`WindowLayout`
 
 **URLDownloader (urldownloader.h/.cpp)**
   Utility class for downloading files over HTTPS.  Provides a
@@ -267,14 +298,16 @@ Support Components
 
 **VerticalLabel (qaddon.h/.cpp)**
   Label widget that renders text rotated 90 degrees for vertical
-  display.  Used in :cpp:class:`QtGraphsBackend` for the Y-axis title.
-  See :cpp:class:`VerticalLabel`
+  display.  See :cpp:class:`VerticalLabel`
 
 Helper Functions
 ----------------
 
 The :ref:`helpers module <helper_functions>` provides utility functions
-used throughout the application:
+used throughout the application.  The ``chartstyle.h/.cpp`` module next to
+it holds the palette of preset series colors and the widget builders that
+the Chart Style dialog and the charts preferences tab share, so that both
+offer the same choices.  The helper functions include:
 
 - Date comparison (``dateCompare`` for version comparisons)
 - Command-line parsing (``splitLine`` with quote handling)
@@ -290,11 +323,11 @@ used throughout the application:
   ``isStdoutSilenced`` and ``notifyCaptureState``)
 
 **Constants (constants.h)**
-  The ``GuiConstants`` namespace centralizes application-wide magic
-  numbers and repeated string literals, including default buffer sizes,
-  minimum window dimensions, file limits, resource paths, and status
-  messages.  Using named constants avoids typos and makes maintenance
-  easier.  See :cpp:type:`GuiConstants`
+  The ``Cfg`` namespace centralizes application-wide magic numbers and
+  repeated string literals, such as default buffer sizes, minimum window
+  dimensions, file limits, resource paths, and version constants, while
+  the ``Keys`` namespace holds every persisted ``QSettings`` key and group
+  name.  Using named constants avoids typos and makes maintenance easier.
 
 ===========
  Data Flow

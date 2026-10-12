@@ -16,12 +16,13 @@
 
 LammpsRunner::LammpsRunner(QObject *parent) : QThread(parent), lammps(nullptr) {}
 
-void LammpsRunner::setupRun(LammpsWrapper *_lammps, std::string _input, std::string _file)
+void LammpsRunner::setupRun(LammpsWrapper *_lammps, std::string _input, std::string _file,
+                            bool _clearfirst)
 {
     lammps = _lammps;
     input  = std::move(_input);
     file   = std::move(_file);
-    lammps->command("clear");
+    if (_clearfirst) lammps->command("clear");
 }
 
 void LammpsRunner::run()

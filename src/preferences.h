@@ -13,6 +13,7 @@
 #define PREFERENCES_H
 
 #include <QDialog>
+#include <QStringList>
 
 class QDialogButtonBox;
 class QFont;
@@ -47,7 +48,7 @@ public:
     explicit Preferences(LammpsWrapper *lammps, LammpsGui *lammpsgui, QWidget *parent = nullptr);
 
     /**
-     * @brief Destructor - saves settings on close
+     * @brief Destructor
      */
     ~Preferences() override;
 
@@ -72,6 +73,20 @@ public:
      */
     void setRelaunch(bool val) { needRelaunch = val; }
 
+    /**
+     * @brief Request a restart and record why
+     * @param reason One sentence naming the setting that changed
+     *
+     * The reasons are collected and shown together in the dialog that
+     * announces the relaunch, so a single visit to the preferences that
+     * changes several restart-only settings explains all of them.
+     */
+    void requestRelaunch(const QString &reason)
+    {
+        needRelaunch = true;
+        if (!relaunchReasons.contains(reason)) relaunchReasons << reason;
+    }
+
 private:
     QTabWidget *tabWidget;       ///< Tab widget for preference categories
     QDialogButtonBox *buttonBox; ///< Dialog buttons (OK, Cancel)
@@ -79,6 +94,7 @@ private:
     LammpsWrapper *lammps;       ///< LAMMPS interface for configuration queries
     LammpsGui *lammpsgui;        ///< Main widget pointer for receiving signals
     bool needRelaunch;           ///< Flag indicating restart is needed
+    QStringList relaunchReasons; ///< Settings that asked for the restart
 };
 
 // individual tabs

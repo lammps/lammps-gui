@@ -79,6 +79,8 @@ TEST_F(FlagWarningsTest, UpdatesSummaryLabel)
 
     FlagWarnings fw(&label, &doc);
     fw.rehighlight();
+    // the label is refreshed from the event loop, once per batch of lines
+    QApplication::processEvents();
 
     // Label should contain the warning count and line count
     QString text = label.text();
@@ -126,4 +128,39 @@ TEST_F(FlagWarningsTest, MultipleWarnings)
     fw.rehighlight();
 
     EXPECT_EQ(fw.getNWarnings(), 4);
+}
+
+TEST_F(FlagWarningsTest, ResetClearsWarningCount)
+{
+    QTextDocument doc;
+    QLabel label;
+
+    doc.setPlainText("WARNING: first warning\nERROR: an error");
+    FlagWarnings fw(&label, &doc);
+    fw.rehighlight();
+    EXPECT_EQ(fw.getNWarnings(), 2);
+
+    fw.reset();
+    EXPECT_EQ(fw.getNWarnings(), 0);
+    EXPECT_EQ(label.text(), QString("0 Warnings / Errors - 0 Lines"));
+}
+
+TEST_F(FlagWarningsTest, ReusedDocumentDoesNotAccumulateWarnings)
+{
+    // the log window is reused across runs: clearing the document and resetting
+    // the counters must not carry the previous run's warnings into the new one
+    QTextDocument doc;
+    QLabel label;
+
+    doc.setPlainText("WARNING: first run warning\nERROR: first run error");
+    FlagWarnings fw(&label, &doc);
+    fw.rehighlight();
+    EXPECT_EQ(fw.getNWarnings(), 2);
+
+    doc.clear();
+    fw.reset();
+    doc.setPlainText("WARNING: second run warning");
+    fw.rehighlight();
+
+    EXPECT_EQ(fw.getNWarnings(), 1);
 }

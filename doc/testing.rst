@@ -90,16 +90,26 @@ from the -N test list output. Examples:
 
 .. code-block:: bash
 
-   ctest --test-dir build/test -R MyStrdup
+   ctest --test-dir build/test -R HelpersTest
    ctest --test-dir build/test -E Frame
    ctest --test-dir build/test -I 20,25
 
 Current Test Coverage
 ^^^^^^^^^^^^^^^^^^^^^
 
-The test infrastructure is under active development. Currently, the test suite
-focuses on utility functions and command-line interface validation. Future
-expansion will include GUI component testing and integration tests.
+The unit tests cover the utility functions, the widget-scoped keyboard
+shortcuts, the stdout capture, the log window warning highlighter, the
+dump-image command builder, the movie import and image cache of the Slide
+Show window, the docked window layout, the Tab completion of the command
+window's prompt, the plot data model with its file parsers and writers, the
+block-structured ``fix ave/*`` file parsers and their reduction to a
+plottable table, the column picker dialog, the chart axis-layout math, and
+the Qt-free math toolkit (least squares and smoothing, autocorrelation, curve fitting, the
+Levenberg-Marquardt solver, the vendored LeptonMini expression parser, and
+the custom-function layer on top of them).  Command-line tests validate
+basic executable behavior, and PyAutoGUI-based tests exercise the GUI
+itself.  Future expansion will include more GUI component testing and
+integration tests.
 
 Test Organization
 =================
@@ -119,7 +129,7 @@ test_helpers.cpp
 ----------------
 
 Comprehensive tests for functions in ``src/helpers.h`` and ``src/helpers.cpp``.
-This module contains 38 test cases covering utility functions used throughout
+This module contains test cases covering the utility functions used throughout
 the application.
 
 **Date Comparison (dateCompare)**
@@ -177,7 +187,7 @@ the application.
 
   - Silencing actually suppresses stdout
   - Restoring when not silenced is a no-op
-  - Idempotent silencing (calling multiple times)
+  - Nested silencing and restoring
   - Silencing skipped during active StdCapture
   - Capture restores silenced stdout state
   - Silence and restore preserves stdout
@@ -189,6 +199,87 @@ the application.
   - Purging directory with files
   - Non-existent directory (no crash)
   - Empty directory
+
+**Image File Detection (isImageFile)**
+  Test for the extension-based check that decides whether a file is loaded
+  as an image by the Slide Show window.
+
+**Grayscale Conversion (grayscaleImage)**
+  Tests for the helper that renders an image in grayscale, used for the
+  "inactive" state of icons:
+
+  - Color is removed while the alpha channel is preserved
+  - Contrast is faded towards the midpoint
+
+**Qt Message Silencing (QtMessageSilencer)**
+  Tests for the :cpp:class:`QtMessageSilencer` RAII guard that collects Qt
+  warning messages instead of printing them to the console:
+
+  - Emitted warnings are collected instead of printed
+  - Nothing is collected when nothing is emitted
+  - The previous message handler is restored and guards can be nested
+
+**Viewer Window Fit (viewerFitSize)**
+  Tests for the pure window-fit computation used by the Image Viewer and
+  Slide Show window auto-resize:
+
+  - Content within the screen budget is fitted exactly (content plus frame)
+  - An exact fit adds no scroll bar allowance
+  - Width or height overflow clamps that axis and adds scroll bar room on
+    the other axis
+  - Overflow in both directions clamps to the budget
+  - The added scroll bar room never exceeds the budget
+  - A negative budget clamps to zero
+
+test_shortcuts.cpp
+------------------
+
+Tests for the ``addShortcut()`` and ``scopeShortcut()`` helpers in
+``src/helpers.{h,cpp}``.  The output windows repeat several main window
+accelerators, which is harmless while each is a window of its own but
+becomes an ambiguous binding once they are docked into the main window, so
+both helpers scope a shortcut to its owning widget.  Test cases cover:
+
+- A shortcut added with ``addShortcut()`` firing only while its widget has
+  the focus
+- ``scopeShortcut()`` binding an action's shortcut to its widget and
+  tolerating null arguments
+- Scoped shortcuts on sibling widgets not colliding with each other
+- A standalone window keeping the shortcuts the main window also binds
+
+test_windowlayout.cpp
+---------------------
+
+Tests for the :cpp:class:`WindowLayout` mediator in
+``src/windowlayout.{h,cpp}``, which docks the output views into the main
+window in the combined layout.  Test cases cover:
+
+- Dock title bars reporting a valid size hint
+- Closing a docked view closing its dock, closing a transient view removing
+  its dock, and a floating view being left alone
+- The saved dock arrangement being keyed by the Qt version, with the legacy
+  key dropped when saving
+- Closing a panel keeping the proportions of the remaining ones
+- A transient view surviving its dock being torn down first
+- A docked view keeping its monospace document font when it inherits the
+  main window's font
+
+test_shellprompt.cpp
+--------------------
+
+Tests for the :cpp:class:`ShellPrompt` input line of the command window in
+``src/shellprompt.{h,cpp}``, driven together with its ``QCompleter`` the
+way the window manager would.  Test cases cover:
+
+- Tab keeping the focus, offering the matches, taking a single match
+  without a list, and walking the matches forward and (with Shift-Tab)
+  backward
+- Enter taking a chosen match without running it and running the line when
+  nothing is chosen or no list is up
+- The completion request being announced before matching, so the list to
+  complete from can be chosen for the line
+- Tab on an empty line, on a read-only prompt, and with a modifier held
+  offering nothing
 
 test_stdcapture.cpp
 -------------------
@@ -225,6 +316,199 @@ label.  Test cases cover:
 - Empty documents produce no spurious warnings
 - Warnings are detected when they appear at the start of a line
 - The running count is correct for multiple warnings
+
+test_dumpimage.cpp
+------------------
+
+Tests for the GUI-free dump-image command builder (``src/dumpimage.{h,cpp}``)
+that assembles the LAMMPS ``write_dump ... image`` command from a
+``DumpImageParams`` snapshot of the Image Viewer state.  Test cases cover:
+
+- Basic structure of the generated render and ``dump_modify`` arguments
+- Pruning of all settings that match the LAMMPS defaults (color tables,
+  transparency, background, up direction, sub-box style, axes center)
+- The default BWR color map, named and reversed continuous maps, discrete
+  bond color maps, and the canonical stops of the perceptual maps
+- Element-based vs. type-based coloring (no color map for type coloring)
+- Bond rendering: suppressed while VDW spheres are active, drawn when
+  requested, auto-bond generation only when a pair style is defined
+- ``noinit`` suppressed while a fix is active; disabled fixes are ignored
+- Region outline points and bond coloring by computed values
+
+test_movieimport.cpp
+--------------------
+
+Tests for the parsing and frame-counting helpers of the movie import
+(``src/movieimport.{h,cpp}``).  These are free functions, so the tests run
+without ``ffprobe`` or ``ffmpeg`` installed.  Test cases cover:
+
+- ``parseFrameRate()``: rational (``30000/1001``) and plain numbers,
+  invalid input
+- ``selectedFrameCount()``: full range, range with interval, invalid ranges
+- ``parseProbeOutput()``: frame count taken from the container, missing
+  frame count or frame size, absent video stream, malformed JSON, and
+  numeric fields given as JSON numbers instead of strings
+
+test_imagecache.cpp
+-------------------
+
+Tests for the :cpp:class:`ImageCache` class (``src/imagecache.{h,cpp}``),
+the temporary-directory backed store for converted images and extracted
+movie frames owned by the Slide Show window.  Test cases cover:
+
+- Qt-readable formats are loaded directly and never cached
+- Exotic formats are converted at most once; changed source files are
+  converted again
+- Missing files return a null image; unreadable files are reported once
+  and not retried until the file changes
+- Usage totals track the converted images
+- ``forget()`` drops the conversion of a deleted file; purging conversions
+  keeps extracted movie frames and failure records
+- Cache subdirectories are unique and sanitized
+- ``clear()`` and the destructor remove the temporary directory
+
+test_plotdata.cpp
+-----------------
+
+Tests for the column-oriented ``PlotData`` model and the parsers and
+writers for external data files (``src/plotdata.{h,cpp}``).  Test cases
+cover:
+
+- Appending rows and columns to the model
+- CSV import with and without a header line
+- Whitespace-separated (``.dat``) import with a LAMMPS-style header
+- LAMMPS YAML thermo output, including trailing commas, interleaved log
+  lines, and a sequence of maps
+- JSON import as array-of-rows and object-of-arrays, with error handling
+  for unequal columns and malformed input
+- Dispatch by file extension and content-based YAML detection in log files
+- CSV, ``.dat``, and YAML export round-trips, including YAML quoting rules
+
+test_plotblockdata.cpp
+----------------------
+
+Tests for the parsers of the block-structured output files written by the
+``fix ave/*`` styles and for their reduction to a flat table
+(``src/plotblockdata.{h,cpp}``).  Test cases cover:
+
+- The native format of ``fix ave/time`` in vector mode, ``fix ave/histo``,
+  ``fix ave/correlate``, and the comment-delimited blocks of
+  ``fix ave/correlate/long``, including the column and per-block scalar
+  names taken from the default header comments
+- A single value in vector mode, whose block header is exactly as wide as
+  its data rows
+- ``overwrite`` (a single block), a header written again mid-file by a
+  second fix instance, a last block cut short by an interrupted run, and
+  blocks whose row count changes
+- Format recognition from the block structure alone, for files whose
+  headers were replaced with ``title1``/``title2``/``title3``
+- ``fix ave/chunk``: a one-dimensional profile and a compressed-chunk-ID
+  file getting the coordinate as their x axis, a cylindrical binning with
+  a single axial bin recognized as one-dimensional from its values, and a
+  real two-dimensional grid and non-binned chunks keeping the generic
+  defaults
+- Rejecting flat tables, including a ``fix ave/time`` scalar file whose
+  header comment reads like a block file's
+- The vector-mode YAML variant, with its synthesized row index, and the
+  scalar-mode YAML shape being left to the flat parser
+- Single-block and block-range reduction with hand-computed means,
+  standard deviations, standard errors, and min/max spreads (whose bars
+  are asymmetric and end exactly on the extreme values), clamped and
+  reversed ranges, and blocks dropped for having a different shape
+- The per-format import defaults, including a running average being
+  recognized so that its blocks are not averaged
+
+test_plotdatadialog.cpp
+-----------------------
+
+Tests for the :cpp:class:`PlotDataDialog` column picker in
+``src/plotdatadialog.{h,cpp}``, run with the ``offscreen`` platform plugin.
+Test cases cover:
+
+- Derived columns referencing columns as ``{name}``, including names with
+  brackets, and a bare name being rejected
+- Renaming a column rewriting the references in already added derived
+  columns, and unusable names being refused
+- The block reduction keeping renames and derived columns
+- ``PlotDataDialog::fromFile()`` picking the block or the flat parser for
+  a file and reporting a file that neither can read
+
+test_plotaxismath.cpp
+---------------------
+
+Tests for the Qt-free chart axis-layout helpers
+(``src/plotaxismath.{h,cpp}``).  Test cases cover:
+
+- ``niceTickInterval()``: 1-2-5-10 interval selection, scaling across
+  powers of ten, degenerate ranges, and non-positive tick targets
+- ``tickValues()``: even spacing, anchor alignment, snapping zero, endpoint
+  inclusion despite floating-point rounding, reversed ranges, custom
+  anchors
+- ``tickDecimals()``: decimal counts for integer and fractional spacings
+- ``formatAxisLabel()``: printf-style integer and floating-point
+  specifiers, length-modifier normalization, literal prefix and suffix
+  text, and fallback behavior for empty or placeholder-free formats
+
+test_leastsquares.cpp
+---------------------
+
+Tests for the dense linear-algebra and smoothing routines
+(``src/leastsquares.{h,cpp}``).  Test cases cover:
+
+- Matrix transpose, multiplication, and inversion
+- LU linear solve with single and multi-column right-hand sides
+- Savitzky-Golay smoothing: moving-average behavior for constant data,
+  exact preservation of linear and quadratic data at matching polynomial
+  degrees, and noise reduction around a line
+
+test_analysis.cpp
+-----------------
+
+Tests for the post-processing analyses (``src/analysis.{h,cpp}``).  Test
+cases cover the normalized autocorrelation function: an exact small case,
+lag zero being one, empty results for constant or too-short series,
+clamping of the maximum lag, and anticorrelation of an alternating series.
+
+test_fitting.cpp
+----------------
+
+Tests for the linear-least-squares curve fits (``src/fitting.{h,cpp}``).
+Test cases cover recovering known polynomial models and evaluating the
+fitted polynomial, recovering a known Birch-Murnaghan equation-of-state
+model, and the failure paths for too few data points and non-positive
+volumes.
+
+test_levmar.cpp
+---------------
+
+Tests for the Levenberg-Marquardt nonlinear least-squares solver
+(``src/levmar.{h,cpp}``).  Test cases cover recovering linear,
+exponential-decay, and Gaussian models, fitting noisy data, rejecting
+underdetermined problems (more parameters than residuals), and reporting a
+failing initial model evaluation as an error instead of crashing.
+
+test_lepton.cpp
+---------------
+
+Tests for the vendored LeptonMini expression parser
+(``thirdparty/lepton_mini``).  Test cases cover expression evaluation,
+error handling for invalid expressions, verification of symbolic
+derivatives, custom functions, and expression optimization.
+
+test_customfunc.cpp
+-------------------
+
+Tests for the custom-function evaluation and fitting layer
+(``src/customfunc.{h,cpp}``) built on LeptonMini.  Test cases cover:
+
+- Evaluating user expressions (polynomials, trigonometric functions,
+  constants, custom variables) over a sample range
+- Skipping non-finite points and clamping the sample count
+- Error handling for empty expressions, syntax errors, and undefined
+  variables
+- Nonlinear custom fits recovering exponential-decay and quadratic models
+- Fit-setup validation: variable/parameter clashes, duplicate parameters,
+  undeclared symbols, and too few data points
 
 Command-Line Tests
 ==================
@@ -268,6 +552,32 @@ and validates that help text is consistent with CMake configuration:
 
 **Environment**: ``OMP_NUM_THREADS=1`` to ensure consistent behavior
 
+CommandLine.NoDisplayHelp
+--------------------------
+
+**Purpose**: Verify that the help text is printed without a display
+
+This test runs::
+
+  lammps-gui -h
+
+with the ``DISPLAY``, ``WAYLAND_DISPLAY``, and ``QT_QPA_PLATFORM``
+environment variables set to empty values, and validates that the help
+text is printed instead of Qt aborting for lack of a platform plugin.
+
+CommandLine.NoDisplayStart
+---------------------------
+
+**Purpose**: Verify that a start without a display fails cleanly
+
+This test runs::
+
+  lammps-gui
+
+in the same environment as ``CommandLine.NoDisplayHelp`` and validates
+that LAMMPS-GUI exits with an error message stating that no graphical
+display was found, instead of aborting with a core dump.
+
 GUI Tests
 =========
 
@@ -288,7 +598,7 @@ screenshooter applications
 
 This test validates the ``shooter`` wrapper script that provides a unified
 interface to various Linux screenshot utilities (ImageMagick's ``import``,
-``magick import``, ``xfce4-screenshooter``, ``gnome-screenshooter``).
+``magick import``, ``xfce4-screenshooter``, ``gnome-screenshot``).
 
 The test runs:
 
@@ -310,7 +620,7 @@ within a virtual frame buffer and validates:
   - PyAutoGUI - for screen size detection
   - Pillow (PIL) - for image file validation
   - One of: ImageMagick (``import`` or ``magick``), ``xfce4-screenshooter``,
-    or ``gnome-screenshooter``
+    or ``gnome-screenshot``
 
 **Setup/Teardown**:
   - ``setUp()``: Removes leftover ``shot.png`` from previous runs
@@ -464,8 +774,8 @@ Adding Tests
 Create a New Test File
 ======================
 
-1. Create a new test file in the `test/` directory (e.g., `test_newfile.cpp`)
-2. Add the test executable to `test/CMakeLists.txt`:
+1. Create a new test file in the ``test/`` directory (e.g., ``test_newfile.cpp``)
+2. Add the test executable to ``test/CMakeLists.txt``:
 
 .. code-block:: cmake
 
@@ -515,8 +825,8 @@ Dependencies
 Notes
 ^^^^^
 
-- Tests that require a Qt application context use a `HelpersTest` fixture that creates a `QCoreApplication` instance.
-- Platform-specific tests (e.g., `has_exe`) use conditional compilation to test appropriate commands on different operating systems.
+- Tests that require a Qt application context use a ``HelpersTest`` fixture that creates a ``QCoreApplication`` instance.
+- Platform-specific tests (e.g., ``has_exe``) use conditional compilation to test appropriate commands on different operating systems.
 - The test suite is designed to be easily extended with additional test files and test cases.
 - GoogleTest is fetched automatically during CMake configuration, so no manual installation is required.
 
@@ -524,6 +834,6 @@ CI Integration
 ^^^^^^^^^^^^^^
 
 The test suite integrates with existing CI workflows:
-- Tests run as part of the standard build process when `ENABLE_TESTING=ON`
+- Tests run as part of the standard build process when ``ENABLE_TESTING=ON``
 - CTest provides standard output for CI systems
 - Tests can be disabled for documentation-only builds

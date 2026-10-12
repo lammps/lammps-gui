@@ -21,9 +21,15 @@ mv -v liblammps.dll ${DESTDIR}/bin/
 wget https://download.lammps.org/thirdparty/ffmpeg-win64.exe.gz
 gunzip ffmpeg-win64.exe.gz
 mv ffmpeg-win64.exe ${DESTDIR}/bin/ffmpeg.exe
+${SRCDIR}/packaging/sign.sh ${DESTDIR}/bin/ffmpeg.exe
 wget https://download.lammps.org/thirdparty/gzip.exe.gz
 gunzip gzip.exe.gz
 mv gzip.exe ${DESTDIR}/bin/
+${SRCDIR}/packaging/sign.sh ${DESTDIR}/bin/gzip.exe
+for dll in libintl-8.dll libpcre2-8-0.dll
+do \
+    cp -v ${SYSROOT}/bin/${dll} ${DESTDIR}/bin
+done
 
 skipdlls="msvcrt ADVAPI32 CFGMGR32 GDI32 KERNEL32 MPR NETAPI32 PSAPI SHELL32 USER32 USERENV UxTheme VERSION WS2_32 WSOCK32 d3d11 dwmapi liblammps msvcrt_ole32 dxgi IMM32 ole32 OLEAUT32 WINMM WTSAPI32 COMCTL32 PSAPI bcrypt CRYPT32 IPHLPAPI Secur32 api-ms-win-core-path-l1-1-0 WLDAP32 api-ms-win-core-synch-l1-2-0 AUTHZ d3d12 DWrite ntdll api-ms-win-core-winrt-l1-1-0 api-ms-win-core-winrt-string-l1-1-0 comdlg32 d2d1 d3d9 SETUPAPI SHCORE SHLWAPI DNSAPI WINHTTP ncrypt"
 echo "Copying required DLL files"
@@ -75,6 +81,11 @@ cat > ${DESTDIR}/bin/qt.conf <<EOF
 [Paths]
 Plugins = ../qt6plugins
 EOF
+
+for f in ${DESTDIR}/bin/*.dll
+do \
+    ${SRCDIR}/packaging/sign.sh $f
+done
 
 cp -v lammps-gui-v${VERSION}.pdf ${DESTDIR}/LAMMPS-GUI-Manual.pdf
 cp -v ${SRCDIR}/LICENSE ${DESTDIR}/LICENSE.txt

@@ -1,0 +1,150 @@
+# Per-command syntax information for the LAMMPS-GUI editor.
+#
+# Format: one command per line with 3 or 4 whitespace separated fields:
+#   <command>  <category>  <minargs>  [<role>[,<role>...]]
+#
+# category (display class of the command word, keep consistent with the
+#   historically grown editor colors):
+#   lattice output modify particle run setup special other
+# minargs: minimum number of required arguments; use a conservative value
+#   (too small only misses a check, too large causes false lint errors)
+# roles of argument positions 1, 2, ... (all further arguments have no
+#   specific role unless the last role is marked with a trailing '*'):
+#   any defid group style:<cat> substyle:<cat> file int number keyword label
+#   with <cat> one of: command fix compute dump atom pair bond angle
+#   dihedral improper kspace region integrate minimize variable units
+#   extra color imagekw
+#
+# Commands not listed here are highlighted in the neutral "other" style with
+# lexical-only argument coloring.  Entries in a table loaded later override
+# earlier entries with the same command name.
+
+# ---- system setup / lattice / geometry ------------------------------------
+units           lattice   1  style:units
+atom_style      lattice   1  style:atom
+change_box      lattice   2  group,keyword
+dielectric      lattice   1  number
+dimension       lattice   1  int
+lattice         lattice   2  keyword,number
+region          lattice   2  defid,style:region
+create_box      lattice   2  int,label
+create_atoms    lattice   2  keyword,keyword
+delete_atoms    lattice   1  keyword
+displace_atoms  lattice   2  group,keyword
+boundary        lattice   3  keyword,keyword,keyword
+replicate       lattice   3  int,int,int
+
+# ---- output and write commands --------------------------------------------
+echo            output    1  keyword
+log             output    1  file
+write_data      output    1  file
+write_coeff     output    1  file
+write_restart   output    1  file
+restart         output    1  int,file
+info            output    1  keyword
+thermo          output    1  int
+print           output    1  any
+thermo_style    output    1  keyword
+timer           output    1  keyword
+pair_write      output    6  int,int,int,keyword,number,number,file
+bond_write      output    4  int,int,number,number,file
+angle_write     output    4  int,int,number,number,file
+dihedral_write  output    2  int,int
+write_dump      output    3  group,style:dump,file
+shell           output    1  keyword
+
+# ---- file input commands (colored like the output commands) ---------------------------------------------------
+include         output    1  file
+read_restart    output    1  file
+read_data       output    1  file
+read_dump       output    2  file,int
+molecule        output    2  defid,file
+geturl          output    1  keyword
+
+# ---- particle, force field, and definition commands ------------------------
+fix             particle  3  defid,group,style:fix
+compute         particle  3  defid,group,style:compute
+dump            particle  5  defid,group,style:dump,int,file
+pair_style      particle  1  style:pair,substyle:pair*
+bond_style      particle  1  style:bond,substyle:bond*
+angle_style     particle  1  style:angle,substyle:angle*
+dihedral_style  particle  1  style:dihedral,substyle:dihedral*
+improper_style  particle  1  style:improper,substyle:improper*
+kspace_style    particle  1  style:kspace
+pair_coeff      particle  2  keyword,keyword,substyle:pair*
+bond_coeff      particle  1  keyword,substyle:bond*
+angle_coeff     particle  1  keyword,substyle:angle*
+dihedral_coeff  particle  1  keyword,substyle:dihedral*
+improper_coeff  particle  1  keyword,substyle:improper*
+group           particle  2  defid,keyword
+variable        particle  2  defid,style:variable
+python          particle  2  defid,keyword
+set             particle  2  keyword,keyword
+group2ndx       particle  1  file
+ndx2group       particle  1  file
+kim             particle  1  keyword
+mdi             particle  1  keyword
+mass            particle  2  keyword,number
+velocity        particle  2  group,keyword
+create_bonds    particle  1  keyword
+delete_bonds    particle  2  group,keyword
+labelmap        particle  2  keyword,any
+
+# ---- run-like commands ------------------------------------------------------
+minimize        run       4  number,number,int,int
+run             run       1  int
+rerun           run       1  file
+tad             run       0
+neb             run       0
+neb/spin        run       0
+prd             run       0
+server          run       1  keyword
+temper          run       0
+temper/npt      run       0
+temper/grem     run       0
+message         run       1  keyword
+hyper           run       0
+dynamical_matrix run      0
+third_order     run       0
+fitpod          run       1  file,file
+
+# ---- settings commands -------------------------------------------
+neighbor        setup     2  number,keyword
+special_bonds   setup     1  keyword
+balance         setup     2  number,keyword
+box             setup     1  keyword
+clear           setup     0
+quit            setup     0
+newton          setup     1  keyword
+partition       setup     3  keyword,int,keyword
+processors      setup     3  keyword,keyword,keyword
+reset_atoms     setup     1  keyword
+reset_ids       setup     0
+min_style       setup     1  style:minimize
+run_style       setup     1  style:integrate
+timestep        setup     1  number
+suffix          setup     1  keyword
+plugin          setup     1  keyword
+comm_style      setup     1  keyword
+package         setup     1  keyword
+reset_timestep  setup     1  int
+
+# ---- modify commands --------------------------------------------------------
+atom_modify     modify    2  keyword,any
+comm_modify     modify    2  keyword,any
+compute_modify  modify    2  label,keyword
+dump_modify     modify    2  label,keyword
+fix_modify      modify    2  label,keyword
+kspace_modify   modify    2  keyword,any
+min_modify      modify    2  keyword,any
+neigh_modify    modify    2  keyword,any
+pair_modify     modify    2  keyword,any
+thermo_modify   modify    2  keyword,any
+
+# ---- undo / flow control commands -------------------------------------------
+unfix           special   1  label
+uncompute       special   1  label
+undump          special   1  label
+label           special   1  label
+jump            special   1  file,label
+next            special   1  label

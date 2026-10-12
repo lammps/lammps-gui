@@ -12,12 +12,11 @@
 #include "findandreplace.h"
 
 #include "codeeditor.h"
+#include "constants.h"
 #include "helpers.h"
 #include "lammpsgui.h"
 
-#include <QApplication>
 #include <QCheckBox>
-#include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QIcon>
@@ -25,7 +24,6 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QShortcut>
-#include <QSizePolicy>
 #include <QTextCursor>
 
 /* ---------------------------------------------------------------------- */
@@ -72,11 +70,10 @@ FindAndReplace::FindAndReplace(CodeEditor *_editor, QWidget *parent) :
     connect(replall, &QPushButton::released, this, &FindAndReplace::replaceAll);
     connect(done, &QPushButton::released, this, &QDialog::accept);
 
-    auto *action = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q), this);
-    connect(action, &QShortcut::activated, this, &FindAndReplace::quit);
+    addShortcut(this, QKeySequence(Qt::CTRL | Qt::Key_Q), this, &FindAndReplace::quit);
 
     setLayout(layout);
-    setWindowIcon(QIcon(":/icons/lammps-gui-icon-128x128.png"));
+    setWindowIcon(QIcon(Cfg::MAIN_ICON));
     setWindowTitle("LAMMPS-GUI - Find and Replace");
 }
 
@@ -92,7 +89,8 @@ void FindAndReplace::findNext()
 
     if (!text.isEmpty()) {
         if (!editor->find(text, find_flags) && wrap->isChecked()) {
-            // nothing found from the current position to the end, reposition cursor and beginning
+            // nothing found from the current position to the end, reposition cursor at the
+            // beginning
             editor->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
             editor->find(text, find_flags);
         }
@@ -110,7 +108,7 @@ void FindAndReplace::replaceNext()
     auto flag   = withcase->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive;
 
     // if selected text at cursor location matches search text, replace
-    if (QString::compare(cursor.selectedText(), search->text(), flag) == 0)
+    if (QString::compare(cursor.selectedText(), text, flag) == 0)
         cursor.insertText(replace->text());
 
     findNext();

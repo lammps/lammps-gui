@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 48 48"
+   width="48"
+   height="48"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="extend-run.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs6">
+    <filter
+       id="sh-3"
+       x="-0.12"
+       y="-0.079137644"
+       width="1.2578528"
+       height="1.2047416">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="0.9"
+         id="feGaussianBlur1-6" />
+      <feOffset
+         dx="0.5"
+         dy="1.1"
+         result="offsetblur"
+         id="feOffset1-7" />
+      <feFlood
+         flood-color="#000"
+         flood-opacity="0.38"
+         id="feFlood1-5" />
+      <feComposite
+         in2="offsetblur"
+         operator="in"
+         id="feComposite1-3" />
+      <feMerge
+         id="feMerge2-5">
+        <feMergeNode
+           id="feMergeNode1-6" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode2-2" />
+      </feMerge>
+    </filter>
+    <linearGradient
+       id="ru"
+       x1="0"
+       y1="6"
+       x2="0"
+       y2="42"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#D8F3B0"
+         id="stop2-9" />
+      <stop
+         offset="0.5"
+         stop-color="#5BB12F"
+         id="stop3-1" />
+      <stop
+         offset="1"
+         stop-color="#3C7E18"
+         id="stop4-2" />
+    </linearGradient>
+    <linearGradient
+       id="blt"
+       x1="0"
+       y1="4"
+       x2="0"
+       y2="22"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-9.352695,0.49224711)">
+      <stop
+         offset="0"
+         stop-color="#FFF1CF"
+         id="stop5" />
+      <stop
+         offset="0.5"
+         stop-color="#F4B73E"
+         id="stop6" />
+      <stop
+         offset="1"
+         stop-color="#C8861A"
+         id="stop7" />
+    </linearGradient>
+    <filter
+       id="filter4"
+       x="-0.1083871"
+       y="-0.078055553"
+       width="1.2151591"
+       height="1.201942">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="0.9"
+         id="feGaussianBlur2" />
+      <feOffset
+         dx="0.5"
+         dy="1.1"
+         result="offsetblur"
+         id="feOffset2" />
+      <feFlood
+         flood-color="#000"
+         flood-opacity="0.38"
+         id="feFlood2" />
+      <feComposite
+         in2="offsetblur"
+         operator="in"
+         id="feComposite2" />
+      <feMerge
+         id="feMerge4">
+        <feMergeNode
+           id="feMergeNode3" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode4" />
+      </feMerge>
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="namedview6"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="5"
+     inkscape:cx="24"
+     inkscape:cy="24"
+     inkscape:window-width="1087"
+     inkscape:window-height="1045"
+     inkscape:window-x="1082"
+     inkscape:window-y="229"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg6" />
+  <g
+     transform="matrix(1.1298 0 0 1.1298 -3.679 -3.114)"
+     id="g6">
+    <defs
+       id="defs4">
+      <filter
+         id="sh"
+         x="-0.59199999"
+         y="-0.098666665"
+         width="2.284"
+         height="1.234">
+        <feGaussianBlur
+           in="SourceAlpha"
+           stdDeviation="0.9"
+           id="feGaussianBlur1" />
+        <feOffset
+           dx="0.5"
+           dy="1.1"
+           result="offsetblur"
+           id="feOffset1" />
+        <feFlood
+           flood-color="#000"
+           flood-opacity="0.38"
+           id="feFlood1" />
+        <feComposite
+           in2="offsetblur"
+           operator="in"
+           id="feComposite1" />
+        <feMerge
+           id="feMerge2">
+          <feMergeNode
+             id="feMergeNode1" />
+          <feMergeNode
+             in="SourceGraphic"
+             id="feMergeNode2" />
+        </feMerge>
+      </filter>
+      <linearGradient
+         id="gla"
+         x1="0"
+         y1="8"
+         x2="0"
+         y2="40"
+         gradientUnits="userSpaceOnUse">
+        <stop
+           offset="0"
+           stop-color="#E8F4FF"
+           id="stop2"
+           style="stop-color:#d7f3af;stop-opacity:1;" />
+        <stop
+           offset="0.5"
+           stop-color="#5BA7F0"
+           id="stop3"
+           style="stop-color:#5bb12f;stop-opacity:1;" />
+        <stop
+           offset="1"
+           stop-color="#1869C8"
+           id="stop4"
+           style="stop-color:#3b7c18;stop-opacity:1;" />
+      </linearGradient>
+    </defs>
+    <g
+       filter="url(#sh)"
+       id="g5">
+      <g
+         id="g4">
+        <rect
+           x="39"
+           y="9"
+           width="5"
+           height="30"
+           rx="2"
+           fill="url(#gla)"
+           stroke="#0E3E72"
+           stroke-width="1.6"
+           id="rect4"
+           style="stroke:#1d4f0d;stroke-opacity:1" />
+      </g>
+    </g>
+  </g>
+  <g
+     transform="matrix(1.2189,0,0,1.2189,-10.597,-4.522)"
+     id="g10">
+    <defs
+       id="defs7">
+      <filter
+         id="filter7"
+         x="-0.1083871"
+         y="-0.078055553"
+         width="1.2151591"
+         height="1.201942">
+        <feGaussianBlur
+           in="SourceAlpha"
+           stdDeviation="0.9"
+           id="feGaussianBlur6" />
+        <feOffset
+           dx="0.5"
+           dy="1.1"
+           result="offsetblur"
+           id="feOffset6" />
+        <feFlood
+           flood-color="#000"
+           flood-opacity="0.38"
+           id="feFlood6" />
+        <feComposite
+           in2="offsetblur"
+           operator="in"
+           id="feComposite6" />
+        <feMerge
+           id="feMerge7">
+          <feMergeNode
+             id="feMergeNode6" />
+          <feMergeNode
+             in="SourceGraphic"
+             id="feMergeNode7" />
+        </feMerge>
+      </filter>
+      <linearGradient
+         id="RESERVED_FOR_INKSCAPE_DUPLICATE_DEF_000000000"
+         x1="0"
+         y1="6"
+         x2="0"
+         y2="42"
+         gradientUnits="userSpaceOnUse">
+        <stop
+           offset="0"
+           stop-color="#D8F3B0"
+           id="stop8" />
+        <stop
+           offset="0.5"
+           stop-color="#5BB12F"
+           id="stop9" />
+        <stop
+           offset="1"
+           stop-color="#3C7E18"
+           id="stop10" />
+      </linearGradient>
+      <linearGradient
+         id="RESERVED_FOR_INKSCAPE_DUPLICATE_DEF_000000001"
+         x1="0"
+         y1="4"
+         x2="0"
+         y2="22"
+         gradientUnits="userSpaceOnUse">
+        <stop
+           offset="0"
+           stop-color="#FFF1CF"
+           id="stop11" />
+        <stop
+           offset="0.5"
+           stop-color="#F4B73E"
+           id="stop12" />
+        <stop
+           offset="1"
+           stop-color="#C8861A"
+           id="stop13" />
+      </linearGradient>
+    </defs>
+    <g
+       filter="url(#sh)"
+       id="g9"
+       style="filter:url(#sh-3)">
+      <path
+         d="M 11,8 39,24 11,40 Z"
+         fill="url(#ru)"
+         stroke="#244f0d"
+         stroke-width="2.4"
+         stroke-linejoin="round"
+         id="path7"
+         style="fill:url(#ru)" />
+      <path
+         d="m 14,12 12,7"
+         stroke="#ffffff"
+         stroke-width="2.2"
+         stroke-linecap="round"
+         opacity="0.5"
+         id="path8" />
+      <path
+         d="m 27.647305,4.4922471 -6.5,10.4999999 h 4.5 l -2,7.5 9,-11 h -5 l 2.5,-6.9999999 z"
+         fill="url(#blt)"
+         stroke="#7a4e0e"
+         stroke-width="1.3"
+         stroke-linejoin="round"
+         id="path9"
+         style="fill:url(#blt)" />
+    </g>
+  </g>
+</svg>
