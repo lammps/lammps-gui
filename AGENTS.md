@@ -1,6 +1,6 @@
-# CLAUDE.md
+# Instructions for AI Coding Agents
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance for AI coding agents when working with code in this repository with the sources to LAMMPS-GUI.
 
 ## Project Overview
 
