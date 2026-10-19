@@ -15,9 +15,9 @@ authors:
     corresponding: true
     affiliation: 1
 affiliations:
-  - name: Institute for Computational Molecular Science, Temple University, Philadelphia, PA, USA
+  - name: Institute for Computational Molecular Science, Temple University, Philadelphia, PA, United States of America
     index: 1
-date: 16 September 2026
+date: 19 October 2026
 bibliography: paper.bib
 ---
 
