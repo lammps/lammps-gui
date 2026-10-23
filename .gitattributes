@@ -3,6 +3,10 @@
 .github export-ignore
 SECURITY.md export-ignore
 CITATION.cff export-ignore
+AGENTS.md export-ignore
+CLAUDE.md export-ignore
+update-codemeta.sh export-ignore
+codemeta.json export-ignore
 *       text=auto
 *.jpg   -text
 *.pdf   -text

@@ -173,7 +173,7 @@ Since this check is performed by the web browser, you can avoid it by
 opening a command prompt terminal window, change to the Downloads folder
 and then download the installer from the command line with:
 
-``curl -OL https://github.com/lammps/lammps-gui/releases/download/<version>/LAMMPS-GUI-Win10-x86_64-<version>.exe`` where you replace ``<version>>`` with the version tag of
+``curl -OL https://github.com/lammps/lammps-gui/releases/download/<version>/LAMMPS-GUI-Win10-x86_64-<version>.exe`` where you replace ``<version>`` with the version tag of
 the release, e.g. v3.1.0.
 
 .. admonition:: Managing Microsoft Defender SmartScreen protection

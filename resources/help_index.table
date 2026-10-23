@@ -75,6 +75,7 @@ angle_spica.html angle_style spica/kk
 angle_spica.html angle_style spica/omp
 angle_style.html angle_style
 angle_table.html angle_style table
+angle_table.html angle_style table/kk
 angle_table.html angle_style table/omp
 angle_write.html angle_write
 angle_zero.html angle_style zero
@@ -147,6 +148,7 @@ bond_rheo_shell.html bond_style rheo/shell
 bond_special.html bond_style special
 bond_style.html bond_style
 bond_table.html bond_style table
+bond_table.html bond_style table/kk
 bond_table.html bond_style table/omp
 bond_write.html bond_write
 bond_zero.html bond_style zero
@@ -178,6 +180,7 @@ compute_bond_local.html compute bond/local
 compute_bond.html compute bond
 compute_born_matrix.html compute born/matrix
 compute_centro_atom.html compute centro/atom
+compute_centro_atom.html compute centro/atom/kk
 compute_centro_atom.html compute centro/atom/omp
 compute_chunk_atom.html compute chunk/atom
 compute_chunk_spread_atom.html compute chunk/spread/atom
@@ -191,8 +194,12 @@ compute_cnp_atom.html compute cnp/atom/omp
 compute_com_chunk.html compute com/chunk
 compute_composition_atom.html compute composition/atom
 compute_composition_atom.html compute composition/atom/kk
+compute_composition_atom.html compute composition/atom/omp
 compute_com.html compute com
+compute_com.html compute com/kk
 compute_contact_atom.html compute contact/atom
+compute_contact_atom.html compute contact/atom/omp
+compute_continuum_chunk.html compute continuum/chunk
 compute_coord_atom.html compute coord/atom
 compute_coord_atom.html compute coord/atom/kk
 compute_coord_atom.html compute coord/atom/omp
@@ -212,11 +219,13 @@ compute_edpd_temp_atom.html compute edpd/temp/atom
 compute_efield_atom.html compute efield/atom
 compute_efield_wolf_atom.html compute efield/wolf/atom
 compute_entropy_atom.html compute entropy/atom
+compute_entropy_atom.html compute entropy/atom/kk
 compute_entropy_atom.html compute entropy/atom/omp
 compute_erotate_asphere.html compute erotate/asphere
 compute_erotate_asphere.html compute erotate/asphere/kk
 compute_erotate_rigid.html compute erotate/rigid
 compute_erotate_sphere_atom.html compute erotate/sphere/atom
+compute_erotate_sphere_atom.html compute erotate/sphere/atom/kk
 compute_erotate_sphere_atom.html compute erotate/sphere/atom/omp
 compute_erotate_sphere.html compute erotate/sphere
 compute_erotate_sphere.html compute erotate/sphere/kk
@@ -231,17 +240,20 @@ compute_global_atom.html compute global/atom
 compute_group_group.html compute group/group
 compute_gyration_chunk.html compute gyration/chunk
 compute_gyration.html compute gyration
+compute_gyration.html compute gyration/kk
 compute_gyration_shape_chunk.html compute gyration/shape/chunk
 compute_gyration_shape.html compute gyration/shape
 compute_hbond_local.html compute hbond/local
 compute_heat_flux.html compute heat/flux
 compute_hexorder_atom.html compute hexorder/atom
+compute_hexorder_atom.html compute hexorder/atom/kk
 compute_hexorder_atom.html compute hexorder/atom/omp
 compute_hma.html compute hma
 compute_improper_local.html compute improper/local
 compute_improper.html compute improper
 compute_inertia_chunk.html compute inertia/chunk
 compute_inertia.html compute inertia
+compute_inertia.html compute inertia/kk
 compute_ke_atom_eff.html compute ke/atom/eff
 compute_ke_atom.html compute ke/atom
 compute_ke_atom.html compute ke/atom/kk
@@ -249,6 +261,8 @@ compute_ke_atom.html compute ke/atom/omp
 compute_ke_eff.html compute ke/eff
 compute_ke_rigid.html compute ke/rigid
 compute_ke.html compute ke
+compute_ke.html compute ke/kk
+compute_mbar.html compute mbar
 compute_mliap.html compute mliap
 compute_modify.html compute_modify
 compute_momentum.html compute momentum
@@ -355,8 +369,10 @@ compute_temp_partial.html compute temp/partial/kk
 compute_temp_profile.html compute temp/profile
 compute_temp_profile.html compute temp/profile/kk
 compute_temp_ramp.html compute temp/ramp
+compute_temp_ramp.html compute temp/ramp/kk
 compute_temp_region_eff.html compute temp/region/eff
 compute_temp_region.html compute temp/region
+compute_temp_region.html compute temp/region/kk
 compute_temp_rotate.html compute temp/rotate
 compute_temp.html compute temp
 compute_temp.html compute temp/kk
@@ -432,7 +448,9 @@ dihedral_spherical.html dihedral_style spherical/omp
 dihedral_style.html dihedral_style
 dihedral_table.html dihedral_style table
 dihedral_table.html dihedral_style table/cut
+dihedral_table.html dihedral_style table/cut/kk
 dihedral_table.html dihedral_style table/cut/omp
+dihedral_table.html dihedral_style table/kk
 dihedral_table.html dihedral_style table/omp
 dihedral_write.html dihedral_write
 dihedral_zero.html dihedral_style zero
@@ -474,6 +492,7 @@ dump_vtk.html dump vtk
 dynamical_matrix.html dynamical_matrix
 dynamical_matrix.html dynamical_matrix/kk
 echo.html echo
+fenix.html fenix
 fitpod_command.html fitpod
 fix_accelerate_cos.html fix accelerate/cos
 fix_acks2_reaxff.html fix acks2/reaxff
@@ -484,6 +503,7 @@ fix_addforce.html fix addforce
 fix_addforce.html fix addforce/kk
 fix_add_heat.html fix add/heat
 fix_addtorque_atom.html fix addtorque/atom
+fix_addtorque_atom.html fix addtorque/atom/kk
 fix_addtorque_group.html fix addtorque/group
 fix_addtorque_group.html fix addtorque/group/kk
 fix_alchemy.html fix alchemy
@@ -506,6 +526,7 @@ fix_ave_moments.html fix ave/moments
 fix_ave_time.html fix ave/time
 fix_balance.html fix balance
 fix_baoab.html fix baoab
+fix_baoab.html fix baoab/kk
 fix_bocs.html fix bocs
 fix_bond_break.html fix bond/break
 fix_bond_create.html fix bond/create
@@ -515,6 +536,7 @@ fix_bond_swap.html fix bond/swap
 fix_box_relax.html fix box/relax
 fix_brownian.html fix brownian
 fix_brownian.html fix brownian/asphere
+fix_brownian.html fix brownian/kk
 fix_brownian.html fix brownian/sphere
 fix_charge_regulation.html fix charge/regulation
 fix_cmap.html fix cmap
@@ -523,6 +545,7 @@ fix_colvars.html fix colvars
 fix_colvars.html fix colvars/kk
 fix_controller.html fix controller
 fix_damping_cundall.html fix damping/cundall
+fix_damping_cundall.html fix damping/cundall/kk
 fix_deform_pressure.html fix deform/pressure
 fix_deform.html fix deform
 fix_deform.html fix deform/kk
@@ -564,6 +587,7 @@ fix_external.html fix external/kk
 fix_ffl.html fix ffl
 fix_filter_corotate.html fix filter/corotate
 fix_flow_gauss.html fix flow/gauss
+fix_flow_gauss.html fix flow/gauss/kk
 fix_freeze.html fix freeze
 fix_freeze.html fix freeze/kk
 fix_gcmc.html fix gcmc
@@ -588,6 +612,7 @@ fix_halt.html fix halt
 fix_halt.html fix halt/kk
 fix_heat_flow.html fix heat/flow
 fix_heat.html fix heat
+fix_heat.html fix heat/kk
 fix_hmc.html fix hmc
 fix_hyper_global.html fix hyper/global
 fix_hyper_local.html fix hyper/local
@@ -662,6 +687,7 @@ fix_npt_sphere.html fix npt/sphere/omp
 fix_numdiff.html fix numdiff
 fix_numdiff_virial.html fix numdiff/virial
 fix_nve_asphere_noforce.html fix nve/asphere/noforce
+fix_nve_asphere_noforce.html fix nve/asphere/noforce/kk
 fix_nve_asphere.html fix nve/asphere
 fix_nve_asphere.html fix nve/asphere/gpu
 fix_nve_asphere.html fix nve/asphere/intel
@@ -688,6 +714,7 @@ fix_nve_sphere.html fix nve/sphere/omp
 fix_nve_spin.html fix nve/spin
 fix_nve_tri.html fix nve/tri
 fix_nvk.html fix nvk
+fix_nvk.html fix nvk/kk
 fix_nvt_asphere.html fix nvt/asphere
 fix_nvt_asphere.html fix nvt/asphere/omp
 fix_nvt_body.html fix nvt/body
@@ -729,6 +756,7 @@ fix_press_langevin.html fix press/langevin
 fix_press_langevin.html fix press/langevin/kk
 fix_print.html fix print
 fix_propel_self.html fix propel/self
+fix_propel_self.html fix propel/self/kk
 fix_property_atom.html fix property/atom
 fix_property_atom.html fix property/atom/kk
 fix_python_invoke.html fix python/invoke
@@ -748,11 +776,18 @@ fix_qeq.html fix qeq/fire
 fix_qeq.html fix qeq/fire/omp
 fix_qeq.html fix qeq/point
 fix_qeq.html fix qeq/point/omp
+fix_qeq.html fix qeq/point/xlmd
+fix_qeq.html fix qeq/point/xlmd/omp
 fix_qeq.html fix qeq/shielded
 fix_qeq.html fix qeq/shielded/omp
+fix_qeq.html fix qeq/shielded/xlmd
+fix_qeq.html fix qeq/shielded/xlmd/omp
 fix_qeq.html fix qeq/slater
 fix_qeq.html fix qeq/slater/omp
+fix_qeq.html fix qeq/slater/xlmd
+fix_qeq.html fix qeq/slater/xlmd/omp
 fix_qmmm.html fix qmmm
+fix_qmmm_xtb.html fix qmmm/xtb
 fix_qtb.html fix qtb
 fix_qtpie_reaxff.html fix qtpie/reaxff
 fix_reaxff_bonds.html fix reaxff/bonds
@@ -799,6 +834,7 @@ fix_setforce.html fix setforce/kk
 fix_setforce.html fix setforce/spin
 fix_set.html fix set
 fix_settorque_atom.html fix settorque/atom
+fix_settorque_atom.html fix settorque/atom/kk
 fix_sgcmc.html fix sgcmc
 fix_shake.html fix rattle
 fix_shake.html fix shake
@@ -823,6 +859,7 @@ fix_spring_self.html fix spring/self
 fix_spring_self.html fix spring/self/kk
 fix_srd.html fix srd
 fix_store_force.html fix store/force
+fix_store_force.html fix store/force/kk
 fix_store_state.html fix store/state
 fix_surface_global.html fix surface/global
 fix_surface_local.html fix surface/local
@@ -852,6 +889,7 @@ fix_tune_kspace.html fix tune/kspace
 fix_vector.html fix vector
 fix_viscosity.html fix viscosity
 fix_viscous_nonlinear.html fix viscous/nonlinear
+fix_viscous_nonlinear.html fix viscous/nonlinear/kk
 fix_viscous.html fix viscous
 fix_viscous.html fix viscous/kk
 fix_viscous_sphere.html fix viscous/sphere
@@ -866,6 +904,7 @@ fix_wall_gran_region.html fix wall/gran/region
 fix_wall_gran.html fix wall/gran
 fix_wall_gran.html fix wall/gran/kk
 fix_wall_piston.html fix wall/piston
+fix_wall_piston.html fix wall/piston/kk
 fix_wall_reflect.html fix wall/reflect
 fix_wall_reflect.html fix wall/reflect/kk
 fix_wall_reflect_stochastic.html fix wall/reflect/stochastic
@@ -875,6 +914,7 @@ fix_wall.html fix wall/colloid
 fix_wall.html fix wall/harmonic
 fix_wall.html fix wall/harmonic/kk
 fix_wall.html fix wall/harmonic/outside
+fix_wall.html fix wall/harmonic/outside/kk
 fix_wall.html fix wall/lepton
 fix_wall.html fix wall/lj1043
 fix_wall.html fix wall/lj1043/kk
@@ -977,6 +1017,8 @@ kspace_style.html kspace_style pppm/stagger
 kspace_style.html kspace_style pppm/tip4p
 kspace_style.html kspace_style pppm/tip4p/kk
 kspace_style.html kspace_style pppm/tip4p/omp
+kspace_style.html kspace_style pppm/tip4p/xtb
+kspace_style.html kspace_style pppm/xtb
 kspace_style.html kspace_style scafacos
 kspace_style.html kspace_style zero
 labelmap.html labelmap
@@ -1040,6 +1082,7 @@ pair_born_gauss.html pair_style born/gauss/kk
 pair_born_gauss.html pair_style born/gauss/omp
 pair_born.html pair_style born
 pair_born.html pair_style born/coul/dsf
+pair_born.html pair_style born/coul/dsf/kk
 pair_born.html pair_style born/coul/dsf/omp
 pair_born.html pair_style born/coul/long
 pair_born.html pair_style born/coul/long/gpu
@@ -1056,6 +1099,7 @@ pair_born.html pair_style born/kk
 pair_born.html pair_style born/omp
 pair_bpm_peri.html pair_style bpm/peri
 pair_bpm_spring.html pair_style bpm/spring
+pair_bpm_spring.html pair_style bpm/spring/omp
 pair_brownian.html pair_style brownian
 pair_brownian.html pair_style brownian/kk
 pair_brownian.html pair_style brownian/omp
@@ -1103,6 +1147,7 @@ pair_charmm.html pair_style lj/charmm/coul/long/opt
 pair_charmm.html pair_style lj/charmm/coul/msm
 pair_charmm.html pair_style lj/charmm/coul/msm/omp
 pair_charmm.html pair_style lj/charmmfsw/coul/charmmfsh
+pair_charmm.html pair_style lj/charmmfsw/coul/charmmfsh/kk
 pair_charmm.html pair_style lj/charmmfsw/coul/charmmfsh/omp
 pair_charmm.html pair_style lj/charmmfsw/coul/long
 pair_charmm.html pair_style lj/charmmfsw/coul/long/kk
@@ -1133,6 +1178,7 @@ pair_coul_diel.html pair_style coul/diel
 pair_coul_diel.html pair_style coul/diel/kk
 pair_coul_diel.html pair_style coul/diel/omp
 pair_coul.html pair_style coul/ctip
+pair_coul.html pair_style coul/ctip/omp
 pair_coul.html pair_style coul/cut
 pair_coul.html pair_style coul/cut/global
 pair_coul.html pair_style coul/cut/global/kk
@@ -1149,6 +1195,7 @@ pair_coul.html pair_style coul/dsf/gpu
 pair_coul.html pair_style coul/dsf/kk
 pair_coul.html pair_style coul/dsf/omp
 pair_coul.html pair_style coul/esp
+pair_coul.html pair_style coul/esp/omp
 pair_coul.html pair_style coul/exclude
 pair_coul.html pair_style coul/exclude/omp
 pair_coul.html pair_style coul/long
@@ -1173,33 +1220,45 @@ pair_coul_shield.html pair_style coul/shield/kk
 pair_coul_shield.html pair_style coul/shield/omp
 pair_coul_slater.html pair_style coul/slater
 pair_coul_slater.html pair_style coul/slater/cut
+pair_coul_slater.html pair_style coul/slater/cut/kk
 pair_coul_slater.html pair_style coul/slater/cut/omp
 pair_coul_slater.html pair_style coul/slater/long
 pair_coul_slater.html pair_style coul/slater/long/gpu
 pair_coul_slater.html pair_style coul/slater/long/kk
 pair_coul_slater.html pair_style coul/slater/long/omp
 pair_coul_tt.html pair_style coul/tt
+pair_coul_tt.html pair_style coul/tt/omp
 pair_cs.html pair_style born/coul/dsf/cs
+pair_cs.html pair_style born/coul/dsf/cs/kk
 pair_cs.html pair_style born/coul/dsf/cs/omp
 pair_cs.html pair_style born/coul/long/cs
 pair_cs.html pair_style born/coul/long/cs/gpu
+pair_cs.html pair_style born/coul/long/cs/kk
 pair_cs.html pair_style born/coul/long/cs/omp
 pair_cs.html pair_style born/coul/wolf/cs
 pair_cs.html pair_style born/coul/wolf/cs/gpu
+pair_cs.html pair_style born/coul/wolf/cs/kk
 pair_cs.html pair_style born/coul/wolf/cs/omp
 pair_cs.html pair_style buck/coul/long/cs
+pair_cs.html pair_style buck/coul/long/cs/kk
 pair_cs.html pair_style buck/coul/long/cs/omp
 pair_cs.html pair_style coul/long/cs
 pair_cs.html pair_style coul/long/cs/gpu
+pair_cs.html pair_style coul/long/cs/kk
 pair_cs.html pair_style coul/long/cs/omp
 pair_cs.html pair_style coul/wolf/cs
+pair_cs.html pair_style coul/wolf/cs/kk
 pair_cs.html pair_style coul/wolf/cs/omp
 pair_cs.html pair_style lj/class2/coul/long/cs
+pair_cs.html pair_style lj/class2/coul/long/cs/kk
 pair_cs.html pair_style lj/class2/coul/long/cs/omp
 pair_cs.html pair_style lj/cut/coul/long/cs
+pair_cs.html pair_style lj/cut/coul/long/cs/kk
 pair_cs.html pair_style lj/cut/coul/long/cs/omp
 pair_dielectric.html pair_style coul/cut/dielectric
+pair_dielectric.html pair_style coul/cut/dielectric/omp
 pair_dielectric.html pair_style coul/long/dielectric
+pair_dielectric.html pair_style coul/long/dielectric/omp
 pair_dielectric.html pair_style lj/cut/coul/cut/dielectric
 pair_dielectric.html pair_style lj/cut/coul/cut/dielectric/omp
 pair_dielectric.html pair_style lj/cut/coul/debye/dielectric
@@ -1207,6 +1266,7 @@ pair_dielectric.html pair_style lj/cut/coul/debye/dielectric/omp
 pair_dielectric.html pair_style lj/cut/coul/long/dielectric
 pair_dielectric.html pair_style lj/cut/coul/long/dielectric/omp
 pair_dielectric.html pair_style lj/cut/coul/msm/dielectric
+pair_dielectric.html pair_style lj/cut/coul/msm/dielectric/omp
 pair_dielectric.html pair_style lj/long/coul/long/dielectric
 pair_dipole.html pair_style lj/cut/dipole/cut
 pair_dipole.html pair_style lj/cut/dipole/cut/gpu
@@ -1231,6 +1291,7 @@ pair_dpd_ext.html pair_style dpd/ext/tstat/omp
 pair_dpd_fdt.html pair_style dpd/fdt
 pair_dpd_fdt.html pair_style dpd/fdt/energy
 pair_dpd_fdt.html pair_style dpd/fdt/energy/kk
+pair_dpd_fdt.html pair_style dpd/fdt/omp
 pair_dpd.html pair_style dpd
 pair_dpd.html pair_style dpd/gpu
 pair_dpd.html pair_style dpd/intel
@@ -1285,29 +1346,37 @@ pair_extep.html pair_style extep/omp
 pair_fep_soft.html pair_style coul/cut/soft
 pair_fep_soft.html pair_style coul/cut/soft/gapsys
 pair_fep_soft.html pair_style coul/cut/soft/gapsys/omp
+pair_fep_soft.html pair_style coul/cut/soft/kk
 pair_fep_soft.html pair_style coul/cut/soft/omp
 pair_fep_soft.html pair_style coul/long/soft
+pair_fep_soft.html pair_style coul/long/soft/kk
 pair_fep_soft.html pair_style coul/long/soft/omp
 pair_fep_soft.html pair_style lj/charmm/coul/long/soft
+pair_fep_soft.html pair_style lj/charmm/coul/long/soft/kk
 pair_fep_soft.html pair_style lj/charmm/coul/long/soft/omp
 pair_fep_soft.html pair_style lj/class2/coul/cut/soft
 pair_fep_soft.html pair_style lj/class2/coul/cut/soft/omp
 pair_fep_soft.html pair_style lj/class2/coul/long/soft
 pair_fep_soft.html pair_style lj/class2/coul/long/soft/omp
 pair_fep_soft.html pair_style lj/class2/soft
+pair_fep_soft.html pair_style lj/class2/soft/kk
 pair_fep_soft.html pair_style lj/class2/soft/omp
 pair_fep_soft.html pair_style lj/cut/coul/cut/soft
 pair_fep_soft.html pair_style lj/cut/coul/cut/soft/gpu
+pair_fep_soft.html pair_style lj/cut/coul/cut/soft/kk
 pair_fep_soft.html pair_style lj/cut/coul/cut/soft/omp
 pair_fep_soft.html pair_style lj/cut/coul/long/soft
 pair_fep_soft.html pair_style lj/cut/coul/long/soft/gpu
+pair_fep_soft.html pair_style lj/cut/coul/long/soft/kk
 pair_fep_soft.html pair_style lj/cut/coul/long/soft/omp
 pair_fep_soft.html pair_style lj/cut/soft
 pair_fep_soft.html pair_style lj/cut/soft/gapsys
+pair_fep_soft.html pair_style lj/cut/soft/kk
 pair_fep_soft.html pair_style lj/cut/soft/omp
 pair_fep_soft.html pair_style lj/cut/tip4p/long/soft
 pair_fep_soft.html pair_style lj/cut/tip4p/long/soft/omp
 pair_fep_soft.html pair_style morse/soft
+pair_fep_soft.html pair_style morse/soft/kk
 pair_fep_soft.html pair_style morse/soft/omp
 pair_fep_soft.html pair_style tip4p/long/soft
 pair_fep_soft.html pair_style tip4p/long/soft/omp
@@ -1323,11 +1392,13 @@ pair_gayberne.html pair_style gayberne/gpu
 pair_gayberne.html pair_style gayberne/intel
 pair_gayberne.html pair_style gayberne/omp
 pair_gran.html pair_style gran/hertz/history
+pair_gran.html pair_style gran/hertz/history/kk
 pair_gran.html pair_style gran/hertz/history/omp
 pair_gran.html pair_style gran/hooke
 pair_gran.html pair_style gran/hooke/history
 pair_gran.html pair_style gran/hooke/history/kk
 pair_gran.html pair_style gran/hooke/history/omp
+pair_gran.html pair_style gran/hooke/kk
 pair_gran.html pair_style gran/hooke/omp
 pair_granular.html pair_style granular
 pair_granular_superellipsoid.html pair_style granular/superellipsoid
@@ -1372,6 +1443,7 @@ pair_ilp_tmd.html pair_style ilp/tmd/opt
 pair_kim.html pair_style kim
 pair_kolmogorov_crespi_full.html pair_style kolmogorov/crespi/full
 pair_kolmogorov_crespi_z.html pair_style kolmogorov/crespi/z
+pair_kolmogorov_crespi_z.html pair_style kolmogorov/crespi/z/omp
 pair_lambda_input_apip.html pair_style lambda/input/apip
 pair_lambda_input_apip.html pair_style lambda/input/csp/apip
 pair_lambda_zone_apip.html pair_style lambda/zone/apip
@@ -1391,6 +1463,7 @@ pair_ldd.html pair_coeff ldd potential table/lin
 pair_ldd.html pair_coeff ldd potential table/spline
 pair_ldd.html pair_style ldd
 pair_lebedeva_z.html pair_style lebedeva/z
+pair_lebedeva_z.html pair_style lebedeva/z/omp
 pair_lepton.html pair_style lepton
 pair_lepton.html pair_style lepton/coul
 pair_lepton.html pair_style lepton/coul/omp
@@ -1421,6 +1494,7 @@ pair_lj_cut_coul.html pair_style lj/cut/coul/dsf/gpu
 pair_lj_cut_coul.html pair_style lj/cut/coul/dsf/kk
 pair_lj_cut_coul.html pair_style lj/cut/coul/dsf/omp
 pair_lj_cut_coul.html pair_style lj/cut/coul/esp
+pair_lj_cut_coul.html pair_style lj/cut/coul/esp/omp
 pair_lj_cut_coul.html pair_style lj/cut/coul/long
 pair_lj_cut_coul.html pair_style lj/cut/coul/long/gpu
 pair_lj_cut_coul.html pair_style lj/cut/coul/long/intel
@@ -1453,6 +1527,7 @@ pair_lj_expand.html pair_style lj/expand/gpu
 pair_lj_expand.html pair_style lj/expand/kk
 pair_lj_expand.html pair_style lj/expand/omp
 pair_lj_expand_sphere.html pair_style lj/expand/sphere
+pair_lj_expand_sphere.html pair_style lj/expand/sphere/kk
 pair_lj_expand_sphere.html pair_style lj/expand/sphere/omp
 pair_lj_long.html pair_style lj/long/coul/long
 pair_lj_long.html pair_style lj/long/coul/long/intel
@@ -1464,6 +1539,7 @@ pair_lj_pirani.html pair_style lj/pirani
 pair_lj_pirani.html pair_style lj/pirani/kk
 pair_lj_pirani.html pair_style lj/pirani/omp
 pair_lj_relres.html pair_style lj/relres
+pair_lj_relres.html pair_style lj/relres/kk
 pair_lj_relres.html pair_style lj/relres/omp
 pair_lj.html pair_style lj/cut
 pair_lj.html pair_style lj/cut/gpu
@@ -1472,6 +1548,7 @@ pair_lj.html pair_style lj/cut/kk
 pair_lj.html pair_style lj/cut/omp
 pair_lj.html pair_style lj/cut/opt
 pair_lj_smooth_linear.html pair_style lj/smooth/linear
+pair_lj_smooth_linear.html pair_style lj/smooth/linear/kk
 pair_lj_smooth_linear.html pair_style lj/smooth/linear/omp
 pair_lj_smooth.html pair_style lj/smooth
 pair_lj_smooth.html pair_style lj/smooth/gpu
@@ -1514,8 +1591,11 @@ pair_mesodpd.html pair_style edpd
 pair_mesodpd.html pair_style edpd/gpu
 pair_mesodpd.html pair_style mdpd
 pair_mesodpd.html pair_style mdpd/gpu
+pair_mesodpd.html pair_style mdpd/omp
 pair_mesodpd.html pair_style mdpd/rhosum
 pair_mesodpd.html pair_style tdpd
+pair_mesomem_dipole.html pair_style mesomem/dipole
+pair_mesomem_dipole.html pair_style mesomem/dipole/omp
 pair_mgpt.html pair_style mgpt
 pair_mie.html pair_style mie/cut
 pair_mie.html pair_style mie/cut/gpu
@@ -1551,6 +1631,7 @@ pair_nm.html pair_style nm/cut/coul/long/omp
 pair_nm.html pair_style nm/cut/kk
 pair_nm.html pair_style nm/cut/omp
 pair_nm.html pair_style nm/cut/split
+pair_nm.html pair_style nm/cut/split/kk
 pair_nm.html pair_style nm/cut/split/omp
 pair_none.html pair_style none
 pair_oxdna2.html pair_style oxdna2/coaxstk
@@ -1607,6 +1688,7 @@ pair_resquared.html pair_style resquared/gpu
 pair_resquared.html pair_style resquared/omp
 pair_rheo.html pair_style rheo
 pair_rheo_solid.html pair_style rheo/solid
+pair_rheo_solid.html pair_style rheo/solid/omp
 pair_runner.html pair_style runner
 pair_saip_metal.html pair_style saip/metal
 pair_saip_metal.html pair_style saip/metal/opt
@@ -1663,6 +1745,7 @@ pair_sw.html pair_style sw/gpu
 pair_sw.html pair_style sw/intel
 pair_sw.html pair_style sw/kk
 pair_sw.html pair_style sw/mod
+pair_sw.html pair_style sw/mod/kk
 pair_sw.html pair_style sw/mod/omp
 pair_sw.html pair_style sw/omp
 pair_table.html pair_style table
@@ -1673,6 +1756,7 @@ pair_table_rx.html pair_style table/rx
 pair_table_rx.html pair_style table/rx/kk
 pair_tersoff_mod.html pair_style tersoff/mod
 pair_tersoff_mod.html pair_style tersoff/mod/c
+pair_tersoff_mod.html pair_style tersoff/mod/c/kk
 pair_tersoff_mod.html pair_style tersoff/mod/c/omp
 pair_tersoff_mod.html pair_style tersoff/mod/gpu
 pair_tersoff_mod.html pair_style tersoff/mod/kk
@@ -1691,6 +1775,7 @@ pair_tersoff_zbl.html pair_style tersoff/zbl/omp
 pair_thole.html pair_style lj/cut/thole/long
 pair_thole.html pair_style lj/cut/thole/long/omp
 pair_thole.html pair_style thole
+pair_thole.html pair_style thole/omp
 pair_threebody_table.html pair_style threebody/table
 pair_threebody_table.html pair_style threebody/table/omp
 pair_tracker.html pair_style tracker
@@ -1729,6 +1814,7 @@ pair_zbl.html pair_style zbl/gpu
 pair_zbl.html pair_style zbl/kk
 pair_zbl.html pair_style zbl/omp
 pair_zero.html pair_style zero
+pair_zero.html pair_style zero/coul
 partition.html partition
 plugin.html plugin
 prd.html prd

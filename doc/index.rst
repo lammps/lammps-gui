@@ -86,9 +86,14 @@ This document describes LAMMPS-GUI version |version|.
 
 .. raw:: html
 
+   <a href="https://doi.org/10.21105/joss.11185"><img src="https://joss.theoj.org/papers/10.21105/joss.11185/status.svg" alt="DOI:10.21105/joss.11185"></a>
+
+   <a href="https://doi.org/10.5281/zenodo.21035505"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21035505.svg" alt="DOI:10.5281/zenodo.21035505"></a>
+
    </h2>
    <hr>
-   <h3>Test Status of the development branch:</h3>
+   <h2>Test Status of the development branch:</h2>
+   <br>
    <p align="left">
    <a href="https://github.com/lammps/lammps-gui/actions/workflows/compile-linux-qt6.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/compile-linux-qt6.yml/badge.svg" alt="Compile with Qt 6.x" style="max-width: 100%;"></a>
    <a href="https://github.com/lammps/lammps-gui/actions/workflows/compile-macos-dmg.yml"><img src="https://github.com/lammps/lammps-gui/actions/workflows/compile-macos-dmg.yml/badge.svg" alt="Compile on macOS and build DMG" style="max-width: 100%;"></a>
@@ -111,7 +116,7 @@ the `Journal of Open Source Software <https://joss.theoj.org/>`_:
 
    Kohlmeyer, A. (2026). LAMMPS-GUI: A Cross-Platform Graphical Tool to
    Learn and Explore Molecular Dynamics with LAMMPS. Journal of Open
-   Source Software, XX(XXX), 11185. https://doi.org/10.21105/joss.11185
+   Source Software, 11(126), 11185. https://joss.theoj.org/papers/10.21105/joss.11185
 
 or in BibTeX format:
 
@@ -124,23 +129,12 @@ or in BibTeX format:
      journal      = {Journal of Open Source Software},
      publisher    = {The Open Journal},
      year         = {2026},
-     volume       = {XX},
-     number       = {XXX},
+     volume       = {11},
+     number       = {126},
      pages        = {11185},
      doi          = {10.21105/joss.11185},
-     url          = {https://doi.org/10.21105/joss.11185},
+     url          = {https://joss.theoj.org/papers/10.21105/joss.11185},
    }
-
-.. raw:: html
-
-   <a href="https://doi.org/10.21105/joss.11185"><img src="https://joss.theoj.org/papers/10.21105/joss.11185/status.svg" alt="DOI"></a>
-
-.. note::
-
-   The paper is accepted for publication but was not yet published at
-   release time.  Volume and issue number are thus currently unknown.
-   The DOI is reserved but is not yet active.  It may become available
-   before the next LAMMPS-GUI release.
 
 Also, starting with version 3.0.0 LAMMPS-GUI releases are automatically
 archived on `Zenodo <https://zenodo.org>`_:
@@ -156,9 +150,6 @@ archived on `Zenodo <https://zenodo.org>`_:
      url          = {https://doi.org/10.5281/zenodo.21035505},
    }
 
-.. raw:: html
-
-   <a href="https://doi.org/10.5281/zenodo.21035505"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21035505.svg" alt="DOI"></a>
 
 The *Soft Matter* collection of tutorials in the :ref:`Tutorials menu
 <tutorials>` is published in LiveCoMS.  Those tutorials teach how to use

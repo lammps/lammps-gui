@@ -2705,6 +2705,8 @@ void LammpsGui::about()
     } else {
         version += "LAMMPS library linked to executable";
     }
+    version += "<br><br>\n";
+    version += citeme.toStdString().substr(1);
 
     QString to_clipboard(version.c_str());
     to_clipboard += "\n\n";
@@ -2763,7 +2765,6 @@ void LammpsGui::about()
         }
     }
 
-    info += citeme.toStdString();
     to_clipboard += info.c_str();
     to_clipboard += details.c_str();
 

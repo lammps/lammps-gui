@@ -1,7 +1,6 @@
 # codemeta.json is generated from this file: after changing it, run
 # ./update-codemeta.sh and commit the regenerated file as well.
 cff-version: 1.2.0
-message: "If you use this software, please cite the article from preferred-citation (https://doi.org/10.21105/joss.11185)."
 title: "LAMMPS-GUI: A Cross-Platform Graphical Tool to Learn and Explore Molecular Dynamics with LAMMPS"
 abstract: >-
   LAMMPS-GUI is a cross-platform Qt-based graphical application for the
@@ -10,12 +9,18 @@ abstract: >-
   interface, log and thermodynamic-data viewing, interactive plotting, and
   snapshot/slide-show visualization into a single tool aimed at learning and
   exploring molecular dynamics with LAMMPS.
-type: software
 authors:
   - family-names: Kohlmeyer
     given-names: Axel
     orcid: "https://orcid.org/0000-0001-6204-6475"
     affiliation: "Institute for Computational Molecular Science, Temple University, Philadelphia, PA, USA"
+contact:
+  - family-names: Kohlmeyer
+    given-names: Axel
+    orcid: "https://orcid.org/0000-0001-6204-6475"
+    affiliation: "Institute for Computational Molecular Science, Temple University, Philadelphia, PA, USA"
+doi: 10.5281/zenodo.21035505
+type: software
 version: "3.1.1"
 date-released: "2026-09-30"
 license: GPL-2.0-or-later
@@ -28,6 +33,7 @@ keywords:
   - scientific visualization
   - simulation
   - research software
+message: "If you use this software, please cite the article in the Journal of Open Source Software (https://doi.org/10.21105/joss.11185)."
 preferred-citation:
   type: article
   title: "LAMMPS-GUI: A Cross-Platform Graphical Tool to Learn and Explore Molecular Dynamics with LAMMPS"
@@ -37,11 +43,13 @@ preferred-citation:
       orcid: "https://orcid.org/0000-0001-6204-6475"
       affiliation: "Institute for Computational Molecular Science, Temple University, Philadelphia, PA, USA"
   journal: "Journal of Open Source Software"
+  issn: 2475-9066
   publisher:
     name: "The Open Journal"
-  year: 2026
-  volume: XX
-  issue: XXX
+  date-published: 2026-10-23
+  issue: 126
+  volume: 11
   start: 11185
+  year: 2026
   doi: "10.21105/joss.11185"
-  url: "https://doi.org/10.21105/joss.11185"
+  url: "https://joss.theoj.org/papers/10.21105/joss.11185"

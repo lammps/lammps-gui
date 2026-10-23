@@ -14,12 +14,14 @@ Please see the online documentation at https://lammps-gui.lammps.org/
 
 ## LAMMPS-GUI vs. LAMMPS
 
-LAMMPS-GUI used to "live" in the "tools/lammps-gui" folder of the LAMMPS source distribution
-and the LAMMPS git repository.  This made it easy to build LAMMPS-GUI together with LAMMPS.
-However, LAMMPS-GUI has matured to the point, that it is easier to maintain it as a separate
-package and make its release schedule independent from LAMMPS releases.  It is still possible
-to build LAMMPS-GUI as part of a LAMMPS build same as before, but that will automatically
-first download the LAMMPS-GUI sources from this repository.
+LAMMPS-GUI used to "live" in the "tools/lammps-gui" folder of the LAMMPS
+source distribution and the LAMMPS git repository.  This made it easy to
+build LAMMPS-GUI together with LAMMPS.  However, LAMMPS-GUI has matured
+to the point, that it is easier to maintain it as a separate package and
+make its release schedule independent from LAMMPS releases.  It is still
+possible to build LAMMPS-GUI as part of a LAMMPS build, just as before,
+but that will now download the LAMMPS-GUI sources from this repository
+first.
 
 ## Citation
 
@@ -29,7 +31,7 @@ If you use LAMMPS-GUI in your work, please cite the following paper in the
 
 > Kohlmeyer, A. (2026). LAMMPS-GUI: A Cross-Platform Graphical Tool to Learn
 > and Explore Molecular Dynamics with LAMMPS. Journal of Open Source Software,
-> XX(XXX), 11185. https://doi.org/10.21105/joss.11185
+> 11(126), 11185. https://joss.theoj.org/papers/10.21105/joss.11185
 
 ``` BibTex
    @article{lammps_gui_joss,
@@ -39,17 +41,13 @@ If you use LAMMPS-GUI in your work, please cite the following paper in the
      journal      = {Journal of Open Source Software},
      publisher    = {The Open Journal},
      year         = {2026},
-     volume       = {XX},
-     number       = {XXX},
+     volume       = {11},
+     number       = {126},
      pages        = {11185},
      doi          = {10.21105/joss.11185},
-     url          = {https://doi.org/10.21105/joss.11185}
+     url          = {https://joss.theoj.org/papers/10.21105/joss.11185}
    }
 ```
-
-NOTE: The paper is accepted for publication but was not yet published at release
-time.  Volume and issue number are thus currently unknown.  The DOI is reserved
-but is not yet active.  It may become available before the next LAMMPS-GUI release.
 
 Also, starting with version 3.0.0 LAMMPS-GUI releases are automatically
 archived on [Zenodo](https://zenodo.org) [![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21035505.svg)](https://doi.org/10.5281/zenodo.21035505):
