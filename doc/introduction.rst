@@ -21,9 +21,9 @@ Mode**.  The mode is controlled by the
 
 **Plugin Mode** (default)
   LAMMPS is loaded dynamically at runtime from a shared library file
-  (.so, .dll, .dylib).  This allows using different LAMMPS builds with
+  (.so, .dll, .dylib).  This enables using different LAMMPS builds with
   different compilation settings and different LAMMPS versions without
-  recompiling the GUI. The library loading is handled in
+  recompiling the GUI.  The library loading is handled in
   :cpp:class:`LammpsWrapper` using platform-specific dynamic loading
   functions (``dlopen()`` on Unix/Linux/macOS, ``LoadLibrary()`` on
   Windows).  The path to the shared library file is auto-detected or
@@ -127,8 +127,8 @@ LAMMPS Interface
 **LammpsRunner (lammpsrunner.h)**
   Worker thread for executing LAMMPS simulations without blocking the
   GUI.  Uses Qt's threading facilities to run simulations in the
-  background, allowing the UI to remain responsive during long
-  calculations.  See :cpp:class:`LammpsRunner`
+  background while the UI remains responsive during calculations.
+  See :cpp:class:`LammpsRunner`
 
 Visualization Components
 ------------------------
@@ -225,7 +225,7 @@ Dialog and Utility Components
 
 **FileViewer (fileviewer.h/.cpp)**
   Read-only text viewer dialog for displaying file contents. Used for
-  viewing auxiliary files without allowing modifications.  See
+  viewing auxiliary files without permitting modifications.  See
   :cpp:class:`FileViewer`
 
 **CommandWindow (commandwindow.h/.cpp)**
@@ -274,9 +274,9 @@ Support Components
 
 **StdCapture (stdcapture.h/.cpp)**
   Utility class that captures stdout output from LAMMPS.  Redirects
-  the C-level stdout file descriptor through a pipe to allow capturing
-  output from the LAMMPS library without blocking the GUI thread.
-  See :cpp:class:`StdCapture`
+  the C-level stdout file descriptor through a pipe to enable
+  capturing output from the LAMMPS library without blocking the GUI
+  thread.  See :cpp:class:`StdCapture`
 
 **FlagWarnings (flagwarnings.h/.cpp)**
   Syntax highlighter for LAMMPS warning and error messages in log
