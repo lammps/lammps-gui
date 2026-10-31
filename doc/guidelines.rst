@@ -7,9 +7,9 @@ Code Style
 
 The project follows these coding conventions:
 
-- **Indentation**: 4 spaces (no tabs)
+- **Indentation**: 4 spaces, **no** tabs
 - **Line length**: Maximum 100 characters
-- **Formatting**: Enforced by ``.clang-format`` configuration (LLVM-based)
+- **Formatting**: Enforced by ``.clang-format`` configuration
 - **Comments**: Use Doxygen-style documentation comments
 - **Naming**:
   - Classes: CamelCase (e.g., ``CodeEditor``, ``ChartWindow``)
