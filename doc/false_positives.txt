@@ -53,6 +53,7 @@ dihedral
 dll
 dlopen
 dmg
+dmgbuild
 doSmooth
 Doxygen
 dumpimage
