@@ -121,7 +121,7 @@ static bool appendFixComputeStyles(QString &cmd, const DumpImageParams &p)
 // the global color namespace (atoms use "map", bonds use "bm").  When @p reverse
 // is set the map is mirrored: the stop order is flipped, and for continuous maps
 // the positions are remapped (pos -> 1 - pos) so they stay ascending and the
-// gradient is inverted (e.g. "RWB" reversed renders identically to "BWR").
+// gradient is inverted (e.g. "BWR" reversed renders as red-white-blue).
 static void appendColorMapArgs(QString &cmd, const QString &kw, const QString &colormap,
                                const QString &mapmin, const QString &mapmax, const QString &pfx,
                                bool reverse)

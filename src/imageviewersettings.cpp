@@ -799,7 +799,7 @@ void ImageViewer::atomSettings()
     auto *minmaxvalidator = new QRegularExpressionValidator(validminmax, this);
 
     // atom color-map row.  Its first column holds the "Reverse" toggle, which
-    // mirrors the selected map (e.g. RWB -> BWR) without needing a separate entry.
+    // mirrors the selected map (e.g. BWR -> RWB) without needing a separate entry.
     auto *arevbutton = new QCheckBox("Reverse Map", this);
     arevbutton->setChecked(revcolormap);
     arevbutton->setObjectName("arevbutton");

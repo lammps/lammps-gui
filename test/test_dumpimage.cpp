@@ -199,10 +199,12 @@ TEST(DumpImageCommand, DefaultColormapIsBWR)
     p.atomcolor       = "vx"; // color atoms by a per-atom value so the map is emitted
     const QString cmd = buildCmd(p);
 
-    // "auto" min/max are translated to "min"/"max"
+    // "auto" min/max are translated to "min"/"max"; repeated colors share one
+    // custom color name
     EXPECT_TRUE(cmd.contains(" color map1 0.000 0.227 0.427"));
     EXPECT_TRUE(cmd.contains(" color map2 0.459 0.055 0.075"));
-    EXPECT_TRUE(cmd.contains(" amap min max cf 0.0 3 min map1 0.5 white max map2"))
+    EXPECT_TRUE(
+        cmd.contains(" amap min max cf 0.0 5 min map1 0.1 map1 0.5 white 0.9 map2 max map2"))
         << cmd.toStdString();
 }
 
@@ -237,17 +239,19 @@ TEST(DumpImageCommand, ReversedContinuousColormap)
     EXPECT_TRUE(cmd.contains(" amap min max cf 0.0 2 min white max black")) << cmd.toStdString();
 }
 
-TEST(DumpImageCommand, ReversedRwbMatchesBwrDirection)
+TEST(DumpImageCommand, ReversedBwrPutsRedAtMinimum)
 {
-    // "RWB" is the unlisted reversed alias of the offered "BWR" map:
-    // reversing RWB must put the blue stop (0.000 0.227 0.427) at the minimum
+    // reversing "BWR" gives red-white-blue: the red stop (0.459 0.055 0.075)
+    // moves to the minimum, and the symmetric stop positions stay the same
     auto p            = makeParams();
     p.atomcolor       = "vx";
-    p.colormap        = "RWB";
+    p.colormap        = "BWR";
     p.revcolormap     = true;
     const QString cmd = buildCmd(p);
-    EXPECT_TRUE(cmd.contains(" color map1 0.000 0.227 0.427")) << cmd.toStdString();
-    EXPECT_TRUE(cmd.contains(" amap min max cf 0.0 5 min map1"));
+    EXPECT_TRUE(cmd.contains(" color map1 0.459 0.055 0.075")) << cmd.toStdString();
+    EXPECT_TRUE(cmd.contains(" color map2 0.000 0.227 0.427"));
+    EXPECT_TRUE(
+        cmd.contains(" amap min max cf 0.0 5 min map1 0.1 map1 0.5 white 0.9 map2 max map2"));
 }
 
 TEST(DumpImageCommand, ReversedDiscreteBondColormap)
