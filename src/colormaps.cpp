@@ -37,18 +37,13 @@ const std::map<QString, ColorMapDef> &table()
 {
     // clang-format off
     static const std::map<QString, ColorMapDef> maps = {
-        {"BWR", {true, {rc(0.0, 0.000, 0.227, 0.427), nm(0.5, "white"),
-                        rc(1.0, 0.459, 0.055, 0.075)}}},
-        {"RWB", {true, {rc(0.0, 0.459, 0.055, 0.075), rc(0.1, 0.459, 0.055, 0.075),
-                        nm(0.5, "white"),
-                        rc(0.9, 0.000, 0.227, 0.427), rc(1.0, 0.000, 0.227, 0.427)}}},
-        {"PWT", {true, {rc(0.0, 0.286, 0.114, 0.553), rc(0.1, 0.286, 0.114, 0.553),
-                        nm(0.5, "white"),
-                        rc(0.9, 0.000, 0.255, 0.267), rc(1.0, 0.000, 0.255, 0.267)}}},
-        {"BWG", {true, {nm(0.0, "blue"), nm(0.1, "blue"), nm(0.5, "white"),
-                        nm(0.9, "green"), nm(1.0, "green")}}},
-        {"BGR", {true, {nm(0.0, "blue"), nm(0.05, "blue"), nm(0.5, "green"),
-                        nm(0.95, "red"), nm(1.0, "red")}}},
+        {"BWR", {true, {rc(0.0, 0.000, 0.227, 0.427), rc(0.1, 0.000, 0.227, 0.427), nm(0.5, "white"),
+                 rc(0.9, 0.459, 0.055, 0.075), rc(1.0, 0.459, 0.055, 0.075)}}},
+        {"PWT", {true, {rc(0.0, 0.286, 0.114, 0.553), rc(0.1, 0.286, 0.114, 0.553), nm(0.5, "white"),
+                 rc(0.9, 0.000, 0.255, 0.267), rc(1.0, 0.000, 0.255, 0.267)}}},
+        {"BWG", {true, {rc(0.0, 0.000, 0.227, 0.427), rc(0.1, 0.000, 0.227, 0.427), nm(0.5, "white"),
+                 rc(0.9, 0.000, 0.427, 0.227), rc(1.0, 0.000, 0.427, 0.227)}}},
+        {"BGR", {true, {nm(0.0, "blue"), nm(0.05, "blue"), nm(0.5, "green"), nm(0.95, "red"), nm(1.0, "red")}}},
         {"Grayscale", {true, {nm(0.0, "black"), nm(1.0, "white")}}},
         {"Viridis", {true, {rc(0.0,   0.267, 0.005, 0.329), rc(0.333, 0.191, 0.407, 0.556),
                             rc(0.667, 0.208, 0.719, 0.473), rc(1.0,   0.993, 0.906, 0.144)}}},
@@ -98,10 +93,6 @@ const ColorMapDef &colorMapDef(const QString &name)
 
 const QStringList &colorMapNames()
 {
-    // RWB is intentionally not offered: it is exactly BWR with the scale
-    // reversed, so the dialog's Reverse option reproduces it.  It is still
-    // present in table() above so any stale RWB selection still renders
-    // correctly.
     static const QStringList names = {
         "BWR",   "PWT",     "BWG",   "BGR",  "Grayscale", "Viridis",    "Plasma",    "Inferno",
         "Magma", "Cividis", "Turbo", "Teal", "Rainbow",   "Sequential", "Landscape", "Basic"};
