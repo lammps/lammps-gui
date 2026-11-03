@@ -774,8 +774,6 @@ void ImageViewer::readImageSettings()
     ellipsoidcolor = "atom";
     linecolor      = "atom";
     tricolor       = "atom";
-    // the historical blue-low/red-high default map ("RWB" is its unlisted
-    // reversed alias, kept so stale selections still render)
     colormap        = settings.value(Keys::COLORMAP, "BWR").toString();
     mapmin          = "auto";
     mapmax          = "auto";
