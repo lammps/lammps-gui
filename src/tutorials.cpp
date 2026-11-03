@@ -90,9 +90,9 @@ TutorialCollection molecular()
 
 // --- Collection 2: the materials-science tutorials (rolling out) --------------
 //
-// Input/solution files for all 14 tutorials are hosted publicly in the
+// Input/solution files for all 18 tutorials are hosted publicly in the
 // matsci-tutorials-inputs repository, so the collection downloads like any other.
-// TODO: add webUrl/slugs and set published = true once all 14 are released.
+// TODO: add webUrl/slugs and set published = true once all 18 are released.
 
 TutorialCollection matsci()
 {
@@ -130,7 +130,7 @@ TutorialCollection matsci()
                 "Oxides and charge-transfer~potentials"};
 
     c.blurbs = {
-        "<p>In tutorial 1, a face-centered cubic cystal structure of a bulk metal is constructed, "
+        "<p>In tutorial 1, a face-centered cubic crystal structure of a bulk metal is constructed, "
         "an EAM potential is applied, and the equilibrium lattice constant and cohesive energy of "
         "the crystal are obtained by energy minimization.</p>",
         "<p>In tutorial 2, the use of variables, loops, and command-line arguments in LAMMPS is "
@@ -145,9 +145,8 @@ TutorialCollection matsci()
         "<p>In tutorial 5, a single crystal is equilibrated and then subjected to tensile and "
         "compressive strain, the stress&ndash;strain response is extracted, and dislocation "
         "nucleation is visualized.</p>",
-        "<p>In tutorial 6, a single crystal is equilibrated and then subjected to tensile and "
-        "compressive strain, the stress&ndash;strain response is extracted, and dislocation "
-        "nucleation is visualized.</p>",
+        "<p>In tutorial 6, a tension test is performed on a nanowire with free surfaces, and "
+        "the effect of copper solutes on the strength and failure of the wire is investigated.</p>",
         "<p>In tutorial 7, grain boundaries are introduced: first a &Sigma;5(310) symmetric tilt "
         "boundary in fcc aluminum is constructed and its energy computed, then a &Sigma;3(111) "
         "boundary in bcc iron is strained to fracture and the per-atom stress is analyzed and "
