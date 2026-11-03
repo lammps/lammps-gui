@@ -121,6 +121,9 @@ void FindAndReplace::replaceAll()
     auto text = search->text();
     if (text.isEmpty()) return;
 
+    // cannot perform replace all if the replacement text contains the search text
+    if (replace->text().contains(search->text())) return;
+
     // drop selection if we have one
     auto cursor = editor->textCursor();
     if (cursor.hasSelection()) cursor.movePosition(QTextCursor::Left);
