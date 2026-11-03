@@ -22,95 +22,95 @@ available (on macOS use the Command key instead of Ctrl/Control).
      - Function
      - Shortcut
      - Function
-   * - Ctrl+N
+   * - Ctrl-N
      - New File
-     - Ctrl+Z
+     - Ctrl-Z
      - Undo edit
-     - Ctrl+Enter
+     - Ctrl-Enter
      - Run Input
-   * - Ctrl+O
+   * - Ctrl-O
      - Open File
-     - Ctrl+Shift+Z
+     - Ctrl-Shift-Z
      - Redo edit
-     - Ctrl+/
+     - Ctrl-/
      - Stop Active Run
-   * - Ctrl+Shift+F
+   * - Ctrl-Shift-F
      - View Text File
-     - Ctrl+C
+     - Ctrl-C
      - Copy text
-     - Ctrl+Shift+V
+     - Ctrl-Shift-V
      - Set Variables
-   * - Ctrl+S
+   * - Ctrl-S
      - Save File
-     - Ctrl+X
+     - Ctrl-X
      - Cut text
-     - Ctrl+I
+     - Ctrl-I
      - Snapshot Image
-   * - Ctrl+Shift+S
+   * - Ctrl-Shift-S
      - Save File As
-     - Ctrl+V
+     - Ctrl-V
      - Paste text
-     - Ctrl+L
+     - Ctrl-L
      - Slide Show
-   * - Ctrl+Q
+   * - Ctrl-Q
      - Quit Application
-     - Ctrl+A
+     - Ctrl-A
      - Select All
-     - Ctrl+F
+     - Ctrl-F
      - Find and Replace
-   * - Ctrl+W
+   * - Ctrl-W
      - Close Window
      - TAB
      - Reformat line
-     - Shift+TAB
+     - Shift-TAB
      - Show Completions
-   * - Ctrl+Shift+Enter
+   * - Ctrl-Shift-Enter
      - Run File
-     - Ctrl+Shift+W
+     - Ctrl-Shift-W
      - Show Variables
-     - Ctrl+P
+     - Ctrl-P
      - Preferences
-   * - Ctrl+Shift+A
+   * - Ctrl-Shift-A
      - About GUI
-     - Ctrl+Shift+H
+     - Ctrl-Shift-H
      - Quick Help
-     - Ctrl+Shift+G
+     - Ctrl-Shift-G
      - LAMMPS-GUI Docs
-   * - Ctrl+Shift+R
+   * - Ctrl-Shift-R
      - Inspect Restart File
-     - Ctrl+Shift+O
+     - Ctrl-Shift-O
      - View in OVITO
-     - Ctrl+Shift+D
+     - Ctrl-Shift-D
      - View in VMD
-   * - Ctrl+Shift+L
+   * - Ctrl-Shift-L
      - Output Window
-     - Ctrl+Shift+C
+     - Ctrl-Shift-C
      - Charts Window
-     - Ctrl+Shift+I
+     - Ctrl-Shift-I
      - Image Window
-   * - Ctrl+Shift+M
+   * - Ctrl-Shift-M
      - LAMMPS Manual
-     - Ctrl+?
+     - Ctrl-?
      - Context Help
-     - Ctrl+Shift+T
+     - Ctrl-Shift-T
      - LAMMPS Tutorial
-   * - Ctrl+Shift+U
+   * - Ctrl-Shift-U
      - Update LAMMPS
-     - Ctrl+Home
+     - Ctrl-Home
      - Go to Home
-     - Ctrl+End
+     - Ctrl-End
      - Go to End
-   * - Ctrl+Shift+J
+   * - Ctrl-Shift-J
      - View Image or Movie File(s)
-     - Ctrl+Shift+P
+     - Ctrl-Shift-P
      - Plot Data File
-     - Ctrl+E
+     - Ctrl-E
      - Extend Run
-   * - Ctrl+K
+   * - Ctrl-K
      - Check Input via Heuristics
-     - Ctrl+Shift+K
+     - Ctrl-Shift-K
      - Check Input via Dry Run
-     - Ctrl+Shift+X
+     - Ctrl-Shift-X
      - Command Window
 
 Further keybindings of the editor window `are documented with the Qt

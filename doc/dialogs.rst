@@ -117,7 +117,7 @@ General Settings
      ``-j`` or ``-w`` :ref:`command-line flag <command-line-options>`.
      In the combined window the views do not remember individual window
      sizes, and a keyboard shortcut that a view shares with the main
-     window (for example ``Ctrl+S``) is left to the main window, so only
+     window (for example ``Ctrl-S``) is left to the main window, so only
      its menu entry remains for the view.
    - **Include citation details:** when checked, full citation info will be
      included in the Output window.  This is equivalent to using ``-cite

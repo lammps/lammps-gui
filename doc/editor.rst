@@ -43,7 +43,7 @@ The word can then be completed by moving to an entry with the cursor
 keys and selecting it with the 'Enter' key or by clicking on the entry
 with the mouse.  The automatic completion pop-up can be disabled in the
 *Preferences* dialog, but the completion can still be requested manually
-by either hitting the `Shift+TAB` key or by right-clicking with the
+by either hitting the `Shift-TAB` keys or by right-clicking with the
 mouse and selecting the option from the context menu.  Most of the
 completion information is retrieved from the active LAMMPS instance and
 thus it shows only available options that were enabled when compiling
