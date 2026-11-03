@@ -1116,14 +1116,14 @@ void ImageViewer::doZoomOut()
 void ImageViewer::doRotLeft()
 {
     vrot += 10;
-    if (vrot < -180) vrot += 360;
+    if (vrot > 180) vrot -= 360;
     createImage();
 }
 
 void ImageViewer::doRotRight()
 {
     vrot -= 10;
-    if (vrot > 180) vrot -= 360;
+    if (vrot < -180) vrot += 360;
     createImage();
 }
 
