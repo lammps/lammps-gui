@@ -252,18 +252,19 @@ included command-line executables, if desired.
 Because the executables are currently not cryptographically signed with
 a digital key provided by Apple, macOS will likely refuse to launch
 LAMMPS-GUI as shown in the center image above.  After this, the
-executable will be listed under ``System Preferences -> Security &
-Privacy`` where you can click on "Open Anyway" to override this (see
-right image).  The details of this can change between different macOS
-versions (the screenshot images were created on macOS 12 Monterey), so
-you may need to look around or search the web to find the equivalent
-settings for your version.
+executable will be listed under either ``System Preferences -> Security
+& Privacy`` or ``System Settings -> Privacy & Security`` (depending on
+your macOS version) where you can click on "Open Anyway" to override
+this (see right image).  The exact details of this can change between
+different macOS versions (the screenshot images were created on macOS 12
+Monterey), so you may need to look around or search the web to find the
+equivalent settings for your version.
 
-A way to avoid this issue (verified with macOS 12 Monterey and macOS 26
-Tahoe) is to download the disk image from a terminal window with
-``curl -OL
+A way to avoid this issue altogether (verified with macOS 12 Monterey
+and macOS 26 Tahoe) is to download the disk image from a terminal window
+with ``curl -OL
 https://github.com/lammps/lammps-gui/releases/download/<version>/LAMMPS-GUI-macOS-multiarch-<version>.dmg``
-where you replace ``<version>`` with the version tag, e.g. v3.1.0.
+where you replace ``<version>`` with the version tag, e.g. v3.1.2.
 
 Linux on x86\_64
 """"""""""""""""
@@ -293,7 +294,7 @@ you can switch into the "LAMMPS_GUI" folder and execute
 .. code-block:: bash
 
    $ cd ~/Downloads
-   $ tar -xzvvf LAMMPS-Linux-x86_64-GUI-30Mar2026.tar.gz
+   $ tar -xzvvf LAMMPS-Linux-x86_64-GUI-30Sep2026.tar.gz
    $ cd LAMMPS_GUI
    $ ./lammps-gui &
 

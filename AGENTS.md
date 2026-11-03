@@ -83,7 +83,7 @@ main.cpp
   └─ LammpsGui (QMainWindow)           ← central coordinator
        ├─ CodeEditor (QPlainTextEdit)  ← input script editor
        │    ├─ Highlighter             ← LAMMPS syntax highlighting
-       │    ├─ FindAndReplace          ← non-modal find/replace dialog
+       │    ├─ FindAndReplace          ← find/replace dialog
        │    └─ QCompleter × N         ← per-command-type auto-complete
        ├─ LammpsWrapper               ← thin C++ wrapper around LAMMPS C API
        ├─ LammpsRunner (QThread)       ← runs LAMMPS in background thread
