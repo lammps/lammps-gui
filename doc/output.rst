@@ -26,7 +26,7 @@ Monitoring LAMMPS output
    1. There can be only one menu bar, so the displayed menu bar is that
       of the section / tab that currently has the focus. If access to
       the menu bar of a specific window is needed, e.g. to open a new
-      LAMMPS input file, it may be needed to first click into the
+      LAMMPS input file, it may be necessary to first click into the
       corresponding area or use the `F6` or `Shift-F6` keyboard
       shortcuts to switch focus.
    2. The *Image Viewer* and *Slide Show* windows lose the auto-resize
@@ -62,7 +62,7 @@ button on the right with the warning symbol or by using the keyboard
 shortcut `Ctrl-N` (`Command-N` on macOS), you can jump to the next
 line with a warning or error.  If there is a URL pointing to additional
 explanations in the online manual, that URL will be highlighted and
-double-clicking on it shall open the corresponding manual page in
+double-clicking on it opens the corresponding manual page in
 the web browser.  The option is also available from the context menu.
 
 The *Output* window is reused for every run: starting a run replaces
@@ -125,9 +125,9 @@ The plots are updated regularly with new data as the run progresses, so
 they can be used to visually monitor the evolution of available
 properties.  The update interval can be set in the *Preferences* dialog.
 By default, the raw data for the selected property is plotted as a blue
-graph.  From the "Plot:" drop-down menu on the second row (immediately
-to the right of the *Chart Style...* and *Postprocess...* quick-access
-buttons), you can select whether to plot only raw data graph, only a
+graph.  From the "Plot:" drop-down menu on the second row (to the right
+of the three quick-access buttons and the "X:" and "Y:" range sliders),
+you can select whether to plot only the raw data graph, only the
 smoothed data graph, or both graphs on top of each other.  The smoothing
 process uses a `Savitzky-Golay convolution filter
 <https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter>`_.  The
@@ -137,13 +137,19 @@ which means that the smoothing window includes 10 points each to the
 left and the right of the current data point for a total of 21 points
 and a fourth order polynomial is fitted to the data in the window.
 
-The "Title:" and "Y:" input boxes let you edit the text shown as the
+The "Title:" and "Y-Axis:" input boxes let you edit the text shown as the
 plot title and the y-axis label, respectively.  The text entered in the
-"Title:" box is applied to *all* charts, while the "Y:" text changes
+"Title:" box is applied to *all* charts, while the "Y-Axis:" text changes
 only the y-axis label of the currently *selected* plot.  In standalone
 plot mode (when plotting an external data file), an additional "X-Axis:"
-input box is shown to the right of "Y:" and sets the x-axis label for all
-charts.
+input box is shown between "Title:" and "Y-Axis:" and sets the x-axis
+label for all charts.  The "Units:" and "Norm:" fields show the `units
+<https://docs.lammps.org/units.html>`_ setting of the simulation and
+whether its thermodynamic output is normalized (see `thermo_modify norm
+<https://docs.lammps.org/thermo_modify.html>`_); they are for information
+only.  The "X:" and "Y:" range sliders on the second row narrow the
+displayed part of the x- and y-axis range, so that a region of the plot
+can be magnified.
 
 The window title shows the current run number that this chart window
 corresponds to.  Same as for the *Output* window, the chart window is
@@ -154,7 +160,8 @@ reused and its charts are replaced on each new run.
 .. index:: data export
 
 From the *File* menu on the top left, it is possible to save an image
-of the currently displayed plot or export the data in either plain text
+of the currently displayed plot, copy it to the clipboard (`Ctrl-C`),
+or export the data in either plain text
 columns (for use by plotting tools like `gnuplot
 <http://www.gnuplot.info/>`_ or `grace
 <https://plasma-gate.weizmann.ac.il/Grace/>`_), as CSV data which can be
@@ -203,7 +210,7 @@ the default chart graph size.
    Using frequent thermo output during long simulations can result in a
    significant slowdown of that simulation since it is accumulating many
    data points for each of the thermo properties in the chart window to
-   be redrawn with every update.  The updates are consuming additional
+   be redrawn with every update.  The updates consume additional
    CPU time when smoothing is enabled.  This slowdown can be confirmed
    when an increasing percentage of the total run time is spent in the
    "Output" or "Other" sections of the `MPI task timing breakdown
@@ -252,7 +259,8 @@ Reference lines
    :align: right
    :scale: 33%
 
-The *Reference Lines...* entry in the chart window's *File* menu opens a
+The *Reference Lines...* entry in the chart window's *File* menu, or the
+second quick-access button of the second toolbar row, opens a
 dialog for adding straight annotation lines that are drawn on *every*
 chart in the window.  Each line is either *Vertical* (at a chosen x
 value) or *Horizontal* (at a chosen y value) and can carry a text label
@@ -280,8 +288,8 @@ Post-process data
 -----------------
 
 The *Postprocess...* entry in the chart window's *File* menu, or the
-quick-access button immediately to the right of the *Chart Style...*
-button, runs an analysis on the data of the currently selected property.
+third quick-access button (to the right of the *Reference Lines...*
+button), runs an analysis on the data of the currently selected property.
 The following analyses are available:
 
 - *Autocorrelation* computes the normalized autocorrelation function of
@@ -294,7 +302,7 @@ The following analyses are available:
 - *Birch-Murnaghan EOS fit* fits a 4-parameter `Birch-Murnaghan equation
   of state
   <https://en.wikipedia.org/wiki/Birch%E2%80%93Murnaghan_equation_of_state>`_
-  to energy-versus-volume data (x = volume per unit cell, y = energy).  A
+  to energy-versus-volume data (x = volume, y = energy).  A
   confirmation dialog lets you verify the x and y column assignments and
   enter the number of atoms in the conventional unit cell N (default 1;
   e.g. 4 for FCC, 2 for BCC or HCP; use N = 1 when the x data is already
@@ -304,7 +312,8 @@ The following analyses are available:
   E\ :sub:`0`, the bulk modulus B\ :sub:`0`, and its pressure
   derivative B\ :sub:`0`'.
 - *Custom function* evaluates a user-supplied mathematical expression
-  ``f(x)`` over the x range of the data and overlays it as a curve.  The
+  ``f(x)`` over the x range of the data (or the part of it selected as
+  *Plot x-range*) and overlays it as a curve.  The
   expression uses the variable ``x`` for the abscissa and supports the
   usual arithmetic operators and functions (for example
   ``2*x^2 + 3*sin(x)``).
@@ -320,8 +329,9 @@ The following analyses are available:
   *d* degrees of freedom, :math:`f(E) = A\,E^{d/2-1}\exp(-E/k_BT)`, to the
   data.  This is what a histogram of the per-atom kinetic energy is
   expected to follow, so importing a ``fix ave/histo`` file of
-  ``c_ke/atom`` and fitting it reads the temperature off the shape of the
-  distribution.  The *Dimensions* selector sets *d*, the degrees of freedom **per atom**
+  ``compute ke/atom`` output and fitting it reads the temperature off
+  the shape of the distribution.  The *Dimensions* selector sets *d*,
+  the degrees of freedom **per atom**
   (three by default, which is the familiar :math:`\sqrt{E}` prefactor).
   Constrained and rigid molecules have fewer: a rigid 3-site water held by
   `fix shake <https://docs.lammps.org/fix_shake.html>`_ has six degrees of
@@ -412,12 +422,13 @@ library used by the LAMMPS `Lepton-based styles
 matches.
 
 When any fit or custom-function overlay is active, the "Plot:" drop-down
-treats the overlay as the "smoothed" series: selecting "Smoothed" or
+treats the overlay as the "smoothed" series: selecting the middle entry
+(which then carries the name of the overlay instead of "Smooth") or
 "Both" shows the overlay curve, while selecting "Raw" hides it.  This
-applies uniformly to all analysis types (polynomial, EOS, custom function,
-and custom fit).  To get the plain smoothed series back, select the
-*Smoothed data (restore)* entry the dialog offers while an overlay is
-active.
+applies uniformly to all overlay types (polynomial, EOS, Maxwell-Boltzmann,
+custom function, custom fit, and overlaid data column).  To get the
+plain smoothed series back, select the *Smoothed data (restore)* entry
+the dialog offers while an overlay is active.
 
 .. figure:: JPG/lammps-gui-post-function.png
    :align: center
@@ -447,9 +458,12 @@ which column provides the x axis and which columns to plot, and also
 allows renaming columns.  A rename takes effect immediately: each column
 has exactly one name at any time, used in the column list, the preview,
 and the expressions described below alike.  An "X-Axis:" label field in
-the first toolbar row (to the right of "Title:" and "Y:") lets you edit
+the first toolbar row (between "Title:" and "Y-Axis:") lets you edit
 the x-axis label after the chart opens.  All the styling, export, and
-post-processing features described above work the same way.  The same
+post-processing features described above work the same way.  In this
+mode the *File* menu also has an *Add Data from File...* entry, which
+reads another data file through the same column-picker dialog and adds
+the selected columns to the current chart as additional series.  The same
 column-picker and standalone chart window are also launched when
 LAMMPS-GUI is invoked from the command line with the ``-c``/``--chart``
 flag (see :ref:`command-line options <command-line-options>`).
@@ -510,7 +524,7 @@ There are two ways to reduce the blocks:
    Average a range of blocks row by row and show the spread as error bars.
    The range covers the whole file, and the two spin boxes select a part
    of it; raising the first one is how a leading stretch of equilibration
-   is left out.  Nothing is dropped without being said: the line below
+   is left out.  Nothing is dropped silently: the line below
    reports how many blocks were averaged, and how many were dropped for
    having a different number of rows than the last block of the range.
 
@@ -662,10 +676,10 @@ separate window as shown below.
 Like for the *Output* and *Charts* windows, its content is continuously
 updated during a run.  It will show "(none)" if there are no variables
 defined.  Note that it is also possible to *set* `index style variables
-<https://docs.lammps.org/variable.html>`_, that would normally be set
-via command-line flags, via the "Set Variables..." dialog from the *Run*
-menu.  LAMMPS-GUI automatically defines the variable "gui_run" to the
-current value of the run counter.  That way it is possible to
+<https://docs.lammps.org/variable.html>`_, which would normally be set
+via command-line flags, with the "Set Variables..." dialog from the *Run*
+menu.  LAMMPS-GUI automatically defines the variable "gui_run" and sets it
+to the current value of the run counter.  That way it is possible to
 automatically record a separate log for each run attempt by using the
 command
 
@@ -710,7 +724,8 @@ it, and hovering over it shows the path in full.  The window starts in the direc
 of the current input file, which is where a run leaves its output, and
 stays independent afterwards: opening a different input file does not
 move a shell that may be busy.  *File* > *Change to Input Directory*
-moves it to the current input file's directory on request.  The
+moves it to the current input file's directory on request, and *File* >
+*Clear Output* empties the scrollback.  The
 up and down arrow keys walk through previously entered commands, which
 are remembered between sessions.
 
@@ -900,7 +915,7 @@ On Windows, neither killing nor interrupting a command is supported;
    is there.  On Fedora and related distributions this is where ``ls``,
    ``ll`` and ``l.`` are defined, so those three are absent while the
    rest of the aliases are present.  *File* > *Command Aliases...* is
-   where to put them back, and it starts out holding exactly those.
+   where to put them back, and it starts out holding ``ls`` and ``ll``.
 
 .. admonition:: This is **NOT** a terminal emulator
    :class: warning

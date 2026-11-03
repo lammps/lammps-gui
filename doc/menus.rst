@@ -9,7 +9,7 @@ Menus
 The menu bar has entries *File*, *Edit*, *Run*, *View*, *Tutorials*, and
 *About*.  Instead of using the mouse to click on them, the individual
 menus can also be activated by hitting the `Alt` key together with the
-corresponding underlined letter, that is `Alt-F` activates the
+corresponding underlined letter, for example, `Alt-F` activates the
 *File* menu.  For the corresponding activated sub-menus, the key
 corresponding to the underlined letters can be used to select entries
 instead of using the mouse.
@@ -20,7 +20,7 @@ instead of using the mouse.
    In combined window mode there can be only one menu bar, so the
    displayed menu bar is that of the section / tab that currently has
    the focus.  If access to the menu bar of a specific window is needed,
-   e.g. to open a new LAMMPS input file, it may be needed to either
+   e.g. to open a new LAMMPS input file, it may be necessary to either
    first click into the corresponding area or use the `F6` or `Shift-F6`
    keyboard shortcuts to switch focus.
 
@@ -34,62 +34,70 @@ File
 
 .. admonition:: The *File* menu offers the usual options:
 
-   - *New Input File* clears the current buffer and resets the file name to ``*unknown*``
-   - *Open Input File* opens a dialog to select a new file for editing in the *Editor*
-   - *Save Input File* saves the current file; if the file name is ``*unknown*``
-     a dialog will open to select a new file name
-   - *Save Input File As* opens a dialog to select a new file name (and folder, if
-     desired) and saves the buffer to it.  Writing the buffer to a different folder
-     will also switch the current working directory to that folder.
-   - *View Text File* opens a dialog to select a file for viewing in a *separate*
-     window (read-only) with support for on-the-fly decompression.
-     If the selected file appears to be an image, a movie, or a binary file,
-     a warning is shown instead; use *View Image or Movie File(s)...* for those.
-   - *View Image or Movie File(s)...* opens a dialog to select one or more image files
-     and shows them together in a standalone :ref:`slide show <slideshow>` window.  This is
-     useful for reviewing images created by an external (e.g. large parallel) simulation,
-     or for revisiting images from an earlier run without rerunning it.  Image formats
-     that Qt cannot read natively are converted on demand with
-     `ImageMagick <https://imagemagick.org/>`_ if it is available, and each file is
-     converted only once.  Movie files may be selected as well: their frames are
-     extracted into individual images with `FFmpeg <https://ffmpeg.org/>`_ after
-     confirming a dialog that also selects the frame range and interval, as explained
-     under :ref:`Importing movie files <movie_import>`.
-   - *Plot Data File...* opens a dialog to select a file with column-oriented numeric
-     data and plots it in a standalone :ref:`Charts window <charts>` without running a
-     simulation.  See the description below for details.
-   - *Inspect Restart File* opens a dialog to select a file.  If that file is a
-     `LAMMPS restart <https://docs.lammps.org/write_restart.html>`_ three
-     windows with :ref:`information about the file are opened
-     <inspect_restart>`.
-   - *Write Restart File...* opens a dialog to select a file name and then
-     writes a `LAMMPS restart file
-     <https://docs.lammps.org/write_restart.html>`_ with the current state
-     of the system.  This requires a system state, e.g. from running an
-     input.  A typical use case is to preserve the state of a run that was
-     interrupted with the *Stop LAMMPS* entry of the :ref:`Run menu
-     <run_menu>` before extending it.
-   - *Quit* exits LAMMPS-GUI. If there are unsaved changes, a dialog will
-     appear to either cancel the operation, or to save, or to not save the
-     modified buffer.
+   - *New Input File* clears the current buffer and resets the file name
+     to ``*unknown*``
+   - *Open Input File* opens a dialog to select a new file for editing
+     in the *Editor*
+   - *Save Input File* saves the current file; if the file name is
+     ``*unknown*`` a dialog will open to select a new file name
+   - *Save Input File As* opens a dialog to select a new file name (and
+     folder, if desired) and saves the buffer to it.  Writing the buffer
+     to a different folder will also switch the current working
+     directory to that folder.
+   - *View Text File* opens a dialog to select a file for viewing in a
+     *separate* window (read-only) with support for on-the-fly
+     decompression.  If the selected file appears to be an image or a
+     movie file, a warning is shown instead; use *View Image or Movie
+     File(s)...* for those.
+   - *View Image or Movie File(s)...* opens a dialog to select one or
+     more image files and shows them together in a standalone
+     :ref:`slide show <slideshow>` window.  This is useful for reviewing
+     images created by an external (e.g. large parallel) simulation, or
+     for revisiting images from an earlier run without rerunning it.
+     Image formats that Qt cannot read natively are converted on demand
+     with `ImageMagick <https://imagemagick.org/>`_ if it is available,
+     and each file is converted only once.  Movie files may be selected
+     as well: their frames are extracted into individual images with
+     `FFmpeg <https://ffmpeg.org/>`_ after confirming a dialog that also
+     selects the frame range and interval, as explained under
+     :ref:`Importing movie files <movie_import>`.
+   - *Plot Data File...* opens a dialog to select a file with
+     column-oriented numeric data and plots it in a standalone
+     :ref:`Charts window <charts>` without running a simulation.  See
+     the description below for details.
+   - *Inspect Restart File* opens a dialog to select a file.  If that
+     file is a `LAMMPS restart
+     <https://docs.lammps.org/write_restart.html>`_ three windows with
+     :ref:`information about the file are opened <inspect_restart>`.
+   - *Write Restart File...* opens a dialog to select a file name and
+     then writes a `LAMMPS restart file
+     <https://docs.lammps.org/write_restart.html>`_ with the current
+     state of the system.  This requires a system state, e.g. from
+     running an input.  A typical use case is to preserve the state of a
+     run that was interrupted with the *Stop LAMMPS* entry of the
+     :ref:`Run menu <run_menu>` before extending it.
+   - *Quit* exits LAMMPS-GUI. If there are unsaved changes, a dialog
+     will appear to either cancel the operation, or to save, or to not
+     save the modified buffer.
 
-In addition, up to 5 recent file names will be listed after the *Open Input File*
-entry that allows re-opening recently opened files.  This list is stored
+In addition, up to 5 recent file names will be listed above the *Quit*
+entry; selecting one of them re-opens that file.  This list is stored
 when quitting and recovered when starting again.
 
 **Files that are not what they are opened as.** Each of these entries
 expects a certain kind of file, and the file dialogs offer *All files*
-as well, so a file can be picked that does not fit: a binary file for the
-editor or the text viewer, something that is not a picture for the slide
-show, an image for the plotter.  Rather than refuse it or fill a window
-with unreadable content, LAMMPS-GUI asks -- *"... does not look like a
-text file.  Do you want to open it anyway?"* -- and the answer defaults
-to *No*, since the usual reason to see the question is a name that was
-mistyped or a file that was picked by mistake.  Answering *Yes* opens it
-regardless, which is occasionally what is wanted: an input file with a
-stray null byte in it can still be edited.  A file that looks right is
-never asked about.  The same check applies to the ``edit``, ``open`` and
-``plot`` commands of the :ref:`command window <commandwindow>`.
+as well, so a file can be picked that does not fit: a binary file for
+the editor or the text viewer, something that is not a picture for the
+slide show, an image for the plotter.  Rather than refuse it or fill a
+window with unreadable content, LAMMPS-GUI asks -- *"... does not look
+like a text file.  Do you want to open it anyway?"* -- and the answer
+defaults to *No*, since the usual reason to see the question is a name
+that was mistyped or a file that was picked by mistake.  Answering *Yes*
+opens it regardless, which is occasionally what is wanted: an input file
+with a stray null byte in it can still be edited.  A file that looks
+right is never asked about.  The same check applies to the ``edit``,
+``open`` and ``plot`` commands of the :ref:`command window
+<commandwindow>`.
 
 **Plotting external data files.** The *Plot Data File...* entry
 (`Ctrl-Shift-P`) opens a dialog to select a file with column-oriented
@@ -137,9 +145,9 @@ Run
 .. index:: LAMMPS library interface
 
 The *Run* menu has options to start and stop a LAMMPS process.  Rather
-than calling the LAMMPS executable as a separate executable, the
-LAMMPS-GUI is linked to the LAMMPS library and thus can run LAMMPS
-internally through the `LAMMPS C-library interface
+than calling the LAMMPS executable as a separate executable,
+LAMMPS-GUI is linked to the LAMMPS library (or loads it at runtime) and
+thus can run LAMMPS internally through the `LAMMPS C-library interface
 <https://docs.lammps.org/Library.html#lammps-c-library-api>`_ in a
 separate thread.
 
@@ -173,14 +181,14 @@ system state, e.g. from a previous run or an inspected restart file.
 The continuation executes a `timer timeout off
 <https://docs.lammps.org/timer.html>`_ command, which resets the
 expired timer in case the previous run was interrupted with *Stop
-LAMMPS*, followed by ``run <steps> pre yes post no``.  The captured
+LAMMPS*, followed by ``run <steps> start 0``.  The captured
 output and thermodynamic data are appended to the existing *Output*
 and *Charts* windows after a message noting the extension.  Typical
 use cases are continuing a run that was stopped (e.g. after writing a
 restart file first), or extending a run that did not produce enough
 frames for a smooth animation or enough data for a plot.
 
-The *Relaunch LAMMPS Instance* will destroy the current LAMMPS thread
+The *Relaunch LAMMPS Instance* entry will destroy the current LAMMPS thread
 and free its data and then create a new thread with a new LAMMPS
 instance.  This is usually not needed, since LAMMPS-GUI tries to detect
 when this is needed and does it automatically.  This is available
@@ -293,8 +301,8 @@ output, charts, slide show, variables, snapshot images, or the
 window instead of windows of their own, and the same entries show and
 hide the panels.  The *Image Window* entry first creates a snapshot
 image, like *Create Image* in the *Run* menu, when there is none yet.
-The default settings for their visibility can be changed in the
-*Preferences* dialog.
+Whether the *Output*, *Charts*, and *Slide Show* windows are shown by
+default can be changed in the *Preferences* dialog.
 
 With that layout the menu also has the *Next Panel* (`F6`) and
 *Previous Panel* (`Shift-F6`) entries, which move the keyboard focus
@@ -333,15 +341,15 @@ DEM*.  Each submenu lists its individual tutorial sessions; selecting one
 begins that session.
 
 Collections are released incrementally.  A collection that is not yet
-fully published is labeled in the menu with its status, e.g. *(coming
-soon)* or *(planned)*.  Within such a collection only the tutorials that
+fully published is labeled in the menu with its status, e.g. *(beta)*
+or *(planned)*.  Within such a collection only the tutorials that
 are already available can be launched; the remaining entries are shown
 (so you can preview what is coming) but are disabled.  A collection with
 no tutorials available yet appears as a single disabled submenu.
 
 Selecting an available tutorial opens a 'wizard' dialog where you can
 choose in which folder you want to work, whether you want that folder to
-be wiped from *any* files, whether you want to download the solution
+be wiped of *any* files, whether you want to download the solution
 files (which can be large) to a ``solution`` sub-folder, and whether you
 want the corresponding tutorial's online version opened in your web
 browser.  The dialog will then start downloading the files requested
@@ -368,13 +376,13 @@ The *About* menu finally offers a couple of dialog windows and an
 option to launch the LAMMPS online documentation in a web browser.  The
 *About LAMMPS-GUI* entry displays a dialog with a summary of the
 configuration settings of the LAMMPS library in use and the version
-number of LAMMPS-GUI itself.  The *Quick Help* displays a dialog with
+number of LAMMPS-GUI itself.  The *Quick Help* entry displays a dialog with
 a minimal description of LAMMPS-GUI.  The *LAMMPS-GUI Documentation* entry
 will open the LAMMPS-GUI online documentation website
 https://lammps-gui.lammps.org in a web browser window.
-The *LAMMPS Manual* entry will open the main page of
+The *LAMMPS Online Manual* entry will open the main page of
 the LAMMPS online documentation in a web browser window.
-The *LAMMPS Tutorial* entry will open the main page of the set of
+The *LAMMPS Tutorial Website* entry will open the main page of the set of
 LAMMPS tutorials authored and maintained by Simon Gravelle at
 https://lammpstutorials.github.io/ in a web browser window.
 The *Check for LAMMPS update* entry -- available only in the plugin

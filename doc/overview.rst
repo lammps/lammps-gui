@@ -13,13 +13,13 @@ It can retrieve and display information from LAMMPS while it is running,
 display visualizations created with the `dump image command
 <https://docs.lammps.org/dump_image.html>`_, and is adapted specifically
 for editing LAMMPS input files through syntax highlighting, text
-completion, and reformatting, and linking to the online LAMMPS
+completion, reformatting, and linking to the online LAMMPS
 documentation for known LAMMPS commands and styles.
 
 LAMMPS-GUI aims to support a workflow similar to the traditional
 experience of running LAMMPS using a text editor, a command-line window,
 launching the LAMMPS text-mode executable printing output to the screen,
-and post-processing and visualizing LAMMPS' output but just integrated
+and post-processing and visualizing LAMMPS' output, but integrated
 into a single application.
 
 LAMMPS-GUI integrates well with graphical desktop environments where the
@@ -61,7 +61,7 @@ facilities.
 
 |fullscreen1|  |fullscreen2|
 
-Most features in LAMMPS-GUI have been exposed to keyboard shortcuts,
+Most features in LAMMPS-GUI can be accessed with keyboard shortcuts,
 making it also appealing for experienced LAMMPS users for prototyping
 and testing simulation setups.
 
@@ -86,7 +86,8 @@ and testing simulation setups.
    - Many adjustable settings and preferences are persistent, including the 5 most recent files
    - Thermodynamic output is captured and displayed as a line graph in a *Charts* window
    - Export of thermodynamic data to CSV, YAML, and multi-column text format
-   - Create simple plots from imported CSV, YAML, and plain multi-column data
+   - Create simple plots from imported CSV, YAML, JSON, and plain multi-column data,
+     and from the block-structured output files of the fix ave/\* commands
    - Multiple post-processing options for plot data, and plot style customizations
    - Interactive visualization of current state via calling `dump image <https://docs.lammps.org/dump_image.html>`_
    - Capture of images created by `dump image <https://docs.lammps.org/dump_image.html>`_ in the *Slide Show* window

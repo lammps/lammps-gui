@@ -46,8 +46,9 @@ LAMMPS-GUI supports the following command-line options:
      - Open ``file`` directly in a standalone :ref:`Charts window <charts>`;
        a column-picker dialog is shown first
    * - ``-i <file>``, ``--image <file>``
-     - Open ``file`` in the :ref:`slide show viewer <slideshow>`; may be given
-       multiple times to load several images at once
+     - Open the image or movie ``file`` in the :ref:`slide show viewer
+       <slideshow>`; may be given multiple times to load several files
+       at once
    * - ``-t <file>``, ``--text <file>``
      - Open ``file`` in a standalone text viewer
    * - ``-j``, ``--joined``
@@ -72,25 +73,26 @@ their text (``--help-all`` then lists only the generic Qt options that
 do not need a display) and ``-p`` still stores the library path, but
 LAMMPS-GUI itself cannot start: it prints an error message and exits.
 Selecting a Qt platform plugin explicitly, with ``-platform <name>`` or
-the ``QT_QPA_PLATFORM`` environment variable, skips this check.  For
-example, ``-platform vnc`` makes LAMMPS-GUI act as a VNC server, so it
-can be used from a VNC viewer on another machine.
+the ``QT_QPA_PLATFORM`` environment variable, or an X display with
+``-display <name>``, skips this check.  For example, ``-platform vnc``
+makes LAMMPS-GUI act as a VNC server, so it can be used from a VNC
+viewer on another machine.
 
 The optional ``file`` argument specifies a LAMMPS input file to open on
-startup.  If no file is provided, LAMMPS-GUI starts with an empty
-editor buffer.  Available choices for the visual style depend on the
-platform and Qt configuration.  On most platforms, there is also the
-option ``Windows`` which is a visual style somewhat resembling
-`Windows 95 <https://en.wikipedia.org/wiki/Windows_95>`_.
+startup.  If no file is provided, LAMMPS-GUI starts with an empty editor
+buffer.  Available choices for the visual style depend on the platform
+and Qt configuration.  On most platforms, there is also the option
+``Windows``, which is a visual style somewhat resembling `Windows 95
+<https://en.wikipedia.org/wiki/Windows_95>`_.
 
 The ``-c``, ``-i``, and ``-t`` flags open a standalone viewer without
 the main editor window; they are mutually exclusive with each other and
 with the ``file`` positional argument.  Such a viewer is always an
 individual window with a menu bar of its own, since there is no main
-window for it to be a panel of, whatever the layout preference or
-``-j`` say.  The ``-i`` flag does not support
-wildcards via filename globbing, but that can be emulated; for example
-on a Bourne shell with: ``lammps-gui $(for f in image-*.png; do echo " -i $f"; done)``.
+window for it to be a panel of, whatever the layout preference or ``-j``
+say.  The ``-i`` flag does not support wildcards via filename globbing,
+but that can be emulated; for example on a Bourne shell with:
+``lammps-gui $(for f in image-*.png; do echo " -i $f"; done)``.
 
 Launching LAMMPS-GUI
 ^^^^^^^^^^^^^^^^^^^^
@@ -114,7 +116,7 @@ the LAMMPS input file syntax.  The status bar shows the status of
 LAMMPS execution on the left (e.g.  "Ready." when idle) and the current
 working directory on the right.  The name of the current file in the
 buffer is shown in the window title; the word `*modified*` is added if
-the buffer edits have not yet been saved to a file.  The geometry of the
+the buffer edits have not yet been saved to a file.  The size of the
 main window is stored when exiting and restored when starting again.
 
 Opening and saving files
@@ -129,13 +131,14 @@ arguments and then starts with an empty buffer in the *Editor* window.
 
 If a file argument is given, LAMMPS-GUI will use it as the file name for
 the *Editor* buffer and read its contents into the buffer, provided a
-file of that name exists; otherwise the buffer will be empty, but set up
-to save any added content to that file.  Files can also be opened via the
+file of that name exists; otherwise a warning is shown and the buffer
+will be empty, but set up to save any added content to that file.
+Files can also be opened via the
 *File* menu, the `Ctrl-O` (`Command-O` on macOS) keyboard shortcut or by
 drag-and-drop of a file from a graphical file manager into the editor
 window.  If a file extension (e.g.  ``.lmp``) has been registered with
 the graphical environment to launch LAMMPS-GUI, an existing input file
-can be launched with LAMMPS-GUI through double clicking.
+can be opened in LAMMPS-GUI by double-clicking it.
 
 Only one file can be edited at a time, so opening a new file with a file
 already loaded into the buffer closes that buffer.  If the buffer has
@@ -173,9 +176,9 @@ buffer, they *will* be used.  As an alternative, it is also possible to
 run LAMMPS by reading the contents of a file from the *Run LAMMPS from
 File* menu entry or with `Ctrl-Shift-Enter`.  This option may be
 required in some rare cases where the input uses some functionality that
-is not compatible with running LAMMPS from a string buffer.  For
-consistency, any unsaved changes in the buffer must be either saved to
-the file or undone before LAMMPS can be run from a file.
+is not compatible with running LAMMPS from a string buffer.  If the
+buffer has unsaved changes, a dialog asks whether to save them to the
+file first, to run the file without them, or to cancel the run.
 
 The line number of the currently executed command is highlighted in
 green in the line number display for the *Editor* window.
@@ -215,7 +218,7 @@ the current `run <https://docs.lammps.org/run.html>`_ or `minimize
    reducing or turning off thread parallelization.  It is also possible
    to reduce the amount of data by increasing the `thermo interval
    <https://docs.lammps.org/thermo.html>`_.  LAMMPS-GUI detects if the
-   associated I/O buffer is significantly full, and will print a warning
+   associated I/O buffer is significantly full, and will show a warning
    *after* the run with suggested adjustments.  The CPU utilization can
    also be lower than expected when some significant parts of the code
    paths in use are not multi-threaded, or when the simulation is slowed

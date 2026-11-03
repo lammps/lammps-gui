@@ -6,21 +6,22 @@ Installation
 .. index:: compilation
 .. index:: pre-compiled packages
 
-LAMMPS-GUI is distributed as `source code on GitHub
-<https://github.com/lammps/lammps-gui>`_ and can be compiled as part
-of compiling LAMMPS, where it will be linked to the corresponding
-version of LAMMPS directly.  Pre-compiled packages of LAMMPS with
-LAMMPS-GUI included are available for download (see below).
+LAMMPS-GUI is distributed via a `source code repository on GitHub
+<https://github.com/lammps/lammps-gui>`_ and can be compiled as part of
+compiling `LAMMPS <https://github.com/lammps/lammps/>`_, where it will
+be linked to the corresponding version of LAMMPS directly.  Pre-compiled
+packages of LAMMPS with LAMMPS-GUI included are available for download
+(see below).
 
 LAMMPS-GUI can also be compiled as a standalone package that loads the
 LAMMPS library dynamically at runtime.  This enables using LAMMPS-GUI
 with customized, patched, or extended LAMMPS versions containing
 features not available in the official LAMMPS distribution packages.  It
-also allows using LAMMPS-GUI with LAMMPS shared libraries compiled
-using the traditional makefile based build process (which does not
-support compiling LAMMPS-GUI directly).  Pre-compiled packages of
-standalone LAMMPS-GUI versions with a LAMMPS shared library included are
-also available for download (see below).
+also allows using LAMMPS-GUI with LAMMPS shared libraries compiled using
+the traditional makefile based build process (which does not support
+compiling LAMMPS-GUI directly).  Pre-compiled packages of standalone
+LAMMPS-GUI versions with a LAMMPS shared library included are also
+available for download (see below).
 
 Prerequisites and portability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -30,11 +31,12 @@ Prerequisites and portability
 .. index:: CMake
 
 LAMMPS-GUI is programmed in C++ based on the C++17 standard and using
-the `Qt GUI framework <https://www.qt.io/development/qt-framework>`_.  As
-of LAMMPS-GUI version 2.0.0 Qt version 6.2 or later is required.
-LAMMPS-GUI can switch between a "light" and a "dark" theme according to
-the settings of the desktop environment.  Building LAMMPS-GUI from
-source requires CMake version 3.20 or later.
+the `Qt GUI framework <https://www.qt.io/development/qt-framework>`_.
+Starting with LAMMPS-GUI version 2.0.0, Qt version 6.2 or later
+including the Widgets, Network, and Svg modules is required.  LAMMPS-GUI
+can switch between a "light" and a "dark" theme according to the
+settings of the desktop environment.  Building LAMMPS-GUI from source
+requires CMake version 3.20 or later.
 
 .. admonition:: LAMMPS-GUI |version| has been successfully compiled and tested on:
 
@@ -73,8 +75,8 @@ Enterprise Linux 9.x or Ubuntu 22.04LTS or later and compatible), macOS
 from the `LAMMPS releases page on GitHub
 <https://github.com/lammps/lammps/releases/>`_.  A backup download
 location is at https://download.lammps.org/static/ but may not always be
-up-to-date.  Occasionally, also test version packages previewing
-recently added features are available at
+up-to-date.  Occasionally, test version packages previewing recently
+added features are also available at
 https://download.lammps.org/testing/ .
 
 Standalone packages with a basic LAMMPS library
@@ -95,26 +97,27 @@ features that do not depend on additional libraries for improved
 portability.
 
 If you want to override that choice of LAMMPS library, you can use the
-``-p`` command line flag to tell LAMMPS-GUI which other LAMMPS shared
+``-p`` command-line flag to tell LAMMPS-GUI which other LAMMPS shared
 library file you want it to load.  By using ``-p ""`` you can also reset
 any previous choice and thus trigger loading the default library again.
 When resetting the LAMMPS shared library path or when the currently
-configured library file cannot be loaded or no longer exists, a dialog
-will appear that lets you re-download the default minimal LAMMPS shared
-library from the LAMMPS web server or browse the file system for a
-suitable custom shared library file.  Once LAMMPS-GUI is running, you
-can also change the path to the LAMMPS shared library or re-download a
-pre-compiled copy from the :doc:`Preferences dialog <dialogs>`.
+configured library file cannot be loaded or no longer exists, and no
+other suitable library file is found automatically, a dialog will appear
+that lets you re-download the default minimal LAMMPS shared library from
+the LAMMPS web server or browse the file system for a suitable custom
+shared library file.  Once LAMMPS-GUI is running, you can also change
+the path to the LAMMPS shared library or re-download a pre-compiled copy
+from the :doc:`Preferences dialog <dialogs>`.
 
 The flatpak version of the standalone LAMMPS-GUI package does not
-contain a pre-compiled library so it will directly show the download
-or browse dialog on the first invocation.  When the flatpak version
-is updated, it may be required to reset the shared library location
-with ``-p ""`` and re-download the latest version.
+contain a pre-compiled library so it will directly show the download or
+browse dialog on the first invocation.  When the flatpak version is
+updated, it may be required to reset the shared library location with
+``-p ""`` and re-download the latest version.
 
 .. versionchanged:: 3.1
 
-   The minimum LAMMPS version required by LAMMPS-GUI is now 2 September 2026
+   The minimum LAMMPS version required by LAMMPS-GUI is now 2 September 2026.
 
 GPU support and MPI parallelization
 -----------------------------------
@@ -154,7 +157,7 @@ Windows 10 and later
 After downloading either the ``LAMMPS-Win10-64bit-GUI-<LAMMPS
 version>.exe`` or the ``LAMMPS-GUI-Win10-x86_64-<LAMMPS-GUI
 version>.exe`` installer package, you need to execute it, and start the
-installation process.  Depending on your security settings of your web
+installation process.  Depending on the security settings of your web
 browser, you may have to explicitly tell it to download the file and
 then confirm **twice** to *keep the downloaded file* despite the claims
 that it may be dangerous and insecure.  The main reason for that is that
@@ -170,8 +173,8 @@ corresponding cryptographic signature to sign the binaries with.
 |windows1|  |windows2|
 
 Since this check is performed by the web browser, you can avoid it by
-opening a command prompt terminal window, change to the Downloads folder
-and then download the installer from the command line with:
+opening a command prompt terminal window, changing to the Downloads
+folder, and then downloading the installer from the command line with:
 
 ``curl -OL https://github.com/lammps/lammps-gui/releases/download/<version>/LAMMPS-GUI-Win10-x86_64-<version>.exe`` where you replace ``<version>`` with the version tag of
 the release, e.g. v3.1.0.
@@ -185,19 +188,19 @@ the release, e.g. v3.1.0.
 
    **Option A: just ignore the warnings**
 
-   When the message "Windows protected your PC" appears, click *More info*,
-   and then *Run anyway*.  You may also have to enable "Developer Mode"
-   in the Windows System Settings to be able to run the installer.
+   When the message "Windows protected your PC" appears, click *More
+   info*, and then *Run anyway*.  You may also have to enable "Developer
+   Mode" in the Windows System Settings to be able to run the installer.
    Using a cryptographic signature still guarantees the file has not
    been modified since we built it, so you have that extra protection.
    This may be needed since these installer packages sometimes cause
-   false positives with anti-virus software and are reported as containing
-   a trojan
+   false positives with anti-virus software and are reported as
+   containing a trojan.
 
    **Option B: install and trust our self-signed certificate**
 
    You can download our self-signed public certificate from
-   https://download.lammps.org/lammps-gui/LAMMPS-GUI.cer (The SHA-256
+   https://download.lammps.org/lammps-gui/LAMMPS-GUI.cer (the SHA-256
    hash of this file is
    ``2a90ba8d0d3406fba6d67e6edb3f4904b1684756abf777bd2c58464ab1dff2cd``) and
    then open a "Command Prompt" with **Administrator** permissions.  At
@@ -220,18 +223,18 @@ the release, e.g. v3.1.0.
 
    ``certutil -delstore TrustedPublisher "The LAMMPS Developers"``
 
-MacOS 12 and later
+macOS 12 and later
 """"""""""""""""""
 
 .. index:: macOS installation
 
 After downloading the ``LAMMPS-macOS-multiarch-GUI-<LAMMPS
-version>.dmg`` or ``LAMMPS-GUI-multiarch-<LAMMPS-GUI version>.dmg``
-application bundle disk image, you need to double-click it and then --
-in the window that opens -- drag the app bundle as indicated into the
-"Applications" folder (see left image below).  Afterwards, the disk
-image can be unmounted or ejected.  For the
-``LAMMPS-macOS-multiarch-GUI-<LAMMPS version>.dmg`` bundle, follow
+version>.dmg`` or ``LAMMPS-GUI-macOS-multiarch-<LAMMPS-GUI
+version>.dmg`` application bundle disk image, you need to double-click
+it and then -- in the window that opens -- drag the app bundle as
+indicated into the "Applications" folder (see left image below).
+Afterwards, the disk image can be unmounted or ejected.  For the
+``LAMMPS-macOS-multiarch-GUI-<LAMMPS version>.dmg`` bundle, follow the
 instructions in the "README.txt" file to get access to the other
 included command-line executables, if desired.
 
@@ -247,13 +250,14 @@ included command-line executables, if desired.
 |macos1|  |macos2|  |macos3|
 
 Because the executables are currently not cryptographically signed with
-a digital key provided by Apple, macOS will likely refuse to launch LAMMPS-GUI
-as shown in the the center image above.  After this, the executable will
-be listed under ``System Preferences -> Security & Privacy`` where you
-can click on "Open Anyway" to override this (see right image).  The details
-of this can change between different macOS versions (the screenshot images
-were created on macOS 12 Monterey), so you may need to look around or
-search the web to find the equivalent settings for your version.
+a digital key provided by Apple, macOS will likely refuse to launch
+LAMMPS-GUI as shown in the center image above.  After this, the
+executable will be listed under ``System Preferences -> Security &
+Privacy`` where you can click on "Open Anyway" to override this (see
+right image).  The details of this can change between different macOS
+versions (the screenshot images were created on macOS 12 Monterey), so
+you may need to look around or search the web to find the equivalent
+settings for your version.
 
 A way to avoid this issue (verified with macOS 12 Monterey and macOS 26
 Tahoe) is to download the disk image from a terminal window with
@@ -302,7 +306,7 @@ automatically.
    Since software is constantly evolving, it may be required to install
    additional software packages for your Linux distribution to achieve
    compatibility with binaries compiled on older distributions.  Using
-   the flatpak bundle (see below) avoids these kind of issues by
+   the flatpak bundle (see below) avoids these kinds of issues by
    compiling and running the application in a standardized sandbox which
    is maintained by the flatpak software manager.
 
@@ -310,14 +314,15 @@ automatically.
 
 .. index:: flatpak
 
-The second Linux package variant uses `flatpak software deployment
+The second Linux package variant uses the `flatpak software deployment
 environment <https://flatpak.org>`_ and requires the flatpak management
 and runtime software to be installed.  As with the binary tarball, there
-are two bundle variants: ``LAMMPS-Linux-x86_64-GUI-<LAMMPS version>.flatpak``
-is built in the LAMMPS repository in linked mode and includes the LAMMPS
-console executable, while ``LAMMPS-GUI-Linux-x86_64-<LAMMPS-GUI version>.flatpak``
-is built in the LAMMPS-GUI repository in plugin mode.  After downloading
-either bundle, you can install it with:
+are two bundle variants: ``LAMMPS-Linux-x86_64-GUI-<LAMMPS
+version>.flatpak`` is built in the LAMMPS repository in linked mode and
+includes the LAMMPS console executable, while
+``LAMMPS-GUI-Linux-x86_64-<LAMMPS-GUI version>.flatpak`` is built in the
+LAMMPS-GUI repository in plugin mode.  After downloading either bundle,
+you can install it with:
 
 .. code-block:: bash
 
@@ -330,9 +335,10 @@ either bundle, you can install it with:
 
 After installation, LAMMPS-GUI should be integrated into your desktop
 environment under "Applications > Science" but also can be launched from
-the console with ``flatpak run org.lammps.lammps-gui``.  The flatpak
-bundle also includes the console LAMMPS executable ``lmp`` which can be
-launched to run simulations with, for example with:
+the console with ``flatpak run org.lammps.lammps-gui``.  The
+``LAMMPS-Linux-x86_64-GUI-<LAMMPS version>.flatpak`` bundle also
+includes the console LAMMPS executable ``lmp``, which can be launched to
+run simulations, for example with:
 
 .. code-block:: sh
 
@@ -367,7 +373,7 @@ will be automatically downloaded from its git repository and configured.
 This is usually the most convenient way to compile and install it.
 Since `CMake <https://docs.lammps.org/Howto_cmake.html>`_ is *required*
 to build LAMMPS-GUI, you need to build LAMMPS with CMake as well.  To
-enable its compilation during compiling LAMMPS, the CMake variable ``-D
+enable its compilation when compiling LAMMPS, the CMake variable ``-D
 BUILD_LAMMPS_GUI=on`` must be set when creating the CMake configuration.
 All other settings (compiler, flags, compile type) for LAMMPS-GUI are
 then inherited from the regular LAMMPS build.  If the Qt library is
@@ -380,19 +386,19 @@ a folder inside the Qt installation that contains the file
 ``Qt6Config.cmake``.
 
 The charts display is drawn by a self-contained native renderer
-(:cpp:class:`PlotWidget`) built only on Qt Widgets and ``QPainter``, so the
-build no longer depends on the Qt Charts or Qt Graphs modules.  No extra
-CMake settings are required to select a chart backend.
+(:cpp:class:`PlotWidget`) built only on Qt Widgets and ``QPainter``, so
+the build no longer depends on the Qt Charts or Qt Graphs modules.  No
+extra CMake settings are required to select a chart backend.
 
 The toolbar and menu icons are bundled in SVG format, so building and
-running LAMMPS-GUI also requires the **Qt Svg** module, which provides the
-SVG icon engine that Qt uses to render them.  On Linux distributions this
-module is often packaged separately from the Qt base libraries (for
+running LAMMPS-GUI also requires the **Qt Svg** module, which provides
+the SVG icon engine that Qt uses to render them.  On Linux distributions
+this module is often packaged separately from the Qt base libraries (for
 example the ``qt6-svg-dev`` development package, which pulls in the
 ``libqt6svg6`` runtime, on Debian and Ubuntu).  The CMake configuration
-requires it, and if the module -- or, at run time, its icon-engine plugin
--- is missing, the icons render blank.  The pre-compiled packages and
-installers already bundle it.
+requires it, and if the module -- or, at run time, its icon-engine
+plugin -- is missing, the icons render blank.  The pre-compiled packages
+and installers already bundle it.
 
 LAMMPS-GUI plugin version
 -------------------------
@@ -403,23 +409,25 @@ LAMMPS-GUI plugin version
 It is possible to compile a standalone LAMMPS-GUI executable (e.g. when
 LAMMPS has been compiled with traditional make).  Rather than linking to
 the LAMMPS library during compilation, it includes a `plugin loader
-<https://github.com/lammps/lammps-gui/tree/main/plugin>`_ that will
-load a LAMMPS shared library file dynamically at runtime during the
-start of the GUI; e.g. ``liblammps.so.0`` or ``liblammps.0.dylib`` or
+<https://github.com/lammps/lammps-gui/tree/main/plugin>`_ that will load
+a LAMMPS shared library file dynamically at runtime during the start of
+the GUI; e.g. ``liblammps.so.0`` or ``liblammps.0.dylib`` or
 ``liblammps.dll`` (depending on the operating system).  This has the
 advantage that the LAMMPS library can be built from updated or modified
 LAMMPS source without having to (re-)compile the GUI.
 
 The ABI of the LAMMPS C-library interface is very stable and generally
 backward compatible.  However, features used in LAMMPS-GUI may require a
-minimum LAMMPS version of the library.  LAMMPS-GUI will print a suitable
-error message and exit if an incompatible LAMMPS library is loaded.  You
-can override the path to the LAMMPS library with the ``-p <path>`` or
-``--pluginpath <path>`` command-line flag.  This is usually
-auto-detected on the first run and can be changed in the LAMMPS-GUI
-*Preferences* dialog.  The command-line flag lets you reset this path
-to a valid value in case the original setting has become invalid.  An
-empty path ("") as argument restores the default setting.
+minimum LAMMPS version of the library.  If the configured LAMMPS shared
+library cannot be loaded or is too old, LAMMPS-GUI shows a dialog that
+lets you download a compatible pre-compiled library (where available),
+browse for a different library file, or exit.  You can override the path
+to the LAMMPS library with the ``-p <path>`` or ``--pluginpath <path>``
+command-line flag.  This is usually auto-detected on the first run and
+can be changed in the LAMMPS-GUI *Preferences* dialog.  The command-line
+flag lets you reset this path to a valid value in case the original
+setting has become invalid.  An empty path ("") as argument restores the
+default setting.
 
 It is also possible to link the standalone compiled LAMMPS-GUI version
 to the LAMMPS library directly.  This feature is enabled by setting ``-D
@@ -428,6 +436,14 @@ setting for compilation within LAMMPS.  In this case, the CMake
 configuration needs to be told where to find the LAMMPS headers and the
 LAMMPS library, via ``-D LAMMPS_SOURCE_DIR=/path/to/lammps/src`` and
 ``-D LAMMPS_LIBRARY=/path/to/liblammps/file``.
+
+For standalone builds, the HTML version of this documentation is also
+built by default (``-D BUILD_DOC=on``).  This requires Python 3.8 or
+later and downloads Sphinx and the other required Python packages into a
+virtual environment in the build folder; use ``-D BUILD_DOC=off`` to
+skip it.  The default installation prefix for standalone builds is
+``$HOME/.local``, so that ``cmake --install <build folder>`` does not
+require administrator access.
 
 
 Platform notes
@@ -447,9 +463,9 @@ environment variable.  Since dmgbuild sets up the Finder window layout
 of the disk image directly, no GUI session is needed, i.e. the installer
 can also be created when logged in remotely via ssh.
 
-To build multi-arch executables on macOS that will run on both, arm64
-and x86_64 architectures natively, it is necessary to set the CMake
-variable ``-D CMAKE_OSX_ARCHITECTURES=arm64;x86_64``.  To achieve wide
+To build multi-arch executables on macOS that will run on both arm64 and
+x86_64 architectures natively, it is necessary to set the CMake variable
+``-D CMAKE_OSX_ARCHITECTURES=arm64;x86_64``.  To achieve wide
 compatibility with different macOS versions, you can also set ``-D
 CMAKE_OSX_DEPLOYMENT_TARGET=12.0`` which will set compatibility to macOS
 12 (Monterey) and later, even if you are compiling on a more recent
@@ -468,15 +484,16 @@ development configuration without deployment or packaging support.
 
 Since LAMMPS-GUI version 3.0.5, the build process includes generating
 cryptographically signed executables and installer packages.  This is
-enabled by default but can be turned off with ``-D CODE_SIGNING=no``
-during CMake configuration and setting the environment variable
-``SIGN_DISABLE`` to 1.
+enabled by default when cross-compiling with MinGW but can be turned off
+with ``-D CODE_SIGNING=no`` during CMake configuration and by setting
+the environment variable ``SIGN_DISABLE`` to 1 (the 'nsis' target signs
+the bundled files regardless of the CMake setting).
 
 *Visual Studio*
 
 Using CMake and Ninja as the build system is required.  Qt needs to be
 installed; a binary Qt package downloaded from https://www.qt.io was
-tested, which installs into the ``C:\\Qt`` folder by default.  The
+tested, which installs into the ``C:\Qt`` folder by default.  The
 compilation is verified by a GitHub action for every proposed change,
 and the compiled ``lammps-gui.exe`` executable is run directly from the
 build folder.  Please note that the pre-compiled LAMMPS shared libraries
@@ -534,4 +551,5 @@ Linux distributions (provided the flatpak system is installed).  Use the
 "flatpak" target to trigger a compile (``cmake --build <build
 folder> --target flatpak`` or ``make flatpak``).  Please note that this
 will not build from the local sources but from the repository and branch
-listed in the ``org.lammps.lammps-gui.yml`` LAMMPS-GUI source folder.
+listed in the ``packaging/org.lammps.lammps-gui.yml`` file in the
+LAMMPS-GUI source folder.

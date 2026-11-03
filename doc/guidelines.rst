@@ -11,7 +11,17 @@ The project follows these coding conventions:
 - **Line length**: Maximum 100 characters
 - **Formatting**: Enforced by ``.clang-format`` configuration
 - **Comments**: Use Doxygen-style documentation comments
+- **File headers**: Start new source files with the ``// -*- c++ -*-``
+  Emacs mode line
+- **Constants**: Add new hard-coded values and repeated string literals to
+  the ``Cfg`` namespace and new QSettings keys to the ``Keys`` namespace
+  in ``src/constants.h``, and refer to them qualified (e.g.,
+  ``Cfg::PREFERENCES_WIDTH``, ``Keys::ZOOM``)
+- **Strings**: Use ``QString`` in internal interfaces; conversions to
+  ``char *`` or ``std::string`` for the LAMMPS C library interface belong
+  in ``LammpsWrapper``
 - **Naming**:
+
   - Classes: CamelCase (e.g., ``CodeEditor``, ``ChartWindow``)
   - Qt overrides: camelCase (e.g., ``setFont``, ``eventFilter``)
   - Custom methods/slots: camelCase (e.g., ``stopRun``, ``saveAs``)
@@ -49,6 +59,11 @@ demonstrated below:
     * @return Description of return value
     */
    int myFunction(int param1);
+
+Member variables are documented with a trailing ``///<`` comment.  New
+public classes also need a ``.. doxygenclass::`` entry in
+``doc/api_reference.rst`` to be included in the generated API
+documentation.
 
 Building
 ========
@@ -119,10 +134,10 @@ Modifying an existing map is just editing its stops in the table; nothing else
 needs to change.  Canonical stops for a matplotlib color map can be resampled
 with a few lines of Python::
 
-    import matplotlib.cm as cm
-    m = cm.get_cmap("cividis")
+    import matplotlib
+    m = matplotlib.colormaps["cividis"]
     n = 5  # number of stops
-    print([tuple(round(c, 3) for c in m(i / (n - 1))[:3]) for i in range(n)])
+    print([tuple(round(float(c), 3) for c in m(i / (n - 1))[:3]) for i in range(n)])
 
 .. _add_tutorial:
 

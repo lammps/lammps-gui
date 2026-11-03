@@ -21,7 +21,8 @@ save or not save the buffer contents to a file.
 
 The editor has an auto-save mode that can be enabled or disabled in the
 *Preferences* dialog.  In auto-save mode, the editor buffer is
-automatically saved before running LAMMPS or before exiting LAMMPS-GUI.
+automatically saved before running LAMMPS or before exiting LAMMPS-GUI,
+provided the buffer already has a file name.
 
 Context Specific Word Completion
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -38,17 +39,22 @@ a word have been typed.
    :align: center
    :scale: 75%
 
-The word can then be completed through selecting an entry by scrolling
-up and down with the cursor keys and selecting with the 'Enter' key or
-by clicking on the entry with the mouse.  The automatic completion
-pop-up can be disabled in the *Preferences* dialog, but the completion
-can still be requested manually by either hitting the `Shift+TAB` key or
-by right-clicking with the mouse and selecting the option from the
-context menu.  Most of the completion information is retrieved from the
-active LAMMPS instance and thus it shows only available options that
-have been enabled when compiling LAMMPS. That list, however, excludes
-accelerated styles and commands; for improved clarity, only the
-non-suffix versions of styles are shown.
+The word can then be completed by moving to an entry with the cursor
+keys and selecting it with the 'Enter' key or by clicking on the entry
+with the mouse.  The automatic completion pop-up can be disabled in the
+*Preferences* dialog, but the completion can still be requested manually
+by either hitting the `Shift+TAB` key or by right-clicking with the
+mouse and selecting the option from the context menu.  Most of the
+completion information is retrieved from the active LAMMPS instance and
+thus it shows only available options that were enabled when compiling
+LAMMPS. That list, however, excludes accelerated styles and commands;
+for improved clarity, only the non-suffix versions of styles are shown.
+Besides command and style names, the completion also offers ``all`` and
+the IDs of the groups defined in the buffer where a group ID is
+expected, references to computes, fixes, and variables (e.g. ``c_ID``,
+``f_ID``, ``v_name``) where such a reference is started, and the names
+of the files in the current working directory where a file name is
+expected.
 
 Like the syntax highlighting, the completion and the context-specific
 help are aware of ``&`` line continuations: on a continuation line,
@@ -68,20 +74,20 @@ strings, ``$`` variable substitutions, and numbers are recognized, and
 command names are colored by category.  Arguments are colored by their
 role in the command, for example the ID, group-ID, and style name of a
 `fix <https://docs.lammps.org/fix.html>`_ command.  IDs use the same
-color whether they are being defined (``fix``, ``compute``, ``dump``)
-or referenced (``fix_modify``, ``unfix``, and so on).  A few commands
-embed a second command in their argument list; the keyword that starts
-the embedded part is shown in the color of the command it stands for,
-that is the ``modify`` keyword of the `write_dump
+color whether they are being defined (``fix``, ``compute``, ``dump``) or
+referenced (``fix_modify``, ``unfix``, and so on).  A few commands embed
+a second command in their argument list; the keyword that starts the
+embedded part is shown in the color of the command it stands for, that
+is the ``modify`` keyword of the `write_dump
 <https://docs.lammps.org/write_dump.html>`_ command is colored like
 ``dump_modify`` and the ``dump`` keyword of the `rerun
 <https://docs.lammps.org/rerun.html>`_ command like ``read_dump``.  The
 arguments following such a keyword are colored as arguments of the
 embedded command, also when the command is spread over multiple lines
-with ``&`` line continuations.  Lines joined with
-the ``&`` line continuation character are highlighted in the context of
-the command they continue, including style names or quoted strings that
-are split across lines.
+with ``&`` line continuations.  Lines joined with the ``&`` line
+continuation character are highlighted in the context of the command
+they continue, including style names or quoted strings that are split
+across lines.
 
 Sub-styles of hybrid styles are recognized the same way LAMMPS parses
 them -- by checking against the known styles of the loaded library --
@@ -94,9 +100,9 @@ sub-styles and are never marked as unknown.  On `dump image
 keywords are marked, and on both ``dump image`` and ``dump_modify``
 lines color names are displayed in their actual color; keywords and
 color names auto-complete in the positions where they are expected.
-Color names with too little contrast against the editor background
-(for example ``yellow`` on a light theme) are placed on a small dark
-or light chip so they remain readable.
+Color names with too little contrast against the editor background (for
+example ``yellow`` on a light theme) are placed on a small dark or light
+chip so they remain readable.
 
 Command and style names that are not known to the LAMMPS library that
 LAMMPS-GUI has loaded -- for example due to a typo or because the
@@ -105,9 +111,8 @@ are marked with a wavy underline.  The marker is not shown for the word
 at the cursor position, so partially typed names are not flagged while
 typing, and it is suppressed for names constructed with ``$``
 substitutions.  When LAMMPS-GUI is running without a usable LAMMPS
-library (for example in plugin mode before a library has been
-selected), the known-name information is unavailable and no words are
-marked.
+library (for example in plugin mode before a library has been selected),
+the known-name information is unavailable and no words are marked.
 
 Line Reformatting
 ^^^^^^^^^^^^^^^^^
@@ -119,12 +124,12 @@ Line Reformatting
 The editor supports reformatting lines according to the syntax in order
 to have consistently aligned lines.  This primarily means adding
 whitespace padding to commands, type specifiers, IDs and names.  This
-reformatting is performed manually by hitting the 'Tab' key.  It is
-also possible to have this done automatically when hitting the 'Enter'
-key to start a new line.  This feature can be turned on or off in the
-*Preferences* dialog for *Editor Settings* with the
-"Reformat with 'Enter'" checkbox. The amount of padding for multiple
-categories can be adjusted in the same dialog.
+reformatting is performed manually by hitting the 'Tab' key.  It is also
+possible to have this done automatically when hitting the 'Enter' key to
+start a new line.  This feature can be turned on or off in the
+*Preferences* dialog for *Editor Settings* with the "Reformat with
+'Enter'" checkbox. The amount of padding for multiple categories can be
+adjusted in the same dialog.
 
 Internally this functionality is achieved by splitting the line into
 "words" and then putting it back together with padding added where the
@@ -156,7 +161,14 @@ keyboard, the first of those entries is chosen.
 
 If the current line defines an index style variable, the context menu
 also has a *Set Variables...* entry that opens the corresponding
-:ref:`dialog <set_variables>` from the *Edit* menu.
+:ref:`dialog <set_variables>` from the *Run* menu.
+
+The context menu further has entries to comment out or uncomment the
+current line or the selected lines (by adding or removing a leading
+``#`` character), to reformat the current line, to run LAMMPS from the
+editor buffer or from the file (or to stop a running simulation), and to
+open the LAMMPS commands overview, the LAMMPS manual, and the LAMMPS
+tutorial website in a web browser.
 
 If the word under the cursor is a file, then additionally the context
 menu has an entry to open the file in a read-only text viewer window.

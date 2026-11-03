@@ -19,16 +19,18 @@ The *Find and Replace* dialog allows searching for and replacing
 text in the *Editor* window.
 
 The dialog can be opened either from the *Edit* menu or with the
-keyboard shortcut `Ctrl-F`. You can enter the text to search for.
+keyboard shortcut `Ctrl-F`. You can enter the text to search for in the
+"Find" field and the replacement text in the "Replace with" field.
 
 .. admonition:: Through three checkboxes the search behavior can be adjusted:
 
    - If checked, "Match case" does a case-sensitive search; otherwise
      the search is case-insensitive.
 
-   - If checked, "Wrap around" starts searching from the start of the
-     document, if there is no match found from the current cursor position
-     until the end of the document; otherwise the search will stop.
+   - If checked (the default), "Wrap around" starts searching from the
+     start of the document, if there is no match found from the current
+     cursor position until the end of the document; otherwise the search
+     will stop.
 
    - If checked, the "Whole word" setting only finds full word matches
      (white space and special characters are word boundaries).
@@ -37,12 +39,12 @@ Clicking on the *Next* button will search for the next occurrence of the
 search text and select / highlight it. Clicking on the *Replace* button
 will replace an already highlighted search text and find the next one.
 If no text is selected, or the selected text does not match the
-selection string, then the first click on the *Replace* button will
-only search and highlight the next occurrence of the search string.
-Clicking on the *Replace All* button will replace all occurrences from
-the cursor position to the end of the file; if the *Wrap around* box is
-checked, then it will replace **all** occurrences in the **entire**
-document.  Clicking on the *Done* button will dismiss the dialog.
+selection string, then the first click on the *Replace* button will only
+search and highlight the next occurrence of the search string.  Clicking
+on the *Replace All* button will replace all occurrences from the cursor
+position to the end of the file; if the *Wrap around* box is checked,
+then it will replace **all** occurrences in the **entire** document.
+Clicking on the *Done* button will dismiss the dialog.
 
 ------
 
@@ -92,17 +94,17 @@ General Settings
      LAMMPS-GUI uses ``-log none``.
    - **Individual Windows** / **Combined Main Window:** selects how the
      Output, Charts, Image, Slide Show, Variables, and Command window
-     views are presented.
-     With *Individual Windows* each of them is a window of its own, placed
-     and stacked freely.  With *Combined Main Window* they become panels
-     docked around the editor: the editor keeps the center, the Charts,
-     Image, and Slide Show views share a tabbed group on the right, and
-     the Output, Variables, and Command window views share a group across
-     the full width at the bottom.  The panels have fixed places and are not dragged around;
-     they are shown and hidden from the *View* menu, and the splitters
-     between them can be moved to change their proportions.  The windows
-     opened on demand join them rather than floating above: a text viewer,
-     an inspected data file or image, a slide show of image or movie files
+     views are presented.  With *Individual Windows* each of them is a
+     window of its own, placed and stacked freely.  With *Combined Main
+     Window* they become panels docked around the editor: the editor
+     keeps the center, the Charts, Image, and Slide Show views share a
+     tabbed group on the right, and the Output, Variables, and Command
+     window views share a group across the full width at the bottom.
+     The panels have fixed places and are not dragged around; they are
+     shown and hidden from the *View* menu, and the splitters between
+     them can be moved to change their proportions.  The windows opened
+     on demand join them rather than floating above: a text viewer, an
+     inspected data file or image, a slide show of image or movie files
      opened with *View Image or Movie File(s)...*, and a plot made with
      *Plot Data File...* all become further tabs of the group on the
      right, and are closed from their own *File* menu.  A panel that
@@ -110,13 +112,13 @@ General Settings
      by a title bar.  The proportions are kept when the main window is
      resized and restored in the next session, and the main window
      remembers a size of its own for each of the two layouts.  Changing
-     this setting relaunches LAMMPS-GUI.  A single session can be started
-     in either layout without changing this setting, with the ``-j`` or
-     ``-w`` :ref:`command-line flag <command-line-options>`.
-     In the combined window the views
-     do not remember individual window sizes, and a keyboard shortcut that
-     a view shares with the main window (for example ``Ctrl+S``) is left to
-     the main window, so only its menu entry remains for the view.
+     this setting relaunches LAMMPS-GUI.  A single session can be
+     started in either layout without changing this setting, with the
+     ``-j`` or ``-w`` :ref:`command-line flag <command-line-options>`.
+     In the combined window the views do not remember individual window
+     sizes, and a keyboard shortcut that a view shares with the main
+     window (for example ``Ctrl+S``) is left to the main window, so only
+     its menu entry remains for the view.
    - **Include citation details:** when checked, full citation info will be
      included in the Output window.  This is equivalent to using ``-cite
      screen`` on the command-line.
@@ -168,7 +170,8 @@ General Settings
    - **Download timeout:** Sets the time, in seconds, after which a
      download (of tutorial files or the LAMMPS shared library) is aborted
      with an error message when no data has arrived.  The default is 10
-     seconds.  Users with a slow internet connection may want to increase
+     seconds and the allowed range is 5 to 300 seconds.  Users with a
+     slow internet connection may want to increase
      this value so that the download of larger files, for example the
      LAMMPS shared library, is not canceled prematurely.
    - **Path to LAMMPS Shared Library File:** this option is only visible
@@ -178,7 +181,9 @@ General Settings
      different compilation of LAMMPS with different settings or from a
      different version can be loaded.  The accompanying *Download LAMMPS
      shared library...* button retrieves a pre-built LAMMPS shared library
-     from the LAMMPS web server.  After changing this setting, LAMMPS-GUI
+     from the LAMMPS web server; it is disabled for LAMMPS-GUI executables
+     compiled with MSVC, for which no compatible pre-built library
+     exists.  After changing this setting, LAMMPS-GUI
      needs to be re-launched.  This setting is remembered separately for
      each compiler toolchain LAMMPS-GUI was built with, so for example an
      MSVC build and a MinGW build on the same machine each keep their own
@@ -212,9 +217,12 @@ using the `-sf <https://docs.lammps.org/suffix.html>`_ and `-pk
 by the LAMMPS library and local hardware are available.  The `Number of
 threads` field allows setting the number of threads for the accelerator
 packages that support using threads (OPENMP, INTEL, KOKKOS, and GPU).
-Furthermore, the precision mode (double, mixed, or single) for the INTEL
-package can be selected, and for the GPU package, whether the neighbor
-lists are built on the GPU or the host (required for `pair style hybrid
+The maximum number of threads is half the number of available hardware
+threads, but no more than 16, unless the ``OMP_NUM_THREADS`` environment
+variable is set to a larger value.  Furthermore, the precision mode
+(double, mixed, or single) for the INTEL package can be selected, and
+for the GPU package, whether the neighbor lists are built on the GPU or
+the host (required for `pair style hybrid
 <https://docs.lammps.org/pair_hybrid.html>`_) and whether only pair
 styles should be accelerated (i.e., run PPPM entirely on the CPU, which
 sometimes leads to better overall performance).  Whether settings can be
@@ -253,10 +261,13 @@ Bonds** checkbox selects whether bonds between atoms shall be
 automatically determined from the atom distances (for instance to
 visualize simulations using force fields with implicit bonds), and the
 corresponding "Bond Cutoff" text field allows the user to set the cutoff
-used for that feature.  Finally, there are a couple of text fields to
-select the two **Background Colors**.  If the two colors differ, there
+used for that feature; the **VDW Style** and **Dynamic Bonds** settings
+are mutually exclusive.  Finally, there are a couple of text fields to
+select the two **Background Colors** and the **Background Gradient**
+checkbox.  When the gradient is enabled (the default), there
 will be a vertical background gradient starting with the "Background"
-color at the bottom and ending with the "Background2" color at the top.
+color at the bottom and ending with the "Background2" color at the top;
+otherwise the background has the solid "Background" color.
 
 These settings correspond to the available settings for the LAMMPS `dump
 image and corresponding dump_modify commands
@@ -270,7 +281,7 @@ Editor Settings
 .. index:: code formatting preferences
 
 This tab allows adjusting settings of the :ref:`editor window <editor>`.
-Specifically, the amount of padding to be added to LAMMPS commands,
+Specifically, one can set the amount of padding to be added to LAMMPS commands,
 types or type ranges, IDs (e.g., for fixes), and names (e.g., for groups).
 The value set is the minimum width for the text element and it can be
 chosen in the range between 1 and 32.

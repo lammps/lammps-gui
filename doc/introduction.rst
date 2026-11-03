@@ -16,25 +16,26 @@ concerns between different components:
 ==================
 
 LAMMPS-GUI can operate in two modes: **Plugin Mode** and **Linked
-Mode**.  The mode is controlled by the
-``-D LAMMPS_GUI_USE_PLUGIN=(ON|OFF)`` CMake configuration option.
+Mode**.  The mode is controlled by the ``-D
+LAMMPS_GUI_USE_PLUGIN=(ON|OFF)`` CMake configuration option.
 
 **Plugin Mode** (default)
   LAMMPS is loaded dynamically at runtime from a shared library file
   (.so, .dll, .dylib).  This enables using different LAMMPS builds with
   different compilation settings and different LAMMPS versions without
   recompiling the GUI.  The library loading is handled in
-  :cpp:class:`LammpsWrapper` using platform-specific dynamic loading
-  functions (``dlopen()`` on Unix/Linux/macOS, ``LoadLibrary()`` on
-  Windows).  The path to the shared library file is auto-detected or
+  :cpp:class:`LammpsWrapper` through the plugin loader in
+  ``plugin/liblammpsplugin.c``, which uses platform-specific dynamic
+  loading functions (``dlopen()`` on Unix/Linux/macOS, ``LoadLibrary()``
+  on Windows).  The path to the shared library file is auto-detected or
   configured via command line or preferences.
 
 **Linked Mode**
   The LAMMPS library is linked at compile time.  Used by default when
-  building LAMMPS-GUI as part of a LAMMPS CMake build with
-  ``-D BUILD_LAMMPS_GUI=on``.  For standalone builds, the
-  ``-D LAMMPS_SOURCE_DIR=<path to LAMMPS' src folder>`` and
-  ``-D LAMMPS_LIBRARY=<path to LAMMPS shared or static library file>``
+  building LAMMPS-GUI as part of a LAMMPS CMake build with ``-D
+  BUILD_LAMMPS_GUI=on``.  For standalone builds, the ``-D
+  LAMMPS_SOURCE_DIR=<path to LAMMPS' src folder>`` and ``-D
+  LAMMPS_LIBRARY=<path to LAMMPS shared or static library file>``
   settings are also required when configuring with CMake.  It may be
   necessary to adjust environment variables to find shared libraries
   (``LD_LIBRARY_PATH`` on Linux, ``DYLD_LIBRARY_PATH`` on macOS, or
@@ -51,11 +52,14 @@ LAMMPS-GUI makes extensive use of Qt features:
   components and background threads.
 
 **Qt Resource System**
-  Icons and resources embedded via ``resources/lammpsgui.qrc``.  The icons
-  are SVG and are rendered through the Qt6 Svg module (``Qt6::Svg``).
+  Icons and resources embedded via ``resources/lammpsgui.qrc``.  The
+  icons are SVG and are rendered through the Qt6 Svg module
+  (``Qt6::Svg``).
 
 **Qt Models**
-  Used for data display in various viewers and inspectors.
+  ``QStringListModel`` instances provide the completion lists of the
+  editor and the command window, and the item-based ``QTableWidget``
+  displays tabular data in dialogs such as the plot data column picker.
 
 LAMMPS-GUI requires the Qt application development and GUI framework
 version 6.2 or later, including the Widgets, Network, and Svg modules.
@@ -71,8 +75,8 @@ Architecture
  Main Components
 =================
 
-The application architecture consists of several key components organized into
-functional groups:
+The application architecture consists of several key components
+organized into functional groups:
 
 Main Window
 -----------
@@ -87,8 +91,8 @@ Main Window
   ``createRunMenu()``, ``createViewMenu()``, ``createTutorialMenu()``,
   ``createAboutMenu()``, and the status bar to ``createStatusBar()``.
   Plugin discovery and accelerator setup are handled by
-  ``setupPlugin()`` and ``setupAccelerators()``.
-  See :cpp:class:`LammpsGui`
+  ``setupPlugin()`` and ``setupAccelerators()``.  See
+  :cpp:class:`LammpsGui`
 
 Editor Components
 -----------------
@@ -115,6 +119,20 @@ Editor Components
   case-sensitive search, wrap-around search, and whole-word matching
   options.  See :cpp:class:`FindAndReplace`
 
+**LammpsSyntax (lammpssyntax.h/.cpp)**
+  Registry of the valid command and style names, populated from the
+  LAMMPS library after LAMMPS is initialized, and of the argument roles
+  of each command, plus the line tokenizer shared by the highlighter, the
+  auto-completion, and the input check.  :cpp:class:`InputScanner`
+  assembles the logical commands of a whole buffer from its lines.  See
+  :cpp:class:`LammpsSyntax`
+
+**SyntaxChecker (syntaxcheck.h/.cpp)**
+  Static pre-run check of the input script with deterministic rules
+  (unknown commands and styles, undefined variables, groups, and IDs,
+  missing files or arguments) designed to avoid false positives.  See
+  :cpp:class:`SyntaxChecker`
+
 LAMMPS Interface
 ----------------
 
@@ -124,7 +142,7 @@ LAMMPS Interface
   LAMMPS initialization, command execution, and error handling.  See
   :cpp:class:`LammpsWrapper`
 
-**LammpsRunner (lammpsrunner.h)**
+**LammpsRunner (lammpsrunner.h/.cpp)**
   Worker thread for executing LAMMPS simulations without blocking the
   GUI.  Uses Qt's threading facilities to run simulations in the
   background while the UI remains responsive during calculations.
@@ -153,9 +171,10 @@ Visualization Components
   selected.  See :cpp:class:`ChartWindow`
 
 **ChartViewer (chartviewer.h/.cpp)**
-  Custom chart view widget that provides interactive features like zooming,
-  smoothing, and panning for data visualization.  ChartViewer is a view over
-  the active ``ChartColumn`` of its window and renders it with
+  Custom chart view widget that displays the raw and the smoothed (or
+  otherwise processed) data, overlays, and reference lines within the axis
+  ranges selected with the range sliders of its window.  ChartViewer is a
+  view over the active ``ChartColumn`` of its window and renders it with
   :cpp:class:`PlotWidget`.  See :cpp:class:`ChartViewer`.
 
 **PlotDataDialog (plotdatadialog.h/.cpp)**
@@ -183,16 +202,28 @@ Visualization Components
   when `FFmpeg <https://ffmpeg.org/>`_ or `ImageMagick
   <https://imagemagick.org/>`_ is available.  See :cpp:class:`SlideShow`
 
-**RangeSlider (thirdparty/rangeslider/rangeslider.h/.cpp)** Custom
-  slider widget with two handles for selecting a range of values. This
-  is code written by Hoyoung Lee and distributed under the `CeCILL Free
-  Software License <https://choosealicense.com/licenses/cecill-2.1/>`_.
-  Used in :cpp:class:`ChartWindow` for selecting x- and y-direction plot
-  ranges.  See :cpp:class:`RangeSlider`
+**ImageCache (imagecache.h/.cpp)**
+  Temporary storage of the slide show for PNG conversions of image
+  formats that Qt cannot decode and for frames extracted from movie
+  files.  See :cpp:class:`ImageCache`
+
+**MovieImportDialog (movieimport.h/.cpp)**
+  Dialog to select the frame range and interval when importing a movie
+  file into the slide show; the frames are extracted with FFmpeg.  See
+  :cpp:class:`MovieImportDialog`
+
+**RangeSlider (thirdparty/rangeslider/rangeslider.h/.cpp)**
+  Custom slider widget with two handles for selecting a range of values.
+  This is code written by Hoyoung Lee and distributed under the `CeCILL
+  Free Software License
+  <https://choosealicense.com/licenses/cecill-2.1/>`_.  Used in
+  :cpp:class:`ChartWindow` for selecting x- and y-direction plot ranges.
+  See :cpp:class:`RangeSlider`
 
 **RangeBandSlider (rangebandslider.h/.cpp)**
   Horizontal ``QSlider`` that paints an active sub-range on its track,
-  distinct from the third-party :cpp:class:`RangeSlider`.  See
+  distinct from the third-party :cpp:class:`RangeSlider`.  Used as the
+  image scroll bar of :cpp:class:`SlideShow`.  See
   :cpp:class:`RangeBandSlider`
 
 Dialog and Utility Components
@@ -224,7 +255,7 @@ Dialog and Utility Components
   using ``${varname}`` syntax.  See :cpp:class:`SetVariables`
 
 **FileViewer (fileviewer.h/.cpp)**
-  Read-only text viewer dialog for displaying file contents. Used for
+  Read-only text viewer window for displaying file contents. Used for
   viewing auxiliary files without permitting modifications.  See
   :cpp:class:`FileViewer`
 
@@ -237,9 +268,10 @@ Dialog and Utility Components
 
   - :cpp:class:`ShellPrompt` - The input line with Tab completion of
     commands, file names, and earlier command lines.
-  - :cpp:class:`ShellAliases` - The configurable aliases, which are
-    defined in the shell at start since a non-interactive shell reads no
-    startup files.
+  - :cpp:class:`ShellAliases` - The dialog for the configurable aliases,
+    which are defined in the shell at start since a shell that does not
+    run in a terminal often skips the part of its startup file that
+    defines them.
 
 **TutorialWizard (tutorialwizard.h/.cpp)**
   Wizard dialog for interactive LAMMPS tutorials. Guides users through
@@ -272,6 +304,11 @@ Support Components
   verifies the SHA-256 checksum if available.
   See :cpp:class:`URLDownloader`
 
+**DownloadProgress (downloadprogress.h/.cpp)**
+  Transient dialog showing the progress of a batch download, such as the
+  files of a tutorial, with a button to cancel it.  See
+  :cpp:class:`DownloadProgress`
+
 **StdCapture (stdcapture.h/.cpp)**
   Utility class that captures stdout output from LAMMPS.  Redirects
   the C-level stdout file descriptor through a pipe to enable
@@ -289,12 +326,14 @@ Support Components
   forms.  See :cpp:class:`QHline`
 
 **QColorCompleter (qaddon.h/.cpp)**
-  Auto-completer for color name inputs, suggesting valid Qt color names
-  as the user types.  See :cpp:class:`QColorCompleter`
+  Auto-completer for color name inputs, suggesting the color names
+  accepted by the LAMMPS dump image command as the user types.  See
+  :cpp:class:`QColorCompleter`
 
 **QColorValidator (qaddon.h/.cpp)**
-  Validator for color input fields, ensuring they contain valid color
-  names or hex color codes.  See :cpp:class:`QColorValidator`
+  Validator for color input fields, ensuring they contain one of the
+  color names accepted by the LAMMPS dump image command.  See
+  :cpp:class:`QColorValidator`
 
 **VerticalLabel (qaddon.h/.cpp)**
   Label widget that renders text rotated 90 degrees for vertical

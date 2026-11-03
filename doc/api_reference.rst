@@ -194,6 +194,24 @@ rebound (via ``setColumn()``) to whichever column is currently selected.
 .. doxygenstruct:: ChartColumn
    :members:
 
+.. doxygenenum:: ChartDisplayMode
+
+-----
+
+RefLine Struct
+--------------
+
+Each ``ChartColumn`` keeps the reference lines of its chart as a list of
+``RefLine`` definitions (``src/chartviewer.h``): a labeled vertical line
+at a fixed x position or horizontal line at a fixed y value, as edited
+in the *Reference Lines* dialog.  The renderer draws them from matching
+``PlotSeries`` objects that the column holds in parallel.
+
+.. doxygenenum:: RefOrient
+
+.. doxygenstruct:: RefLine
+   :members:
+
 -----
 
 ChartViewer Class
@@ -209,9 +227,13 @@ PlotWidget Class
 ----------------
 
 Native ``QWidget`` + ``QPainter`` 2D line/scatter chart renderer
-(``src/plotwidget.h``).  It is the sole chart backend; ``ChartViewer`` feeds it
-neutral ``PlotSeries`` / ``PlotAxis`` model objects plus the Qt-free
-axis-layout helpers from ``plotaxismath`` -- no Qt Charts, Graphs, or QML.
+(``src/plotwidget.h``).  It is the sole chart backend; ``ChartViewer``
+registers the neutral ``PlotSeries`` objects of its column with it and
+sets the axis titles and ranges, which ``PlotWidget`` keeps as
+``PlotAxis`` values and lays out with the Qt-free axis-layout helpers
+from ``plotaxismath`` -- no Qt Charts, Graphs, or QML.
+
+.. doxygenenum:: LegendPos
 
 .. doxygenclass:: PlotWidget
    :members:
@@ -223,8 +245,9 @@ Chart Model and Axis Math
 -------------------------
 
 Neutral chart model value types (``src/plotseries.h``) consumed by
-``PlotWidget``, and the Qt-free axis-layout helpers (``src/plotaxismath.h``:
-nice-number ticks, tick values, and printf-style label formatting).
+``PlotWidget``, and the Qt-free axis-layout helpers
+(``src/plotaxismath.h``: nice-number ticks, tick values, and
+printf-style label formatting).
 
 .. doxygenfile:: plotseries.h
 
@@ -246,12 +269,14 @@ Dump Image Command Builder
 
 The ``DumpImageParams`` struct and the ``buildDumpImageCommand()`` free
 function (``src/dumpimage.h``) form a GUI-free, unit-testable core that
-assembles the LAMMPS ``write_dump ... image ...`` command from a snapshot of
-the viewer state.  ``ImageViewer`` populates the struct (resolving all LAMMPS
-queries up front) and then calls the pure builder, which returns a
-``DumpImageCommand`` holding the render and ``dump_modify`` argument strings;
-``toWriteDumpCommand()`` composes the final one-shot ``write_dump`` command
-from those pieces.
+assembles the arguments of the LAMMPS ``dump image`` and ``dump_modify``
+commands from a snapshot of the viewer state.  ``ImageViewer`` populates
+the struct (resolving all LAMMPS queries up front) and then calls the
+pure builder, which returns a ``DumpImageCommand`` holding the render
+and ``dump_modify`` argument strings; the viewer renders with a
+temporary ``dump`` executed by a zero-step run, while
+``toWriteDumpCommand()`` composes an equivalent one-shot ``write_dump``
+command from the same pieces.
 
 .. doxygenstruct:: DumpImageParams
    :members:
@@ -300,9 +325,10 @@ ImageCache Class
 ``SlideShow`` owns an ``ImageCache`` (``src/imagecache.h``) that holds the
 temporary files it creates: the PNG copies of image formats that Qt cannot
 decode natively, and the frames extracted from imported movie files.  A source
-file is converted at most once, since the cache entries are validated against
-the modification time and the size of the source file, and the whole cache
-directory is removed when the slide show window is closed.
+file is converted at most once unless it changes on disk, since the cache
+entries are validated against the modification time and the size of the
+source file, and the whole cache directory is removed when the slide show
+window is closed.
 
 .. doxygenclass:: ImageCache
    :members:
@@ -339,6 +365,10 @@ so that they can be unit tested without running either program.
 .. doxygenfunction:: parseFrameRate
 
 .. doxygenfunction:: selectedFrameCount
+
+.. doxygenfunction:: frameToSeconds
+
+.. doxygenfunction:: sampleOutdated
 
 .. doxygenfunction:: extractMovieFrames
 
@@ -609,6 +639,10 @@ Qt Helper Widgets
 
 -----
 
+.. doxygenfunction:: lammpsImageColors
+
+-----
+
 StdoutSilencer Class
 --------------------
 
@@ -642,14 +676,20 @@ Block-Structured fix ave/\* Files
 ---------------------------------
 
 Data model and parsers (``src/plotblockdata.h``) for the block-structured
-output files of ``fix ave/time`` in vector mode, ``fix ave/histo`` and
-``fix ave/correlate``, which are reduced to a flat :cpp:class:`PlotData`
-before they are plotted.
+output files of ``fix ave/time`` in vector mode, ``fix ave/histo``,
+``fix ave/correlate``, ``fix ave/correlate/long``, and ``fix ave/chunk``,
+which are reduced to a flat :cpp:class:`PlotData` before they are plotted.
 
 .. doxygenstruct:: PlotDataBlock
    :members:
 
 .. doxygenstruct:: PlotBlockData
+   :members:
+
+.. doxygenstruct:: BlockAverage
+   :members:
+
+.. doxygenstruct:: AveImportDefaults
    :members:
 
 .. doxygenfile:: plotblockdata.h

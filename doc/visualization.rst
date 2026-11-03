@@ -14,24 +14,24 @@ Snapshot Image Viewer
 
 By selecting the *Create Image* entry in the *Run* menu, or by hitting
 the `Ctrl-I` (`Command-I` on macOS) keyboard shortcut, or by clicking on
-the "palette" button in the status bar of the :doc:`Editor window
-<editor>`, LAMMPS-GUI sends a custom `write_dump image
-<https://docs.lammps.org/dump_image.html>`_ command to LAMMPS and reads
-back the resulting snapshot image with the current state of the system
-into an image viewer.  This functionality is *not* available *during* an
-ongoing run.  In case LAMMPS is not yet initialized, LAMMPS-GUI tries to
-identify the line with the first `run
-<https://docs.lammps.org/run.html>`_ or `minimize
+the "Create snapshot image" button in the status bar of the :doc:`Editor
+window <editor>`, LAMMPS-GUI sends a custom `dump image
+<https://docs.lammps.org/dump_image.html>`_ command for a single
+zero-step run to LAMMPS and reads back the resulting snapshot image with
+the current state of the system into an image viewer.  This
+functionality is *not* available *during* an ongoing run.  In case
+LAMMPS is not yet initialized, LAMMPS-GUI tries to identify the line
+with the first `run <https://docs.lammps.org/run.html>`_ or `minimize
 <https://docs.lammps.org/minimize.html>`_ command and execute all
 commands in the editor up to that line, and then executes a "run 0"
-command.  This initializes the system so an image of the initial state
-of the system that can be rendered.  If there was an error in that
+command.  This initializes the system so that an image of the initial
+state of the system can be rendered.  If there was an error in that
 process, a dialog with the error message will appear.
 
 Automatic settings
 ------------------
 
-When possible, LAMMPS-GUI tries to detect which elements the atoms
+If possible, LAMMPS-GUI tries to detect which elements the atoms
 correspond to (via their mass) and then colorizes them in the image and
 sets their atom diameters accordingly.  If this is not possible -- for
 instance when using reduced (= 'lj') `units
@@ -47,7 +47,7 @@ lattice spacing.
 
 For particles that use `atom styles
 <https://docs.lammps.org/atom_style.html>`_ "body", "ellipsoid", "line",
-or "tri" LAMMPS will visualize the particles according to their atom
+or "tri", LAMMPS will visualize the particles according to their atom
 style information by default.  Other particle types will be visualized
 as spheres.  In the *Atom/Bond* settings dialog, this can be further
 customized (or disabled).
@@ -70,7 +70,7 @@ customized (or disabled).
 |gui-image1|  |gui-image2|  |gui-image3|  |gui-image4|  |gui-image5|
 
 It is also possible to visualize regions, graphics from computes and
-fixes, and have bonds computed dynamically for potentials, where the
+fixes, and have bonds computed dynamically for potentials where the
 bonds are determined implicitly (like `AIREBO
 <https://docs.lammps.org/pair_airebo.html>`_).  Please see the
 documentation of the `dump image command
@@ -139,8 +139,8 @@ list is maintained by LAMMPS-GUI and information from them is passed to
 LAMMPS via LAMMPS commands while creating colors named "type#" where '#'
 is the atom type number.  These color definitions can also be written to
 and loaded from :ref:`JSON files <json_format>`.  Recent LAMMPS versions
-have a `dump_modify loadcolors
-<https://docs.lammps.org/dump_image.html>`_ and *savecolors* command
+have `dump_modify loadcolors
+<https://docs.lammps.org/dump_image.html>`_ and *savecolors* commands
 that can read and write files in the same format.  The second is the
 list of named colors that are maintained by the *dump image* command in
 LAMMPS.  LAMMPS-GUI has the list of predefined color names and may
@@ -159,8 +159,8 @@ The Image Viewer window consists of three main areas: a menu/toolbar
 strip at the top, the rendered image in the center, and a settings panel
 on the right side.  Following the general theme of LAMMPS-GUI of
 extensive keyboard shortcut support, you can select most text fields by
-using the `Alt` key and the underlined letter.  For example the *File*
-menu is opened with `Alt-F` and its entries can be also selected the
+using the `Alt` key and the underlined letter.  For example, the *File*
+menu is opened with `Alt-F` and its entries can also be selected the
 same way or using the cursor keys and `Enter`.  Keyboard shortcuts
 starting with `Ctrl` usually work globally inside the image window, that
 is even when the corresponding menu item is not visible.
@@ -188,22 +188,24 @@ The **menu bar row** has:
      :doc:`text editor window <editor>` or some other text editor.  This
      allows the current visualization settings to be reproduced during a
      simulation run, including in the :ref:`slide show viewer <slideshow>`.
-   - **Load Colors/Lights from JSON File...**: Load a list of
+   - **Load Colors from JSON...**: Load a list of
      definitions for per-type colors and settings for the four light
      sources from a :ref:`JSON format file <json_format>`.  The list of
      colors may contain either more or fewer definitions than the
      current system has atom types. In the latter case the colors "wrap
      around", that is colors are read from the list multiple times.
-   - **Save Colors/Lights to JSON File...**: Save the currently used
+   - **Save Colors to JSON...**: Save the currently used
      list of definitions for per-type colors and the current lighting
      settings to a :ref:`JSON format file <json_format>`.  The list may
      be loaded later to restore a previous color and lighting
      assignment, since these settings are reset when the Image Viewer
      dialog is restarted.
-   - **Reset Colors**: Reset the list of per-type colors to a compiled
-     in default list.
+   - **Reset Colors**: Reset the list of per-type colors and the
+     lighting settings to their compiled-in defaults.
    - **Close** (`Ctrl-W`): Close the Image Viewer window.
    - **Quit** (`Ctrl-Q`): Quit the entire application.
+- With individual windows, the *Run*, *View*, *Tutorials*, and *About*
+  menus of the main window follow the *File* menu.
 - The **busy indicator**, a small palette icon that is colored |palette|
   while LAMMPS is rendering a new image and grayed out |inactive| when
   rendering is complete.
@@ -212,14 +214,14 @@ The **menu bar row** has:
   automatically set.
 - The **Bond size** text field, where the bond diameter can be
   adjusted.  This field is only visible when the bond diameter is not
-  automatically set and display of explicit or implicit bonds is enabled
+  automatically set and display of explicit or implicit bonds is enabled.
 - The **Width** spin box where the image width can be set.  It can be
   accessed using the `Alt-W` keyboard shortcut.
 - The **Height** spin box, where the image height can be set.  It can
   be accessed using the `Alt-H` keyboard shortcut.
 
 
-The **toolbar buttons** row below the menu bar provide quick access to
+The **toolbar buttons** row below the menu bar provides quick access to
 several rendering options and view manipulations.  From left to right
 there are:
 
@@ -243,17 +245,18 @@ there are:
   in the :ref:`Global image settings dialog <global_settings>`.
 - **Shininess** (toggle): Switch between shiny and matte surface
   rendering of graphics objects like atoms and bonds.
-- **VDW style** (toggle): Switch between space-filling (Van der Waals)
+- **VDW style** (toggle): Switch between space-filling (van der Waals)
   sphere representation of atoms and the smaller ball-and-stick style
   of atoms and bonds.
 - **Dynamic bonds** (toggle): Automatically compute bonds from atom
-  distances.  This is useful for force fields with implicit bonds.  When
+  distances.  This is useful for force fields with implicit bonds and
+  only available when a pair style is defined.  When
   enabled, the adjacent text field allows setting the bond cutoff
   distance.  This feature depends on existing neighbor list data and thus
   may not always work as expected when the system has explicit bonds and
   thus neighbors may be automatically excluded from neighbor lists due
   to the `special_bonds settings
-  <https://docs.lammps.org/special_bonds.html>`_
+  <https://docs.lammps.org/special_bonds.html>`_.
 - **Box** (toggle): Show or hide the simulation box drawn as colored
   cylinders.
 - **Axes** (toggle): Show or hide the labeled coordinate axes arrows.
@@ -269,12 +272,13 @@ there are:
 - **Fit window**: Resize the window so the image is shown at its full
   size, without scroll bars or unused space.  This undoes a manual
   resize of the window; the window is never grown beyond a fraction of
-  the screen, so scroll bars remain for very large images.
+  the screen, so scroll bars remain for very large images.  This button
+  is not shown in the combined main window.
 
 The default image size, some default image quality settings, the view
 style and some colors can be changed in the :doc:`Preferences <dialogs>`
 dialog window.  From the image viewer window further adjustments can be
-made: actual image size, high-quality (SSAO) rendering, anti-aliasing,
+made: current image size, high-quality (SSAO) rendering, anti-aliasing,
 view style, display of box or axes, zoom factor.  The view of the system
 can be rotated horizontally and vertically.
 
@@ -284,9 +288,11 @@ additional controls (most are explained in detail below):
 - **Group**: A drop-down list to select which `group
   <https://docs.lammps.org/group.html>`_ of atoms to display (default
   is "all").  Only atoms belonging to the selected group are rendered.
+  It can be accessed using the `Alt-G` keyboard shortcut.
 - **Molecule**: A drop-down list to select a `molecule
   <https://docs.lammps.org/molecule.html>`_ to visualize (default is
-  "none").  When a molecule is selected, it is shown at the center of
+  "none").  It can be accessed using the `Alt-M` keyboard shortcut.
+  When a molecule is selected, it is shown at the center of
   the simulation box, and the group selection is disabled.  Selecting
   "none" restores normal group-based display.
 - **Global**: Opens the :ref:`Global image settings <global_settings>`
@@ -311,7 +317,7 @@ additional controls (most are explained in detail below):
 The image is re-rendered after each change to the buttons, text fields
 or settings dialogs, and when there are many atoms to render and high
 quality images with anti-aliasing are requested, re-rendering may take
-several seconds.  Some time consuming rendering steps are
+several seconds.  Some time-consuming rendering steps are
 multi-threaded, but there is no GPU acceleration.
 
 ---------------
@@ -367,9 +373,9 @@ The dialog is organized into the following sections:
    - **Color**: The color used to draw the box edges.  Accepts
      `named colors <https://docs.lammps.org/dump_image.html>`_.
    - **Diameter**: The diameter of the box edge sticks as fraction
-     of the box size (range: 0.000001 -- 5.0).
+     of the box size (range: 0.00001 -- 5.0).
    - **Opacity**: The transparency of the box edges (range: 0.0 -- 1.0,
-     where 1.0 is fully opaque and 0.0 is fully transparent)
+     where 1.0 is fully opaque and 0.0 is fully transparent).
 
 **Subbox**
    Controls the display of the per-processor sub-domain boxes
@@ -389,14 +395,15 @@ The dialog is organized into the following sections:
 **Background**
    Sets the background color(s) of the rendered image.
 
-   - **Bottomcolor**: The background color at the bottom of the image.
-   - **Topcolor**: The background color at the top of the image.  If
-     the two colors differ, a vertical gradient is applied from bottom
-     to top.
+   - **Bottom**: The background color, or the color at the bottom of
+     the image when the gradient is enabled.
+   - **Gradient** (checkbox): Enable or disable a vertical background
+     gradient from the bottom color to the top color in the field next
+     to it (default: enabled).  When disabled, the background is a
+     solid color and the top color field is disabled.
    - **Zoom**: The zoom factor of the view (range: 0.1 -- 10.0, where
      values larger than 1.0 zoom in).  This is the same setting that
-     the zoom in/out buttons of the settings panel change in steps of
-     10 percent.
+     the zoom in/out toolbar buttons change in steps of 10 percent.
 
 **Depth Cueing**
    Controls depth cueing, which fades distant objects toward a fog
@@ -486,16 +493,17 @@ The dialog is organized into the following sections:
 
 **Center**
    Adjusts the center point of the rendered view.  The drop-down list
-   selects between **Center (static)**, where the center fractions refer
-   to the simulation box, and **Center (dynamic)**, where they refer to
-   the bounding box of the currently displayed atoms in each frame.
+   selects between **Static**, where the center fractions are
+   converted into a point in space only once, and **Dynamic**, where
+   they are converted again for every image from the current
+   simulation box.
    The dynamic setting is mainly useful for the copied ``dump image``
-   command when creating a movie of a system that drifts or expands.
+   command when creating a movie of a system whose box changes its
+   size or shape.
 
-   - **X-direction**, **Y-direction**, **Z-direction**: Fractional
+   - **X-Center**, **Y-Center**, **Z-Center**: Fractional
      coordinates (range: 0.0 -- 1.0) specifying the center of the
-     view relative to the simulation box (static) or the bounding
-     box of the displayed atoms (dynamic).
+     view relative to the simulation box.
 
 **Camera up**
    Sets the direction that points up in the rendered image.
@@ -565,34 +573,38 @@ The dialog contains the following sections:
    - **Atoms** (checkbox): Enable or disable rendering of atoms.
    - **Color**: Select the per-atom property used for coloring.
      Options include *type*, *element* (if detected), *mol*, *q*
-     (charge), *diameter*, *id*, *mass*, *x*/*y*/*z* (coordinates), as
+     (charge), *mu* (dipole moment), *diameter*, *id*, *mass*,
+     *x*/*y*/*z* (coordinates), *vx*/*vy*/*vz* (velocities),
+     *fx*/*fy*/*fz* (forces), as
      well as atom-style variables (`v_<name>`), per-atom compute results
      (`c_<name>` or `c_<name>[col]`), and per-atom fix results
-     (`f_<name>` or `f_<name>[col]`).  The contents of the list depends
+     (`f_<name>` or `f_<name>[col]`).  The contents of the list depend
      on which are available in the current simulation state.  When
-     selecting *type* or *element* the colors are fixed and can be only
-     changed manually for ``dump_image`` output in the input using
-     ``dump_modify acolor`` or ``dump_modify element``, respectively.
+     selecting *type* or *element*, the color map is not used: the
+     per-type colors can be changed in the :ref:`Atom Type Color
+     Customization <customcolors>` dialog, while the element colors are
+     fixed and can only be changed manually for ``dump image`` output in
+     the input using ``dump_modify element``.
      Otherwise, the colors are determined by the color map selection
      described below.
    - **Size**: Select the property used for atom sizing.  Options
-     include *auto* (when element, diameter, or sigma data is
-     available), *type*, *element*, atom-style variables (`v_<name>`)
+     include *element*, *diameter*, or *sigma* (when the corresponding
+     data is available), *type*, atom-style variables (`v_<name>`)
      defined in the current simulation state, and a few pre-defined
      choices for custom atom diameters.  The text field can be edited
      and a different custom diameter entered.  Selecting an atom-style
      variable uses its per-atom value directly as the atom diameter;
-     this allows, for example, to apply a scaling factor to a per-atom
+     this allows, for example, applying a scaling factor to a per-atom
      property.  Per-atom data from computes and fixes are not offered
      directly, but they can be referenced from an atom-style variable,
-     which then also allows to scale them to suitable diameters.
+     which then also allows scaling them to suitable diameters.
    - **Opacity**: The transparency of atoms (range: 0.0 -- 1.0, where 1.0
      is fully opaque and 0.0 is fully transparent).  Bonds have their own
      Opacity setting in the **Bonds** section below.
    - **Map**: Select the color map used for coloring by a per-atom
      property.  This option is *not* available for atom color selections
      *type* and *element*\ .  Currently available continuous color maps
-     are: *RWB* (red-white-blue), *PWT*
+     are: *BWR* (blue-white-red), *PWT*
      (purple-white-teal), *BWG* (blue-white-green), *BGR*
      (blue-green-red), *Grayscale* (black-white), *Viridis* (from
      matplotlib), *Plasma* (from matplotlib), *Inferno* (from
@@ -602,13 +614,13 @@ The dialog contains the following sections:
      color map settings and currently cannot be adjusted from LAMMPS-GUI
      directly.  As for *all* image settings, further customizations can
      be realized by copying the dump image command line as customized by
-     the Image Viewer to the editor and then run LAMMPS and observe the
+     the Image Viewer to the editor, then running LAMMPS, and observing the
      resulting images in the Slide Show window.  Then the color
      map setting can be fully customized according to the `dump_modify
      colormap documentation <https://docs.lammps.org/dump_image.html>`_.
-   - **Reverse** (checkbox): Mirror the selected color map so its low and
-     high ends are swapped (for example, *RWB* becomes blue-white-red).
-     This replaces the former *BWR* entry, which is exactly *RWB*
+   - **Reverse Map** (checkbox): Mirror the selected color map so its low and
+     high ends are swapped (for example, *BWR* becomes red-white-blue).
+     This replaces the former *RWB* entry, which is exactly *BWR*
      reversed.  Enabled together with the **Map** selector.
    - **Min** / **Max**: Set the range of the color map.  Use *auto* to
      have LAMMPS determine the range automatically or specify an
@@ -651,7 +663,8 @@ Guide for step-by-step instructions.
      *engrot*, *engtrans*, *omega*, and *velvib*.  Selecting one of these
      colors the bonds by that per-bond value using the bond color map (see
      **Map** below); LAMMPS-GUI creates the required ``compute
-     bond/local`` automatically.
+     bond/local`` automatically.  These properties are only offered for
+     explicit bonds and not when **AutoBonds** is enabled.
    - **Size**: Select bond diameter mode.  Options include *atom*,
      *type*, and a few pre-defined choices for custom bond diameters.
      The text field can be edited and a different custom diameter
@@ -666,14 +679,15 @@ Guide for step-by-step instructions.
      always work as expected when the system has explicit bonds and thus
      neighbors may be automatically excluded from neighbor lists due to
      the `special_bonds settings
-     <https://docs.lammps.org/special_bonds.html>`_
+     <https://docs.lammps.org/special_bonds.html>`_.  It is only
+     available when a pair style is defined.
    - **Cutoff**: The distance cutoff used for automatic bond detection
      (range: 0.001 -- 10.0 in distance units), in the text field next to
      the AutoBonds checkbox.  Only available when auto-bonds are enabled.
-   - **Reverse** / **Map** / **Min** / **Max**: Select the color map and
+   - **Reverse Map** / **Map** / **Min** / **Max**: Select the color map and
      value range used when coloring bonds by a per-bond value (see
      **Color** above).  The same color maps as the atom **Map** are
-     offered, and the **Reverse** checkbox mirrors the chosen map exactly
+     offered, and the **Reverse Map** checkbox mirrors the chosen map exactly
      like its atom counterpart.  These fields are only enabled when a
      per-bond property is selected as the bond color.  Use *auto* for
      **Min** / **Max** to let LAMMPS determine the range automatically.
@@ -691,7 +705,7 @@ Guide for step-by-step instructions.
    - **Style** (radio buttons): Select the body rendering style --
      *Cylinders*, *Triangles*, or *Both*.  For cylinders -- when used for
      body particle rendering -- their diameter can also be set (range:
-     0.1 -- 10.0).
+     0.001 -- 5.0).
 
 **Ellipsoids**
    Controls visualization of `aspherical particles
@@ -705,9 +719,9 @@ Guide for step-by-step instructions.
    - **Color** (selection): Use coloring by the *atom* color choice, the
      ellipsoid *index*, or the atom *type* of the ellipsoid particles.
    - **Style** (radio buttons): Select the ellipsoid rendering style --
-     *Cylinders*, *Triangles*, or *Both*.  For cylinders -- when used for
+     *Cylinders* or *Triangles*.  For cylinders -- when used for
      ellipsoid particle rendering -- their diameter can also be set (range:
-     0.1 -- 10.0).
+     0.001 -- 5.0).
    - **Refine** (spinbox): Level of triangle mesh refinement.  At level
      1 the ellipsoids are represented by a deformed octahedron.  With a
      level increase, each triangle is replaced by 4 triangles following
@@ -725,7 +739,7 @@ Guide for step-by-step instructions.
    - **Lines** (checkbox): Enable or disable rendering of line segment
      particle shapes as connected cylinders.  When disabled, the
      particles are rendered as spheres like regular atoms.  Also the
-     cylinder diameter can be set (range: 0.1 -- 10.0).
+     cylinder diameter can be set (range: 0.001 -- 5.0).
    - **Color** (selection): Use coloring by the *atom* color choice, the
      line *index*, or the atom *type* of the line particles.
 
@@ -743,7 +757,7 @@ Guide for step-by-step instructions.
    - **Style** (radio buttons): Select the particle rendering style --
      *Cylinders*, *Triangles*, or *Both*.  For cylinders -- when used for
      triangle particle rendering -- their diameter can also be set
-     (range: 0.1 -- 10.0).
+     (range: 0.001 -- 5.0).
 
 Press **Apply** to apply the settings and re-render the image, or
 **Cancel** to discard changes.   The **Help** button opens the LAMMPS
@@ -782,8 +796,7 @@ For each region, the following settings can be adjusted:
   (wireframe), *filled* (solid), *transparent* (see-through solid), or
   *points* (point cloud).
 - **Color**: The color used to render the region.  Accepts `named
-  colors <https://docs.lammps.org/dump_image.html>`_ or hex color
-  values.
+  colors <https://docs.lammps.org/dump_image.html>`_.
 - **Size**: The diameter of the lines (for frame style) or points (for
   points style).
 - **# Points**: The number of points used to approximate the region
@@ -839,8 +852,7 @@ settings can be adjusted:
 - **Color Style**: Select the coloring mode -- *type*, *element*, or
   *const* (constant color).
 - **Color**: The color to use when *const* color style is selected.
-  Accepts `named colors <https://docs.lammps.org/dump_image.html>`_
-  or hex color values.
+  Accepts `named colors <https://docs.lammps.org/dump_image.html>`_.
 - **Opacity**: The opacity of the graphics objects (range: 0.0 -- 1.0).
 - **Flag #1** / **Flag #2**: Style-specific numeric flags that control
   additional rendering options.  Their meaning depends on the
@@ -871,11 +883,16 @@ Atom Type Color Customization
            :width: 15%
 
 This dialog allows customizing the current color definitions used for
-per-type coloring, reset them to the default settings, and load or save
-them using `JSON format <https://www.json.org/>`_ files.
+per-type coloring, resetting them to the default settings, and loading
+or saving them using `JSON format <https://www.json.org/>`_ files.  It
+is opened by pressing the "Colors" button in the settings panel or by
+using the `Alt-O` keyboard shortcut.
 
 The dialog contains as many color rows as the current system has atom
-types and it is initialized from the current list of colors.  If there
+types and it is initialized from the current list of colors.  Each row
+shows the atom type, a color button that opens a color selection
+dialog, the color name, and its red, green, and blue components (range:
+0.0 -- 1.0), which can also be edited directly.  If there
 are fewer types, then only the first part of that list is used.  If
 there are more types, then the list of colors is used multiple times and
 wraps around.  When the list is too long to fit into the dialog window,
@@ -910,12 +927,14 @@ restore a previous color assignment.
   be validated with the JSON schema file at
   https://download.lammps.org/json/color-schema.json.
 
-  The "application", "format", "revision" entries are *required* and are
+  The "application", "format", and "revision" entries are *required* and are
   checked for on reading so that files without them are rejected.  Also
   the "colors" list is *required* with color definitions of three
   entries each: "red", "green", and "blue" that have the value of the
   corresponding color component given as a floating point number in the
-  range from 0.0 to 1.0 inclusive.  The "lights" object is *optional*
+  range from 0.0 to 1.0 inclusive.  Each color definition may also
+  have a "name" entry with the name of the color; both LAMMPS-GUI and
+  LAMMPS write it.  The "lights" object is *optional*
   (LAMMPS-GUI will display a warning if it is missing) and contains the
   intensity settings for the four light sources: "ambient", "key",
   "fill", and "back" also in the range from 0.0 to 1.0 inclusive.
@@ -943,10 +962,10 @@ restore a previous color assignment.
             }
          ],
          "lights": {
-            "ambient": 0.2,
-            "back": 0.4,
-            "fill": 0.4,
-            "key": 0.4
+            "ambient": 0.0,
+            "back": 0.9,
+            "fill": 0.45,
+            "key": 0.9
          }
      }
 
@@ -998,8 +1017,8 @@ slide show is opened this way, the controls that act on a running
 simulation (such as stopping the run or sending images to the trash) are
 hidden.
 
-To load many imagefiles from the command line, you can use on Linux and
-macOS a command line like the following:
+To load many image files from the command line on Linux and macOS, you
+can use a command line like the following:
 
 .. code-block:: bash
 
@@ -1012,10 +1031,13 @@ files <movie_import>` below.
 From the slide show window the following global keyboard shortcuts are
 supported: `Ctrl-W`: close window, `Ctrl-Q`: quit application, `Ctrl-/`:
 stop running simulation.  Other keyboard shortcuts are connected to some
-of the controls and listed in their documentation below.
+of the controls and listed in their documentation below.  The *File*
+menu of the window has the entries *Save Image As...*, *Copy Image*, and
+*Export Movie...*, which do the same as the corresponding toolbar
+buttons, plus *Close* and *Quit*.
 
 The visualization shown below is created by the
-`in.breakable GRAPHICS package example <https://github.com/lammps/lammps/blob/develop/examples/GRAPHICS/in.breakable>`_
+`in.breakable GRAPHICS package example <https://github.com/lammps/lammps/blob/develop/examples/GRAPHICS/in.breakable>`_.
 
 .. image:: JPG/lammps-gui-slideshow.png
    :align: center
@@ -1083,14 +1105,16 @@ following controls, organized from left to right:
   the **Start** and **Stop** controls below) to a movie file or `animated
   GIF file <https://en.wikipedia.org/wiki/GIF#Animated_GIF>`_.  This requires
   that either the `FFmpeg program <https://ffmpeg.org/>`_ or the
-  `ImageMagick software <https://imagemagick.org/>`_ are installed.
-  Supported output formats include MP4, MKV, AVI, MPG, MPEG, WEBM, and
-  animated GIF.  The file format is determined by the file name
-  extension.  Any active image transformations (rotation, mirroring, see
-  below) are applied to the exported movie.
+  `ImageMagick software <https://imagemagick.org/>`_ is installed.
+  Supported output formats include MP4, M4V, MKV, MOV, AVI, MPG, MPEG,
+  WEBM, and animated GIF.  The file format is determined by the file name
+  extension.  Any active image transformations (zoom, rotation, mirroring,
+  see below) are applied to the exported movie, and its frame rate is
+  set from the **Delay** setting.
 - **Save current image** (`Ctrl-S`): Save the currently displayed image
-  to a file, including any applied transformations (rotation, mirroring,
-  see below).  The file format is inferred from the file name extension.
+  to a file, including any applied transformations (zoom, rotation,
+  mirroring, see below).  The file format is inferred from the file name
+  extension.
   When the `ImageMagick software <https://imagemagick.org/>`_ is
   installed, additional file formats beyond those natively supported by
   the `Qt library <https://doc.qt.io/qt-6/qtimageformats-index.html>`_
@@ -1138,7 +1162,10 @@ following controls, organized from left to right:
   its full size, without scroll bars or unused space.  This undoes a
   manual resize of the window; the window is never grown beyond a
   fraction of the screen, so scroll bars remain for very large images.
-- **Stop Simulation** (`Ctrl-/`): Stop a running simulation.
+  This button is not shown in the combined main window.
+- **Stop Simulation** (`Ctrl-/`): Stop a running simulation.  This
+  button is not shown in the combined main window, whose status bar
+  already has a stop button.
 
 These image transformations are useful when the simulation images need
 to be adjusted for presentation purposes.  The same transformations are
@@ -1153,7 +1180,8 @@ image, restrict the active range, and control the slideshow settings:
   playback wraps around from the last image of the active range back to
   the first.
 - **Delay**: Set the delay in milliseconds between frames
-  during animation playback.
+  during animation playback.  This also sets the frame rate of
+  exported movies.
 - **Start**: First image of the active range.  Animation, single
   stepping, movie export, and image deletion are all restricted to
   images at or after this position.  Defaults to the first image.

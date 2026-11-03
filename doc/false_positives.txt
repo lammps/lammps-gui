@@ -111,6 +111,7 @@ imagecache
 imagefiles
 imagename
 imageviewersettings
+inputvariables
 isImageFile
 isLightTheme
 isMovieFile
@@ -119,10 +120,12 @@ Jacobian
 json
 keyPressEvent
 Khinchin
+Kokkos
 kspace
 kx
 lammps
 lammpsImageColors
+lammpssyntax
 launchable
 leastsquares
 Lennard
@@ -214,8 +217,10 @@ rangeslider
 rasterizer
 README
 Rebindable
+recalibrate
 recurse
 renameColumns
+renameToBackup
 resizable
 restoreStdout
 rollout
@@ -264,6 +269,7 @@ substituteColumnRefs
 supercomputing
 Sur
 Svg
+syntaxcheck
 Targa
 TGA
 tga
@@ -290,6 +296,7 @@ underdetermined
 Unregister
 unregisters
 Validator
+validators
 varname
 vendored
 Ventura

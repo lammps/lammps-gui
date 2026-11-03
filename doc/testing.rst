@@ -16,7 +16,7 @@ and can be run individually or as a complete suite for each test
 program.  Tests running LAMMPS-GUI itself use the "virtual frame buffer"
 X server (Xvfb) and are written in Python using the ``unittest``
 Python module and the `PyAutoGUI module
-<https://pyautogui.readthedocs.io/>`_
+<https://pyautogui.readthedocs.io/>`_.
 
 Building the Tests
 ^^^^^^^^^^^^^^^^^^
@@ -47,6 +47,17 @@ they can be disabled at a later point with:
 .. code-block:: bash
 
    cmake -S . -B build -D ENABLE_TESTING=OFF
+
+Code Coverage
+=============
+
+When compiling with the GNU compilers and testing enabled, the ``-D
+ENABLE_COVERAGE=ON`` setting compiles the ``lammps-gui`` executable (but
+not the unit test programs) with coverage instrumentation.  If the
+``gcovr`` program is found, the ``coverage`` build target then creates
+an HTML report from the collected data in the ``coverage_html`` folder
+of the build tree, and the ``clean_coverage`` target removes the report
+and the coverage data files.
 
 Running Tests
 ^^^^^^^^^^^^^
@@ -99,12 +110,16 @@ Current Test Coverage
 
 The unit tests cover the utility functions, the widget-scoped keyboard
 shortcuts, the stdout capture, the log window warning highlighter, the
+input script syntax engine with the editor's syntax highlighter and the
+pre-run input check, the index variable handling of the *Set Variables*
+dialog, the
 dump-image command builder, the movie import and image cache of the Slide
 Show window, the docked window layout, the Tab completion of the command
 window's prompt, the plot data model with its file parsers and writers, the
 block-structured ``fix ave/*`` file parsers and their reduction to a
 plottable table, the column picker dialog, the chart axis-layout math, and
-the Qt-free math toolkit (least squares and smoothing, autocorrelation, curve fitting, the
+the Qt-free math toolkit (least squares and smoothing, autocorrelation,
+Fourier transforms and structure factors, curve fitting, the
 Levenberg-Marquardt solver, the vendored LeptonMini expression parser, and
 the custom-function layer on top of them).  Command-line tests validate
 basic executable behavior, and PyAutoGUI-based tests exercise the GUI
@@ -156,7 +171,7 @@ the application.
   - Double-quoted strings
   - Escaped quotes within strings
   - Mixed quoting styles
-  - Triple-nested quotes
+  - Triple-quoted strings
   - Multiple consecutive whitespace characters
   - Empty input
   - Quotes at string boundaries
@@ -172,6 +187,26 @@ the application.
   - Empty string input
   - bash executable
   - Platform-specific behavior (conditional compilation)
+
+**Executable Lookup (findExe)**
+  Tests for the findExe function that returns the full path of an
+  executable: an absolute path to an executable file for a common system
+  command, an empty string for a non-existent command, and consistency
+  with hasExe.
+
+**Backup Files (renameToBackup)**
+  Tests for the renameToBackup function: creating a backup file,
+  replacing a stale backup file, and failing for a missing file.
+
+**LAMMPS Library Name (getLammpsLibName)**
+  Test that the shared library name is one of the known per-platform names
+  (or empty in linked mode).
+
+**Default File Names (defaultFileStem, ensureFileSuffix)**
+  Tests for deriving the default name stem of a saved file from the name of
+  the input or data file (removing a directory part, a leading ``in.``
+  prefix, and known file extensions, with ``lammps`` as fallback) and for
+  appending a default suffix to a file name without one.
 
 **Theme Detection (isLightTheme)**
   Tests for the isLightTheme function that determines if the current
@@ -297,6 +332,11 @@ collected and displayed in the *Output* window.  Test cases cover:
 - ``getChunk()`` returning an empty string when not capturing
 - Multiple successive ``getChunk()`` calls during one capture
 - ``endCapture()`` being a safe no-op when no capture is active
+- ``beginCapture()`` verifying the capture with a marker that does not
+  appear in the captured output
+- ``totalRead()`` counting the bytes of the chunks read
+- The end-of-run probe (``probeRunEnd()``) reporting an intact capture
+  without losing pending output
 - ``getBufferUse()`` reporting zero before any capture activity
 - ``getBufferUse()`` reflecting the size of the most recent chunk
 - The original ``stdout`` file descriptor being restored when capture ends
@@ -316,12 +356,92 @@ label.  Test cases cover:
 - Empty documents produce no spurious warnings
 - Warnings are detected when they appear at the start of a line
 - The running count is correct for multiple warnings
+- ``reset()`` clears the warning count
+- A document reused for another run does not accumulate the warnings of
+  the previous run
+
+test_lammpssyntax.cpp
+---------------------
+
+Tests for the Qt Core-only LAMMPS input syntax engine
+(``src/lammpssyntax.{h,cpp}``) that is shared by the syntax highlighter,
+the auto-completion, and the input check.  Test cases cover:
+
+- Tokenizing lines: commands and arguments, comments (but not ``#``
+  inside quotes), single, double, and triple quotes (also spanning
+  lines), escaped and unbalanced quotes, and ``&`` line continuations,
+  also in the middle of a word, in comments, and within quoted strings
+  (but not inside triple quotes)
+- Finding ``$`` variable references and recognizing numbers
+- Packing and unpacking the per-line syntax state
+- The registry of commands and styles, including ``none`` as a valid
+  force field style, parsing and overriding command specifications, and
+  loading the shipped ``resources/command_specs.table`` file
+- The completion target for a cursor position, also for hybrid sub-styles,
+  ``dump image`` keywords and colors, and on continuation lines
+- The ``InputScanner`` that joins continuation lines, removes quotes,
+  skips comments and empty lines, flags words with substitutions, and
+  reports unbalanced quotes, unclosed triple quotes, and dangling
+  continuations
+
+test_highlighter.cpp
+--------------------
+
+Tests for the :cpp:class:`Highlighter` of the *Editor* window
+(``src/highlighter.{h,cpp}``), applied to a plain ``QTextDocument`` with
+the ``offscreen`` platform plugin.  Test cases cover:
+
+- Colors by command category and by argument role, also on continuation
+  lines
+- The wavy underline for unknown names, which is not applied to word
+  fragments joined with ``&``, to the word at the cursor, or without a
+  populated registry
+- Comment continuations and triple-quoted blocks, also after edits
+- Hybrid sub-styles, ``dump image`` keywords and colors, and the sections
+  of embedded commands
+- Variable references inside strings, ``c_`` references, and special
+  words
+
+test_syntaxcheck.cpp
+--------------------
+
+Tests for the pre-run input check (``src/syntaxcheck.{h,cpp}``) behind
+*Check Input via Heuristics* in the *Run* menu.  Test cases cover:
+
+- A clean input producing no findings
+- Unknown commands (downgraded to a warning in inputs with ``jump`` and
+  skipped after a ``plugin`` command) and unknown styles
+- Quote and line continuation diagnostics
+- Undefined variables and groups, and missing files
+- Minimum argument counts and strictly numeric arguments
+- Warnings for references to computes, fixes, or variables that are
+  defined nowhere in the input
+- Continuation lines being joined before checking
+- Formatting and counting the findings
+
+test_inputvariables.cpp
+-----------------------
+
+Tests for the Qt Core-only index variable helpers
+(``src/inputvariables.{h,cpp}``) used by the *Set Variables* dialog.  Test
+cases cover:
+
+- ``matchIndexVariable()``: recognizing an index variable definition and
+  the position of its value, also with extra whitespace or an empty value
+- ``parseInputVariables()``: the first definition taking precedence,
+  other variable styles not being listed, and variables that are used but
+  not defined
+- ``mergeInputVariables()``: edits of the input taking precedence,
+  overrides from the dialog being kept, and entries that are no longer in
+  the input being kept as long as they have a value
+- ``isOverridden()``: detecting a value that differs from the definition
+  in the input
 
 test_dumpimage.cpp
 ------------------
 
 Tests for the GUI-free dump-image command builder (``src/dumpimage.{h,cpp}``)
-that assembles the LAMMPS ``write_dump ... image`` command from a
+that assembles the LAMMPS ``dump image`` and ``dump_modify`` arguments from a
 ``DumpImageParams`` snapshot of the Image Viewer state.  Test cases cover:
 
 - Basic structure of the generated render and ``dump_modify`` arguments
@@ -330,6 +450,12 @@ that assembles the LAMMPS ``write_dump ... image`` command from a
 - The default BWR color map, named and reversed continuous maps, discrete
   bond color maps, and the canonical stops of the perceptual maps
 - Element-based vs. type-based coloring (no color map for type coloring)
+- Explicit color map ranges, atom diameters taken from a variable, hidden
+  atoms, and a dynamic view center (which is always emitted)
+- The optional rendering effects (depth cue, defocus, outline, specular
+  highlights, metal effect, gamma, and SSAO samples), which are emitted
+  only when they differ from their defaults, and the clamping of
+  out-of-range metal, gamma, and SSAO sample values
 - Bond rendering: suppressed while VDW spheres are active, drawn when
   requested, auto-bond generation only when a pair style is defined
 - ``noinit`` suppressed while a fix is active; disabled fixes are ignored
@@ -345,6 +471,9 @@ without ``ffprobe`` or ``ffmpeg`` installed.  Test cases cover:
 - ``parseFrameRate()``: rational (``30000/1001``) and plain numbers,
   invalid input
 - ``selectedFrameCount()``: full range, range with interval, invalid ranges
+- ``frameToSeconds()``: time offset of a frame, invalid input
+- ``sampleOutdated()``: deciding when the sample frame of the selected
+  range has to be refreshed, invalid input
 - ``parseProbeOutput()``: frame count taken from the container, missing
   frame count or frame size, absent video stream, malformed JSON, and
   numeric fields given as JSON numbers instead of strings
@@ -468,6 +597,11 @@ Tests for the post-processing analyses (``src/analysis.{h,cpp}``).  Test
 cases cover the normalized autocorrelation function: an exact small case,
 lag zero being one, empty results for constant or too-short series,
 clamping of the maximum lag, and anticorrelation of an alternating series.
+The cosine, sine, and power spectrum Fourier transforms are compared to
+the exact transforms of an exponential decay, also on a non-uniform grid,
+and the Hann taper is checked.  The structure factor S(q) computed from a
+radial distribution function is compared to an ideal gas and to an
+exactly known case.  Both return empty results for degenerate input.
 
 test_fitting.cpp
 ----------------
@@ -506,7 +640,13 @@ Tests for the custom-function evaluation and fitting layer
 - Skipping non-finite points and clamping the sample count
 - Error handling for empty expressions, syntax errors, and undefined
   variables
-- Nonlinear custom fits recovering exponential-decay and quadratic models
+- Column references written as ``{name}``: substitution with generated
+  variables, names with brackets, operators, and spaces, repeated
+  references, accessors, error reporting, and renaming a column
+- Nonlinear custom fits recovering exponential-decay and quadratic models,
+  and a binned, truncated Maxwell-Boltzmann distribution
+- Weighted fits, with the weights shifting the solution and wrongly sized
+  weights being ignored
 - Fit-setup validation: variable/parameter clashes, duplicate parameters,
   undeclared symbols, and too few data points
 
@@ -587,6 +727,9 @@ environment, allowing automated interaction and screenshot capture.
 
 **Important Note**: The argument for the screen number flag ``-n`` for ``xvfb-run``
 *must* be different for each test, so that the tests may run in parallel.
+
+The GUI tests are only registered when LAMMPS-GUI is compiled without a code
+sanitizer (i.e. with ``ENABLE_SANITIZER`` set to ``none``, the default).
 
 Framebuffer.CreateScreenshot (test_shooter.py)
 -----------------------------------------------
@@ -703,6 +846,10 @@ within a virtual frame buffer and validates:
   - The ``Cancel`` option returns to the editor without exiting
   - The ``No`` option exits without saving
 
+Three more tests in this file (``testExitModSave``, ``testEditSaveLoad``,
+and ``testEditCompletion``) are currently skipped, since their interaction
+with modal dialogs and the completion pop-up is not reliable.
+
 **Dependencies**:
   - PyAutoGUI - for keyboard and mouse automation
   - Pillow (PIL) - for screenshot validation
@@ -723,17 +870,16 @@ Test Fixtures and Utilities
   Base test fixture that creates a ``QCoreApplication`` instance for tests
   that require Qt functionality. The application is created once per test
   suite and reused across tests for efficiency.  Similar lightweight
-  fixtures (``StdCaptureTest``, ``FlagWarningsTest``) are used by the
-  matching unit test programs.
+  fixtures (e.g. ``StdCaptureTest``, ``SyntaxCheckTest``) are used by the
+  matching unit test programs; the fixtures for testing widgets and
+  syntax highlighters (e.g. ``FlagWarningsTest``, ``HighlighterTest``,
+  ``ShellPromptTest``) create a ``QApplication`` with the ``offscreen``
+  platform plugin instead.
 
 **Platform-Specific Testing**
-  Tests use conditional compilation (``#ifdef _WIN32``) to adapt to
-  platform differences in:
-
-  - Path separators
-  - Line endings
-  - Available system executables
-  - Default shell commands
+  Tests use conditional compilation (``#if defined(_WIN32)``) to adapt to
+  platform differences in the available system executables (``cmd`` on
+  Windows, ``ls`` and ``bash`` elsewhere).
 
 Future Test Expansion
 =====================
@@ -742,7 +888,6 @@ Planned additions to the test suite include:
 
 **GUI Component Tests**
   - CodeEditor text manipulation
-  - Syntax highlighter accuracy
   - Find/replace functionality
   - Auto-completion behavior
 
@@ -818,15 +963,22 @@ Add new test cases using GoogleTest macros:
 Dependencies
 ^^^^^^^^^^^^
 
-- **GoogleTest**: Automatically fetched via CMake FetchContent (v1.17.0)
+- **GoogleTest**: Automatically fetched via CMake FetchContent (v1.18.0)
 - **Qt6**: Required for Qt-dependent functions (Widgets component)
 - **CTest**: Part of CMake, used for test execution
+- **Xvfb**: The ``xvfb-run`` script and a supported screenshooter program
+  (``magick``, ``import``, ``xfce4-screenshooter``, or
+  ``gnome-screenshot``) are required during CMake configuration when
+  testing is enabled
+- **Python 3.8 or later**: Used to set up a virtual environment during the
+  build, into which the packages listed in ``test/requirements.txt``
+  (including PyAutoGUI and Pillow) are installed with ``pip``
 
 Notes
 ^^^^^
 
-- Tests that require a Qt application context use a ``HelpersTest`` fixture that creates a ``QCoreApplication`` instance.
-- Platform-specific tests (e.g., ``has_exe``) use conditional compilation to test appropriate commands on different operating systems.
+- Tests that require a Qt application context use a fixture like ``HelpersTest`` that creates a ``QCoreApplication`` (or a ``QApplication``) instance.
+- Platform-specific tests (e.g., for ``hasExe``) use conditional compilation to test appropriate commands on different operating systems.
 - The test suite is designed to be easily extended with additional test files and test cases.
 - GoogleTest is fetched automatically during CMake configuration, so no manual installation is required.
 
@@ -834,6 +986,7 @@ CI Integration
 ^^^^^^^^^^^^^^
 
 The test suite integrates with existing CI workflows:
+
 - Tests run as part of the standard build process when ``ENABLE_TESTING=ON``
 - CTest provides standard output for CI systems
 - Tests can be disabled for documentation-only builds
