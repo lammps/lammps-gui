@@ -33,7 +33,7 @@ constexpr double LABEL_GAP  = 5.0;  ///< gap between tick labels and the axis
 constexpr double TICK_LEN   = 5.0;  ///< length of axis tick marks
 
 // legend box layout (logical pixels)
-constexpr double LEGEND_INSET  = 8.0;  ///< inset from the top-left plot corner
+constexpr double LEGEND_INSET  = 8.0;  ///< inset from the plot corner holding the legend
 constexpr double LEGEND_PAD    = 5.0;  ///< padding inside the legend box
 constexpr double LEGEND_SWATCH = 20.0; ///< width of a legend color swatch
 constexpr double LEGEND_GAP    = 6.0;  ///< gap between swatch and label text

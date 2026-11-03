@@ -69,15 +69,18 @@ class WindowLayout;
  * - Application preferences and settings
  * - Tutorial wizard for interactive LAMMPS learning
  *
- * The class integrates with Qt's main window framework and provides menu actions,
- * toolbars, and status bar components. It uses a LammpsWrapper to interface with
- * the LAMMPS library and LammpsRunner to execute simulations in a separate thread.
+ * The class integrates with Qt's main window framework and provides menu actions
+ * and a status bar with buttons for the most common actions. It uses a LammpsWrapper
+ * to interface with the LAMMPS library and LammpsRunner to execute simulations in a
+ * separate thread.
  *
  * @see CodeEditor for the text editor component
  * @see ChartWindow for the charts window component
  * @see LogWindow for the log output window component
  * @see ImageViewer for the snapshot image window component
  * @see SlideShow for the slide show viewer window component
+ * @see CommandWindow for the shell command window component
+ * @see WindowLayout for the placement of the output windows (individual or docked)
  * @see Preferences for the preferences window component
  * @see LammpsRunner for simulation execution in a separate thread
  * @see LammpsWrapper for LAMMPS library interface
@@ -108,7 +111,8 @@ public:
     /**
      * @brief Destructor
      *
-     * Cleans up resources including dynamically created widgets and LAMMPS instances.
+     * Saves the dock arrangement and deletes the dynamically created widgets.
+     * The LAMMPS instance is not closed here; quit() finalizes it.
      */
     ~LammpsGui() override;
 
@@ -119,10 +123,13 @@ public:
     LammpsGui &operator=(LammpsGui &&)      = delete;
 
 protected:
-    /** @brief Read a restart file into LAMMPS and open the inspection windows */
+    /** @brief Read a restart file into LAMMPS and open the inspection windows
+     *  @param filename Restart file to inspect; nothing happens if it is empty */
     void inspectFile(const QString &filename);
 
-    /** @brief Write current editor content to a file */
+    /** @brief Write current editor content to a file
+     *  @param filename File to write; once it is opened, it becomes the current
+     *                  file and its folder the working directory */
     void writeFile(const QString &filename);
 
 public:
@@ -151,9 +158,9 @@ public:
      * @brief Open a file in a read-only text viewer
      * @param filename File to show; nothing happens if it is empty
      *
-     * Refuses an image or a movie file, which belong in openImageFiles(), and a
-     * binary one, which belongs nowhere.  Also reachable from the command
-     * window's "open".
+     * Refuses an image or a movie file, which belong in openImageFiles(), and
+     * asks before opening a binary one, which belongs nowhere.  Also reachable
+     * from the command window's "open".
      */
     void viewFile(const QString &filename);
 
@@ -184,10 +191,14 @@ protected:
     /** @brief Set the editor window title from the current file and run number
      *
      * In the docked layout the views are named by their dock tab and no longer
-     * carry a window title with the run number, so the editor title shows it. */
+     * carry a window title with the run number, so the editor title shows it.
+     * @param file Name of the current file; empty shows "*unknown*" */
     void updateEditorTitle(const QString &file);
 
-    /** @brief Update the recent files list */
+    /** @brief Update the recent files list
+     *  @param filename File to add at the top of the list unless it is listed
+     *                  already; empty only prunes unreadable entries and
+     *                  refreshes the menu */
     void updateRecents(const QString &filename = "");
 
     /** @brief Delete all variables defined in the LAMMPS instance */
@@ -210,7 +221,8 @@ protected:
 
     /**
      * @brief Execute a LAMMPS simulation
-     * @param use_buffer If true, runs from editor buffer; if false, saves and runs from file
+     * @param use_buffer If true, runs from editor buffer; if false, runs from the file
+     *        (offering to save unsaved changes first)
      * @param dryrun If true, checks the input via a dry run: LAMMPS executes
      *        the setup of every command but no timesteps (the equivalent of
      *        the -skiprun command line flag)
@@ -238,7 +250,7 @@ protected:
      */
     void launchRunner(std::string input, std::string file, bool clearfirst);
 
-    /** @brief Initialize and start a new LAMMPS instance */
+    /** @brief Initialize and start a new LAMMPS instance unless one is open already */
     void startLammps();
 
     /** @brief Fill the syntax registry from LAMMPS library introspection
@@ -251,8 +263,9 @@ protected:
 
     /** @brief Variable names that are defined before the input runs
      *
-     * The names from the Set Variables dialog plus the always-present
-     * @c gui_run variable; passed to the input checker as preset names. */
+     * The names of the variables with a value from the Set Variables dialog
+     * plus the always-present @c gui_run variable; passed to the input
+     * checker as preset names. */
     QStringList presetVariableNames() const;
 
     /** @brief Run the pre-run input lint and ask about found errors
@@ -273,8 +286,11 @@ protected:
     void autoSave();
 
     /**
-     * @brief Update the editor font
-     * @param newfont The font to apply to the editor
+     * @brief Update the general font of the main window, its editor, and its menu bar
+     * @param newfont The font to apply
+     *
+     * The text in the editor uses the document's default (fixed-width) font,
+     * which is set separately.
      */
     void setFont(const QFont &newfont);
 
@@ -307,11 +323,11 @@ protected:
     void setupTutorial(int collection, int tutno, const QString &dir, bool purgedir,
                        bool getsolution, bool openwebpage);
 
-    /** @brief Clean up the inspect file dialog list */
+    /** @brief Delete hidden restart file inspection views and drop empty list entries */
     void purgeInspectList();
 
     /**
-     * @brief Event filter for handling special events
+     * @brief Event filter that routes the close event of the main window to quit()
      * @param watched Object being watched
      * @param event Event to filter
      * @return true if event was handled
@@ -338,7 +354,7 @@ private slots:
     /** @brief View a file in read-only mode */
     void view();
 
-    /** @brief Open one or more image files in a standalone snapshot viewer */
+    /** @brief Open one or more image or movie files in a standalone slide show viewer */
     void openImages();
 
     /** @brief Select and inspect a restart file */
@@ -350,7 +366,7 @@ private slots:
     /** @brief Open a file from the recent files list */
     void openRecent();
 
-    /** @brief Change the working directory */
+    /** @brief Choose the folder for the tutorial files in the tutorial wizard */
     void getDirectory();
 
     /** @brief Start external executable */
@@ -392,13 +408,13 @@ private slots:
     /** @brief Check the editor buffer via a dry run (setup only, no timesteps) */
     void dryRunBuffer() { doRun(true, true); }
 
-    /** @brief Restart LAMMPS with a new instance */
+    /** @brief Close the LAMMPS instance so that the next use starts a new one */
     void restartLammps();
 
     /** @brief Open dialog to edit index-style variables */
     void editVariables();
 
-    /** @brief Render an image from a dump file */
+    /** @brief Create a snapshot image of the current system in the image viewer */
     void renderImage();
 
     /** @brief Open an external data file and plot selected columns */
@@ -416,16 +432,18 @@ private slots:
      */
     void adoptChartResult(ChartWindow *win, const QString &title);
 
-    /** @brief View a slideshow of images */
+    /** @brief Toggle the slide show window from the View menu */
     void viewSlides();
 
-    /** @brief View a single image */
+    /** @brief Toggle the image viewer window from the View menu
+     *
+     * On first use there is nothing to toggle, so it creates a snapshot image. */
     void viewImage();
 
-    /** @brief View a chart from thermodynamic data */
+    /** @brief Toggle the charts window from the View menu */
     void viewChart();
 
-    /** @brief View the log window */
+    /** @brief Toggle the output (log) window from the View menu */
     void viewLog();
 
     /** @brief Toggle the shell prompt window from the View menu
@@ -436,7 +454,7 @@ private slots:
     /** @brief Open and raise the shell prompt window (Run menu) */
     void openCommandWindow();
 
-    /** @brief View current variable definitions */
+    /** @brief Toggle the window with the current variable definitions from the View menu */
     void viewVariables();
 
     /** @brief Show about dialog */
@@ -447,7 +465,7 @@ private slots:
     void checkUpdate();
 #endif
 
-    /** @brief Show context-sensitive help */
+    /** @brief Show the Quick Help dialog */
     void help();
 
     /** @brief Open LAMMPS manual */
@@ -463,10 +481,10 @@ private slots:
      */
     void startTutorial(int collection, int tutno);
 
-    /** @brief Open HOWTO documentation */
+    /** @brief Open the LAMMPS-GUI online documentation */
     void howto();
 
-    /** @brief Update log window with new output */
+    /** @brief Poll a run: update the log window, progress, charts, and slide show */
     void logUpdate();
 
     /** @brief Handle document modification */
@@ -475,7 +493,7 @@ private slots:
     /** @brief Open preferences dialog */
     void preferences();
 
-    /** @brief Reset settings to defaults */
+    /** @brief Reset settings to defaults and delete a downloaded LAMMPS shared library */
     void defaults();
 
 private:
@@ -531,15 +549,16 @@ private:
     };
 
     /**
-     * @brief Download the listed tutorial files from @p baseUrl; false on error
+     * @brief Download the listed tutorial files from @p baseUrl; false if canceled
      *
      * Per-file progress is shown in @p dlg.  A file that fails to download is
      * recorded and skipped so one missing file (e.g. from a stale manifest
-     * entry) does not discard the rest of the tutorial; after the batch a
-     * dialog lists the missing files and offers to report them at
-     * @p issuesUrl.  Only a download canceled by the user aborts the batch
-     * (the dialog is closed and false is returned).  On success the dialog
-     * stays open (the caller closes it when the whole setup is complete).
+     * entry) does not discard the rest of the tutorial; after the batch the
+     * progress dialog is closed and another dialog lists the missing files and
+     * offers to report them at @p issuesUrl.  Only a download canceled by the
+     * user aborts the batch (the dialog is closed and false is returned).  When
+     * no file is missing, the dialog stays open (the caller closes it when the
+     * whole setup is complete).
      */
     bool downloadTutorialFiles(const QString &dir, const QList<DownloadItem> &downloads,
                                URLDownloader &downloader, const QString &baseUrl,
@@ -630,7 +649,7 @@ private:
     /** @brief Create the status bar and its widgets */
     void createStatusBar();
 
-    /** @brief Create (or recreate) the floating "Current Variables" window.
+    /** @brief Create (or recreate) the "Current Variables" window.
      *
      * @c varwindow is torn down together with the other output windows when the
      * editor is reset (newDocument()/openFile()), so it must be recreated on
@@ -642,7 +661,7 @@ private:
     QMenuBar *menubar;              ///< Menu bar with menus and actions
     QMenu *filemenu;                ///< Editor File menu, swapped out for a view's own when docked
     QMenu *editmenu;                ///< Editor Edit menu, shown only for the editor
-    QMenu *currentviewmenu;         ///< View menu currently at the front of the bar
+    QMenu *currentviewmenu;         ///< Focused view's own menu at the front of the bar, or null
     QMenu *runmenu;                 ///< Run menu, shared with the other windows
     QMenu *viewmenu;                ///< View menu, shared with the other windows
     QMenu *tutorialmenu;            ///< Tutorials menu, shared with the other windows
@@ -653,7 +672,7 @@ private:
     LammpsSyntax syntax;          ///< Syntax registry for highlighting and input checking
     bool dryRunActive = false;    ///< current run is an input check dry run
     Highlighter *highlighter;     ///< Syntax highlighter for LAMMPS input
-    StdCapture *capturer;         ///< Captures stdout/stderr from LAMMPS
+    StdCapture *capturer;         ///< Captures the stdout output of LAMMPS
     QLabel *status;               ///< Status bar label for general status
     QLabel *cpuuse;               ///< Status bar label for CPU usage
     int lastCpuBucket;            ///< Last applied cpuuse color bucket (-1 = none yet)
@@ -672,20 +691,21 @@ private:
     WindowLayout *viewlayout;     ///< Presentation policy for the output windows above
 
     /**
-     * @brief Container for inspect dialog widgets
+     * @brief Container for the views of an inspected restart file
      *
-     * Holds references to the three tabs (info, data, image) in an inspect dialog
+     * Holds references to the three views (info, data, image) opened for one
+     * restart file
      */
     struct InspectData {
         /// Held weakly: a view that is closed deletes itself, and purgeInspectList()
         /// reaps the entry rather than the widget in that case
-        QPointer<QWidget> info;  ///< Information tab widget
-        QPointer<QWidget> data;  ///< Data viewing tab widget
-        QPointer<QWidget> image; ///< Image rendering tab widget
+        QPointer<QWidget> info;  ///< Viewer for the output of the info command
+        QPointer<QWidget> data;  ///< Viewer for the data file written from the restart
+        QPointer<QWidget> image; ///< Snapshot image viewer
     };
-    QList<InspectData *> inspectList; ///< List of open inspect dialogs
+    QList<InspectData *> inspectList; ///< Views of the inspected restart files
 
-    QString currentFile;            ///< Path to currently opened file
+    QString currentFile;            ///< Name of the currently opened file (without directory)
     QString currentDir;             ///< Current working directory
     QList<QString> recent;          ///< List of recently opened files
     QList<VariableEntry> variables; ///< Index-style variable definitions

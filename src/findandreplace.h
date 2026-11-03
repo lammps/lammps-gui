@@ -23,8 +23,9 @@ class QCheckBox;
  *
  * FindAndReplace provides a dialog for searching and replacing text
  * in the CodeEditor. It supports case-sensitive/insensitive search,
- * whole word matching, text wrapping, and batch replace operations.
- * The dialog is non-modal so users can continue editing while searching.
+ * whole word matching, wrapping around at the end of the document, and
+ * replacing all matches at once.  LammpsGui::findAndReplace() runs it as
+ * a modal dialog with exec().
  */
 class FindAndReplace : public QDialog {
     Q_OBJECT

@@ -55,6 +55,8 @@ public:
      * @brief Create a new LAMMPS instance
      * @param nargs Number of command-line arguments
      * @param args Command-line arguments array
+     *
+     * Does nothing if an instance is open already: there is only one.
      */
     void open(int nargs, char **args);
 
@@ -64,7 +66,9 @@ public:
     void close();
 
     /**
-     * @brief Finalize MPI (if used) and close LAMMPS
+     * @brief Close LAMMPS and finalize MPI, Kokkos, and Python (if used)
+     *
+     * Does nothing if no LAMMPS instance is open.
      */
     void finalize();
 
@@ -128,8 +132,8 @@ public:
     /**
      * @brief Extract data from a compute from LAMMPS
      * @param id compute id as a QString
-     * @param style style of data to extract
-     * @param type type of data to extract
+     * @param style style (scope) of data to extract (GLOBAL_STYLE, ATOM_STYLE, LOCAL_STYLE)
+     * @param type type of data to extract (a TypeConst value)
      * @return data cast to a void pointer
      */
     void *extractCompute(const QString &id, int style, int type);
@@ -137,8 +141,8 @@ public:
     /**
      * @brief Extract data from a fix from LAMMPS
      * @param id fix id as a QString
-     * @param style style of data to extract
-     * @param type type of data to extract
+     * @param style style (scope) of data to extract (GLOBAL_STYLE, ATOM_STYLE, LOCAL_STYLE)
+     * @param type type of data to extract (a TypeConst value)
      * @param nrow row index (only for global)
      * @param ncol column index (only for global)
      * @return data cast to a void pointer. Must be freed for global elements
@@ -155,13 +159,13 @@ public:
     /**
      * @brief Extract style of a variable from LAMMPS
      * @param keyword variable name as a QString
-     * @return Value type of variable as integer
+     * @return Data type of the variable as a StyleConst value, or -1 if unknown
      */
     int extractVariableDatatype(const QString &keyword);
 
     /**
-     * @brief Check if a compute/fix/variable ID exists
-     * @param idtype Type of ID ("compute", "fix", "variable")
+     * @brief Check if a compute/fix/variable/... ID exists
+     * @param idtype Type of ID ("compute", "fix", "variable", "region", ...)
      * @param id The ID to check
      * @return 1 if exists, 0 otherwise
      */
@@ -169,7 +173,7 @@ public:
 
     /**
      * @brief Get count of IDs of a specific type
-     * @param idtype Type of ID ("compute", "fix", "variable", "group")
+     * @param idtype Type of ID ("compute", "fix", "variable", "group", "dump", ...)
      * @return Number of IDs of that type
      */
     int idCount(const char *idtype);
@@ -198,9 +202,10 @@ public:
     QString styleName(const char *keyword, int idx);
 
     /**
-     * @brief Get the name of a variable by index
+     * @brief Get a description of a variable by index
      * @param idx Variable index
-     * @return The variable name, or an empty string on error
+     * @return One line with the index, name, style, and definition of the
+     *         variable (as printed by "info variables"), or an empty string on error
      */
     QString variableInfo(int idx);
 
@@ -280,11 +285,11 @@ public:
     QString lastErrorMessage();
 
     /**
-     * @brief Check if an accelerator package is available
-     * @param package Package name
-     * @param category Category name
-     * @param setting Setting name
-     * @return true if available, false otherwise
+     * @brief Check for a compile-time setting of an accelerator package
+     * @param package Package name (`GPU`, `KOKKOS`, `INTEL`, `OPENMP`)
+     * @param category Category name (`api` or `precision`)
+     * @param setting Setting name (e.g. `cuda`, `openmp`, `serial`, `mixed`)
+     * @return true if the package is included with this setting, false otherwise
      */
     [[nodiscard]] bool configAccelerator(const char *package, const char *category,
                                          const char *setting) const;
@@ -328,8 +333,12 @@ public:
 
     /**
      * @brief Load LAMMPS shared library (plugin mode)
-     * @param fname Library filename (QString version)
+     * @param fname Path to the shared library file
      * @return true on success, false on failure
+     *
+     * Rejects a truncated file, a library with an incompatible ABI or missing
+     * functions, and a LAMMPS version older than `Cfg::MIN_LAMMPS_VERSION_STR`.
+     * In linked mode this does nothing and returns true.
      */
     bool loadLib(const QString &fname);
 

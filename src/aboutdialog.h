@@ -21,7 +21,7 @@
  * AboutDialog displays version information, LAMMPS configuration details,
  * and available styles in scrollable text areas. The dialog automatically
  * scrolls down when the content exceeds the visible area, pauses at the
- * bottom, and then returns back to the top.
+ * bottom, and then returns to the top.
  * When style information is available, the dialog allocates
  * 2/3 of the combined scroll area space to the configuration information
  * text and 1/3 to the style information text.
@@ -46,6 +46,7 @@ public:
     AboutDialog(const QString &version, const QString &info, const QString &details, int minwidth,
                 QWidget *parent = nullptr);
 
+    /** @brief Destructor */
     ~AboutDialog() override = default;
 
     AboutDialog()                               = delete;

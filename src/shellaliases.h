@@ -38,7 +38,8 @@ using ShellAlias = QPair<QString, QString>;
  * restore the output a terminal would have produced.
  *
  * Only what is in the table is sent, and only when a shell starts or the table
- * is accepted; nothing else ever reaches the shell without being typed.
+ * is accepted; an alias removed from the table is then also withdrawn from the
+ * running shell.
  *
  * @see CommandWindow
  */

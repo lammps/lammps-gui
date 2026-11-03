@@ -13,10 +13,11 @@
 #define PLOTBLOCKDATA_H
 
 // Block-structured data model and parsers for the output files written by the
-// LAMMPS `fix ave/time` (vector mode), `fix ave/histo` and `fix ave/correlate`
-// styles.  Unlike the flat tables of plotdata.h these files are a sequence of
-// per-timestep blocks, each a small table of its own, which has to be reduced
-// to one flat PlotData before it can be plotted.
+// LAMMPS `fix ave/time` (vector mode), `fix ave/histo`, `fix ave/correlate`,
+// `fix ave/correlate/long`, and `fix ave/chunk` styles.  Unlike the flat tables
+// of plotdata.h these files are a sequence of per-timestep blocks, each a small
+// table of its own, which has to be reduced to one flat PlotData before it can
+// be plotted.
 
 #include "plotdata.h"
 
@@ -45,10 +46,11 @@ enum class AveFileKind {
  * @brief One per-timestep block of a fix ave/\* output file
  *
  * A block is the table LAMMPS writes for a single output timestep: the rows of
- * a vector, the bins of a histogram, or the time windows of a correlation
- * function.  @ref scalars carries the extra per-block numbers some styles put
- * on the block header line (for `fix ave/histo` the total and missing counts
- * and the value range); their names are in PlotBlockData::scalarNames.
+ * a vector, the bins of a histogram, the time windows of a correlation
+ * function, or the chunks of `fix ave/chunk`.  @ref scalars carries the extra
+ * per-block numbers some styles put on the block header line (for
+ * `fix ave/histo` the total and missing counts and the value range); their
+ * names are in PlotBlockData::scalarNames.
  */
 struct PlotDataBlock {
     long long step = 0;          ///< timestep this block was written for
@@ -122,7 +124,9 @@ PlotBlockData parseAveBlocksYaml(const QString &text, QString *error = nullptr);
  *
  * Requires an actual block structure, not just a matching header comment: the
  * row-index column of every block has to count 1, 2, ... n.  A flat table is
- * therefore never mistaken for a block file, whatever its comments say.
+ * therefore never mistaken for a block file, whatever its comments say.  The
+ * `fix ave/correlate/long` format has no row index; its `# Timestep: N`
+ * delimiter is accepted as proof of the block structure instead.
  */
 bool looksLikeAveBlocks(const QString &text);
 
@@ -206,11 +210,11 @@ struct AveImportDefaults {
  * @param data Parsed blocks
  * @return Reduction mode and column roles to preselect in the dialog
  *
- * Histograms and correlation functions default to the block average, because
- * their time evolution is rarely what is wanted.  A file whose correlator
- * accumulates over the whole run defaults to the last block instead: there
- * every block is a successive estimate of the same quantity, so averaging them
- * would be statistically wrong.
+ * Histograms, correlation functions, and 1-d chunk profiles default to the
+ * block average, because their time evolution is rarely what is wanted.  A
+ * file whose correlator accumulates over the whole run defaults to the last
+ * block instead: there every block is a successive estimate of the same
+ * quantity, so averaging them would be statistically wrong.
  */
 AveImportDefaults aveImportDefaults(const PlotBlockData &data);
 

@@ -56,7 +56,7 @@ public:
 protected:
     /**
      * @brief Paint a two-color track plus the native handle
-     * @param event The paint event (unused)
+     * @param event The paint event (only passed on for a vertical slider)
      */
     void paintEvent(QPaintEvent *event) override;
 

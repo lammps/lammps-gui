@@ -66,6 +66,11 @@ struct RefLine {
  * charts showing time-series data from LAMMPS simulations (thermodynamic
  * output). It supports data smoothing, zooming via range sliders, and
  * export to various formats (PNG, CSV, YAML, DAT).
+ *
+ * Without a LammpsGui it is a standalone window that plots the columns of a
+ * data file (see loadData()).  Each chart is a ChartColumn owned by the
+ * window; a single ChartViewer renders the one selected in the "Data" combo
+ * box and is rebound to another with ChartViewer::setColumn().
  */
 class ChartWindow : public QWidget {
     Q_OBJECT
@@ -73,9 +78,11 @@ class ChartWindow : public QWidget {
 public:
     /**
      * @brief Constructor
-     * @param filename Path to the log file containing the data
-     * @param lammpsgui Pointer to LammpsGui for sending signals (optional;
-     *                  nullptr for a standalone window with no live simulation)
+     * @param filename Input file of the run, or the plotted data file in a
+     *                 standalone window; used in the title and export file names
+     * @param lammpsgui Pointer to LammpsGui for quitting, stopping the run, and
+     *                  the shared menus (optional; nullptr for a standalone
+     *                  window with no live simulation)
      * @param parent Parent widget
      */
     explicit ChartWindow(const QString &filename, LammpsGui *lammpsgui = nullptr,
@@ -100,12 +107,12 @@ public:
 
     /**
      * @brief Get the current simulation step number
-     * @return Current step
+     * @return Step of the last data point of the first chart, or -1 if there is none
      */
     int getStep() const;
 
     /**
-     * @brief Reset all charts to initial state
+     * @brief Remove all charts from the window
      */
     void resetCharts();
 
@@ -122,7 +129,7 @@ public:
     /**
      * @brief Manually update chart display zoom status
      *
-     * This is needed at an end of a run when the run finishes too quickly
+     * This is needed at the end of a run when the run finishes too quickly
      * and the regular chart update has not yet triggered.
      */
     void resetZoom();
@@ -137,7 +144,7 @@ public:
     /**
      * @brief Add a data point to a chart
      * @param step Simulation step number
-     * @param data Data value
+     * @param value Data value
      * @param index Chart index
      */
     void addData(int step, double value, int index);
@@ -149,20 +156,22 @@ public:
     void setUnits(const QString &_units);
 
     /**
-     * @brief Enable/disable data normalization
-     * @param norm true to normalize data, false otherwise
+     * @brief Show whether LAMMPS normalizes its thermo output
+     * @param norm true if the thermo output is normalized, false otherwise
+     *
+     * Only sets the read-only "Norm" check box; the data itself is not changed.
      */
     void setNorm(bool norm);
 
     /**
-     * @brief Enable/Disable range sliders
-     * @param enabled  true to enable sliders and false to disable them
+     * @brief Enable/disable the range sliders and the smoothing controls
+     * @param enabled  true to enable the controls and false to disable them
      */
     void setRangeEnabled(bool enabled);
 
     /**
      * @brief Populate the window from an external data table (file plotting)
-     * @param data  Parsed column data
+     * @param table Parsed column data
      * @param xcol  Index of the column to use as the shared x axis
      * @param ycols Indices of the columns to plot, one chart each
      * @param yerrs Optional error bars, indexed like the columns of @p table;
@@ -264,7 +273,7 @@ private:
     /// and the active column's data range (so a view-only change preserves zoom).
     void applySliderWindow();
 
-    LammpsGui *lammpsgui;     ///< Main widget pointer for receiving signals
+    LammpsGui *lammpsgui;     ///< Main widget pointer (nullptr in a standalone window)
     bool doRaw, doSmooth;     ///< Flags for displaying raw/smoothed data
     QMenuBar *menu;           ///< Menu bar
     QMenu *file;              ///< File menu
@@ -277,7 +286,7 @@ private:
     QCheckBox *norm;              ///< Normalization checkbox
     RangeSlider *xrange, *yrange; ///< Range sliders for axes
 
-    QString filename;    ///< Log file path
+    QString filename;    ///< Input or data file name (for the title and export names)
     ChartViewer *viewer; ///< The single chart view (renders the active column)
     std::vector<std::unique_ptr<ChartColumn>> cols; ///< Per-column data/display state
     int active;              ///< Index into cols of the rendered column (-1 = none)
@@ -381,6 +390,7 @@ public:
 
     /**
      * @brief Bind this view to a column (or nullptr) and render it
+     * @param c Column to render, or nullptr for an empty plot
      *
      * Unregisters the previous column's series from the shared plot and
      * (re)attaches and draws @p c, restoring its Y-axis label. The column is
@@ -394,7 +404,8 @@ public:
      * @param y Y value
      *
      * The point is appended only if @p x is greater than the last appended x;
-     * this keeps the live thermo feed monotonic in the step number.
+     * this keeps the live thermo feed monotonic in the step number.  The plot
+     * is redrawn at most once per configured chart update interval.
      */
     void addPoint(double x, double y);
 
@@ -512,7 +523,7 @@ public:
      * @brief Set reference lines (replaces any existing set)
      * @param lines List of reference line descriptors
      *
-     * Each line spans the full data range perpendicular to its orientation
+     * Each line spans the full data range along its own direction
      * and is updated on every zoom reset. Lines are described by their
      * orientation, position, label (series name), anchor, and color.
      */
@@ -527,7 +538,7 @@ public:
     /**
      * @brief Set how the raw data series is displayed
      * @param mode  Lines, points, or both
-     * @param color Series color (invalid color falls back to the theme default)
+     * @param color Series color (invalid color falls back to the configured default)
      * @param width Line width (used for the line and lines+points modes)
      * @param pointSize Marker diameter (used for the points and lines+points modes)
      */
@@ -535,7 +546,7 @@ public:
 
     /** @brief Current display mode */
     ChartDisplayMode displayMode() const { return col->dispmode; }
-    /** @brief Current series color (may be invalid, meaning the theme default) */
+    /** @brief Current series color (may be invalid, meaning the configured default) */
     QColor displayColor() const { return col->rawColor; }
     /** @brief Current line width */
     qreal displayWidth() const { return col->rawWidth; }
@@ -545,7 +556,7 @@ public:
     /**
      * @brief Set how the processed (smoothed) data series is displayed
      * @param mode  Lines, points, or both
-     * @param color Series color (invalid color falls back to the theme default)
+     * @param color Series color (invalid color falls back to the configured default)
      * @param width Line width (used for the line and lines+points modes)
      * @param pointSize Marker diameter (used for the points and lines+points modes)
      */
@@ -553,7 +564,7 @@ public:
 
     /** @brief Current processed-series display mode */
     ChartDisplayMode smoothMode() const { return col->smoothmode; }
-    /** @brief Current processed-series color (may be invalid, meaning the theme default) */
+    /** @brief Current processed-series color (may be invalid, meaning the configured default) */
     QColor smoothColor() const { return col->smoothcolor; }
     /** @brief Current processed-series line width */
     qreal smoothWidth() const { return col->smoothwidth; }

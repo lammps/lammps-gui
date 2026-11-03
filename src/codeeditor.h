@@ -47,7 +47,7 @@ class LammpsSyntax;
  * - Context-aware auto-completion for LAMMPS commands
  * - Automatic indentation and formatting
  * - Context menu with LAMMPS-specific help
- * - Line highlighting for error visualization
+ * - Line highlighting for run progress and error visualization
  */
 class CodeEditor : public QPlainTextEdit {
     Q_OBJECT
@@ -101,8 +101,8 @@ public:
     void setCursor(int block);
 
     /**
-     * @brief Highlight a specific line (used for error indication)
-     * @param block Block number to highlight
+     * @brief Highlight a line number (current line of a run, or an error) and move the cursor there
+     * @param block Block number to highlight, or NO_HIGHLIGHT to remove the highlight
      * @param error true for the error (red) highlight, false for the normal (green) one
      */
     void setHighlight(int block, bool error);
@@ -120,7 +120,12 @@ public:
     void setAutoComplete(bool flag) { automaticCompletion = flag; }
 
     /**
-     * @brief Reformat a line with proper indentation
+     * @brief Reformat a line by padding the command and its leading arguments to aligned columns
+     *
+     * The column widths are taken from the Editor Settings preferences.  Reformatting a
+     * group, variable, compute, or fix command also refreshes the corresponding
+     * ID completion list.
+     *
      * @param line Line to reformat
      * @return Reformatted line
      */
@@ -420,9 +425,9 @@ private slots:
 
 private:
     /**
-     * @brief Find help page and section for a command
+     * @brief Find the help page for the command (or style) at the cursor
      * @param page Output parameter for help page name
-     * @param help Output parameter for help section
+     * @param help Output parameter for the command name (plus style name) the page documents
      */
     void findHelp(QString &page, QString &help);
 

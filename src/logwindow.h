@@ -37,7 +37,7 @@ public:
     /**
      * @brief Constructor
      * @param filename Name of the input file the run belongs to (used for default save-file names)
-     * @param lammpsgui Pointer to LammpsGui for sending signals
+     * @param lammpsgui Pointer to the main window for run control, quitting, and its shared menus
      * @param parent Parent widget
      */
     LogWindow(const QString &filename, LammpsGui *lammpsgui, QWidget *parent = nullptr);
@@ -121,7 +121,7 @@ private:
     void createMenuBar();
 
     QString filename;            ///< Input file name used to derive default save-file names
-    LammpsGui *lammpsgui;        ///< Main widget pointer for receiving signals
+    LammpsGui *lammpsgui;        ///< Main window for run control, quit, and shared menus
     QString errorurl;            ///< URL of last detected error
     FlagWarnings *warnings;      ///< Warning highlighter
     QLabel *summary;             ///< Summary label for warning count

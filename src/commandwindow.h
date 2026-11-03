@@ -96,7 +96,8 @@ public:
      * @return Sorted list of shells the preferences can offer
      *
      * On Unix-like systems the entries of @c /etc/shells that exist and are
-     * not a @c nologin, plus @c $SHELL.  On Windows @c cmd.exe, PowerShell
+     * neither a @c nologin nor a terminal multiplexer (@c tmux, @c screen),
+     * plus @c $SHELL.  On Windows @c cmd.exe, PowerShell
      * and any @c bash.exe found on the search path or in a Git for Windows
      * installation.  Each shell *name* appears once: a shell listed under
      * several paths (e.g. @c /bin and @c /usr/bin) is offered only under the
@@ -119,6 +120,10 @@ private slots:
 protected:
     /**
      * @brief Filter the prompt's key presses for the history keys
+     *
+     * Also follows the size and font of the scrollback, which set the panel
+     * size the shell is told and the room for the directory in the prompt.
+     *
      * @param watched Object being watched
      * @param event Event to filter
      * @return true if the event was consumed

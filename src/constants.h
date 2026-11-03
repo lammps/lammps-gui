@@ -88,8 +88,9 @@ constexpr int CHART_DEFAULT_HEIGHT   = 480;   ///< Default chart height
 constexpr double CHART_YPAD_FRACTION = 0.05;  ///< Relative y-axis margin around the data range
 
 // ---- Chart series style defaults -----------------------------------------
-// The color defaults are indices into the fixed palette of the color combo
-// boxes in the charts preferences tab (black, blue, red, green, gray).
+// The color defaults are indices into the preset series palette in chartstyle.cpp
+// (0 black, 1 blue, 2 red, 3 green, 4 gray, ...), which the color combo boxes
+// in the charts preferences tab offer.
 constexpr int RAWBRUSH_DEFAULT      = 1;    ///< Default raw series color (blue)
 constexpr int SMOOTHBRUSH_DEFAULT   = 2;    ///< Default processed series color (red)
 constexpr int ERRBRUSH_DEFAULT      = 0;    ///< Default error bar color (black)
@@ -104,7 +105,7 @@ constexpr int PROC_LABEL_MAXLEN =
     12; ///< Longest post-process name shown as the processed-slot label as is
 
 // ---- Chart post-processing dialog ----------------------------------------
-constexpr int POSTPROCESS_EXPR_WIDTH  = 260; ///< Min width of the custom-function expression field
+constexpr int POSTPROCESS_EXPR_WIDTH  = 260; ///< Min width of the dialog's text fields
 constexpr int POSTPROCESS_GRID_POINTS = 200; ///< Default number of Fourier output grid points
 
 // ---- Plot data import dialog ---------------------------------------------

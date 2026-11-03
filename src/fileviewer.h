@@ -25,8 +25,9 @@ class QResizeEvent;
  * FileViewer provides a simple read-only text window for viewing
  * file contents. It's used in the context menu of the code editor
  * to view files referenced in LAMMPS input scripts (data files,
- * potential files, etc.). The viewer supports keyboard shortcuts
- * for closing and stopping the simulation.
+ * potential files, etc.). Compressed files (`.gz`, `.bz2`, `.zst`, `.xz`, `.lzma`,
+ * `.lz4`) are decompressed with the matching command line tool. The viewer
+ * supports keyboard shortcuts for closing and stopping the simulation.
  */
 class FileViewer : public QPlainTextEdit {
     Q_OBJECT
@@ -35,8 +36,9 @@ public:
     /**
      * @brief Constructor
      * @param filename Path to file to display
-     * @param lammpsgui Pointer to LammpsGui for sending signals
-     * @param title Window title (defaults to filename if empty)
+     * @param lammpsgui Pointer to the main window for stopping runs, quitting, and its shared
+     *                  menus (may be null)
+     * @param title Window title (derived from the file name if empty)
      * @param parent Parent widget
      */
     explicit FileViewer(const QString &filename, LammpsGui *lammpsgui, const QString &title = "",
@@ -54,7 +56,7 @@ public:
     FileViewer &operator=(FileViewer &&)      = delete;
 
 private slots:
-    void quit();    ///< Close the viewer window
+    void quit();    ///< Quit the entire application (via LammpsGui::quit)
     void stopRun(); ///< Stop the running simulation
 
 protected:
@@ -77,7 +79,7 @@ private:
 
     QMenuBar *menubar = nullptr; ///< Own menu bar, in reserved viewport margin
     QString fileName;            ///< Path to the displayed file
-    LammpsGui *lammpsgui;        ///< Main widget pointer for receiving signals
+    LammpsGui *lammpsgui;        ///< Main window for stop and quit requests; may be null
 };
 
 #endif

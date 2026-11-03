@@ -33,7 +33,7 @@ class SetVariables : public QDialog {
 public:
     /**
      * @brief Constructor
-     * @param vars Reference to list of variable entries (modified in place)
+     * @param vars Reference to list of variable entries (replaced when the dialog is accepted)
      * @param parent Parent widget
      */
     explicit SetVariables(QList<VariableEntry> &vars, QWidget *parent = nullptr);
@@ -61,7 +61,7 @@ private slots:
     void addRow();
 
     /**
-     * @brief Delete the currently selected variable row
+     * @brief Delete the variable row whose delete button was clicked
      */
     void delRow();
 

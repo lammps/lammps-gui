@@ -48,6 +48,8 @@ public:
      */
     explicit DownloadProgress(const QString &headline, const QPixmap &logo,
                               QWidget *parent = nullptr);
+
+    /** @brief Destructor */
     ~DownloadProgress() override = default;
 
     DownloadProgress()                                    = delete;
@@ -56,7 +58,10 @@ public:
     DownloadProgress &operator=(const DownloadProgress &) = delete;
     DownloadProgress &operator=(DownloadProgress &&)      = delete;
 
-    /** @brief Show indeterminate (busy) progress with the given activity text */
+    /**
+     * @brief Show indeterminate (busy) progress with the given activity text
+     * @param text Current activity (e.g. retrieving the list of files)
+     */
     void setBusy(const QString &text);
 
     /**

@@ -66,13 +66,17 @@ extern void reassertMonoFont(QTextDocument *document);
  * @param one First date string
  * @param two Second date string
  * @return -1 if one < two, 0 if equal, 1 if one > two
+ *
+ * Only the first three letters of the month are compared, so a month name may
+ * also be spelled out ("2 September 2026").  A first string that is not made
+ * of three words compares as older, a malformed second one as newer.
  */
 extern int dateCompare(const QString &one, const QString &two);
 
 /**
  * @brief Split a string into words while respecting quotes
  * @param text The string to split
- * @return List of words extracted from the string
+ * @return List of words extracted from the string; quoted words keep their quotes
  */
 extern QStringList splitLine(const QString &text);
 
@@ -132,10 +136,10 @@ extern QString getLammpsLibName();
 extern QString getLammpsDownloadUrl();
 
 /**
- * @brief Save image directly or convert with ImageMagick
+ * @brief Ask for a file name and save an image directly or convert with ImageMagick
  * @param parent       Pointer to parent widget
- * @param image        Pointer to image class
- * @param title        Warning dialog title if failed
+ * @param image        Image to save (nothing happens if null)
+ * @param title        Prefix of the warning dialog title if failed
  * @param defaultname  Default file name offered by the save dialog (resolved
  *                     relative to the current working directory)
  */
@@ -331,9 +335,10 @@ extern void styleMessageBoxButtons(QMessageBox &mb);
 /**
  * @brief Silence stdout by redirecting it to the null device
  *
- * Redirects stdout to /dev/null (Unix) or NUL: (Windows) to suppress
- * all output.  Does nothing if StdCapture is currently active or if
- * stdout is already silenced.
+ * Redirects stdout to /dev/null (Unix) or NUL (Windows) to suppress
+ * all output.  Does nothing if StdCapture is currently active.  Nested
+ * calls are counted: when stdout is already silenced, only the count is
+ * increased, so each call must be matched by a restoreStdout().
  *
  * @note Not thread-safe.  Must only be called from the main thread.
  */
@@ -343,7 +348,8 @@ extern void silenceStdout();
  * @brief Restore stdout after it was silenced
  *
  * Restores the original stdout file descriptor that was saved by
- * silenceStdout().  Does nothing if stdout is not currently silenced.
+ * silenceStdout(), once every nested silenceStdout() call has been matched.
+ * Does nothing if stdout is not currently silenced.
  *
  * @note Not thread-safe.  Must only be called from the main thread.
  */
@@ -378,7 +384,9 @@ extern void notifyCaptureState(bool active);
  */
 class StdoutSilencer {
 public:
+    /** @brief Silence stdout via silenceStdout() */
     StdoutSilencer() { silenceStdout(); }
+    /** @brief Restore stdout via restoreStdout() */
     ~StdoutSilencer() { restoreStdout(); }
     StdoutSilencer(const StdoutSilencer &)            = delete;
     StdoutSilencer(StdoutSilencer &&)                 = delete;
@@ -407,7 +415,9 @@ public:
  */
 class QtMessageSilencer {
 public:
+    /** @brief Start collecting; only the outermost of nested guards installs the handler */
     QtMessageSilencer();
+    /** @brief Stop collecting; the outermost guard restores the previous handler */
     ~QtMessageSilencer();
     QtMessageSilencer(const QtMessageSilencer &)            = delete;
     QtMessageSilencer(QtMessageSilencer &&)                 = delete;
@@ -473,7 +483,8 @@ extern QSize toolButtonSize(const QAbstractButton *sample);
  * Fixes every button to @p size (a square from toolButtonSize()) and gives it
  * the standard Cfg::TOOLBAR_ICON_SIZE icon, so only a small, uniform padding
  * remains between icon and frame. The image viewer, slide show, chart window,
- * and editor status bar all use this so their button rows look identical.
+ * command window, and editor status bar all use this so their button rows look
+ * identical.
  *
  * @param size    Square button size (from toolButtonSize())
  * @param buttons Buttons to size and assign the standard icon size
@@ -487,8 +498,8 @@ extern void styleToolButtons(const QSize &size, std::initializer_list<QAbstractB
  * not a transient that stays above its parent) and removes the minimize button.
  * The maximize button is also removed, except on macOS where it is kept because
  * removing it makes the window non-resizable there. Used for the log, chart,
- * image, slide-show, file-viewer and variables windows so they share one frame
- * policy.
+ * image, slide-show, file-viewer, command, and variables windows so they share
+ * one frame policy.
  *
  * @note setWindowFlags() re-shows a hidden widget, so call this before a final
  *       hide() when the window must start hidden.

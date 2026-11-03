@@ -24,7 +24,7 @@ class QTextDocument;
  *
  * FlagWarnings extends QSyntaxHighlighter to detect and highlight
  * warning and error messages in LAMMPS log output. It also detects
- * and highlights URLs, enabling easy navigation and documentation access.
+ * and highlights error-explanation URLs, enabling easy documentation access.
  * The class maintains a count of warnings and updates a summary label.
  */
 class FlagWarnings : public QSyntaxHighlighter {

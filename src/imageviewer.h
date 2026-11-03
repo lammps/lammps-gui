@@ -55,9 +55,10 @@ class ImageViewer : public QDialog {
 public:
     /**
      * @brief Constructor
-     * @param fileName Path to the image file to display
+     * @param fileName Name of the input (or restart) file the image is rendered for; used for
+     *                 the window title and to derive the temporary and default image file names
      * @param lammps Pointer to LammpsWrapper for regenerating images
-     * @param lammpsgui Pointer to LammpsGui for sending signals
+     * @param lammpsgui Pointer to the main window for quitting and its shared menus (may be null)
      * @param parent Parent widget
      */
     explicit ImageViewer(const QString &fileName, LammpsWrapper *lammps, LammpsGui *lammpsgui,
@@ -77,7 +78,7 @@ public:
 private slots:
     void saveAs();            ///< Save image to file
     void copy();              ///< Copy image to clipboard
-    void quit();              ///< Close dialog
+    void quit();              ///< Quit the entire application (via LammpsGui::quit)
     void getHelp();           ///< Open online help
     void setAtomSize();       ///< Set explicit atom display size
     void setBondSize();       ///< Set explicit bond display size
@@ -89,7 +90,7 @@ private slots:
     void toggleDepthcue();    ///< Toggle depth cueing
     void toggleDefocus();     ///< Toggle defocusing of distant objects
     void toggleShiny();       ///< Toggle shiny/specular rendering
-    void toggleVdw();         ///< Toggle Van der Waals radii
+    void toggleVdw();         ///< Toggle van der Waals radii
     void toggleBond();        ///< Toggle bond display
     void vdwbondSync();       ///< Sync settings of VDW style and autobonds in Atoms dialog
     void acolorSync();        ///< Sync settings of atom color based on shaped object color
@@ -129,14 +130,14 @@ protected:
     void showEvent(QShowEvent *event) override; ///< Redo the initial window fit once shown
 
 private:
-    void createActions();     ///< Setup menu actions
+    void createActions();     ///< Set up menu actions
     void updateActions();     ///< Update action states
     void adjustWindowSize();  ///< Auto-resize window to fit image
     void readImageSettings(); ///< Read snapshot settings from QSettings and reset members
     void updateFixes();       ///< Update fix graphics information
     void updateRegions();     ///< Update region information
     void updatePeratom();     ///< Update per-atom information
-    bool hasAutobonds();      ///< Check if autobonds are enabled
+    bool hasAutobonds();      ///< Check if autobonds are available (a pair style is defined)
 
     /** @brief True when bond color-by-value applies: a bond/local attribute is
      *  selected, the atom style has real bonds, and AutoBonds is off (compute
@@ -210,10 +211,10 @@ private:
     QStringList image_fixes;                     ///< list of fixes supporting dump image
     QStringList atom_properties;                 ///< list of per-atom properties for coloring
     LammpsWrapper *lammps;                       ///< LAMMPS interface for image generation
-    LammpsGui *lammpsgui;                        ///< Main widget pointer for receiving signals
+    LammpsGui *lammpsgui;                        ///< Main window (quit, shared menus); may be null
     QString group;                               ///< Current atom group
     QString molecule;                            ///< Current molecule selection
-    QString filename;                            ///< Image filename
+    QString filename;                            ///< Input file name; stem for image file names
     QString last_dumpargs;                       ///< Render args of the last image command
     QString last_modifyargs;                     ///< dump_modify args of the last image command
     QString renderdumpid = "WRITE_DUMP";         ///< Id of our render dump; renamed to a missing
@@ -230,11 +231,11 @@ private:
     double linediam;                             ///< linewidth setting (diameter)
     double tridiam;                              ///< tflag2 setting (diameter)
     double zoom;                                 ///< Zoom level
-    double vdwfactor;                            ///< Van der Waals radius scaling factor
+    double vdwfactor;                            ///< van der Waals radius scaling factor
     double shinyfactor;                          ///< Shininess/specular factor
     double bondcutoff;                           ///< Bond cutoff distance
-    double boxdiam;                              ///< Simulation box diameter
-    double subboxdiam;                           ///< Simulation subbox diameter
+    double boxdiam;                              ///< Simulation box edge diameter
+    double subboxdiam;                           ///< Subdomain box edge diameter
     double boxtrans;                             ///< Transparency for box and subbox
     double axeslen;                              ///< Axes length
     double axesdiam;                             ///< Axes diameter

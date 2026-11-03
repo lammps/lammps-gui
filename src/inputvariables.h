@@ -54,8 +54,8 @@ IndexVariableMatch matchIndexVariable(const QString &line);
  * @brief Collect index-style variables from an input script
  *
  * Records every index variable definition (first definition wins, as in
- * LAMMPS) with its assigned value and every use of an otherwise undefined
- * variable with an empty value.
+ * LAMMPS) with its assigned value and every $-substitution of an otherwise
+ * undefined variable with an empty value.
  *
  * @param text Complete input script text
  * @return List of variable entries in order of appearance

@@ -43,23 +43,26 @@ struct LintIssue {
  * of strictly numeric positions.
  *
  * The design priority is the absence of false positives: any word containing
- * a '$' substitution is exempt from every check, a substitution anywhere on a
- * line disables its argument-count check, and script features that make
- * static analysis unreliable disable whole rule groups.  Any of include
- * files, jump/label loops, if/then commands, or python scripting disables
- * all definition-tracking rules (variable, group, and reference checks);
- * jump/label additionally downgrades unknown commands to warnings; shell,
- * geturl, and include disable file-existence checks downstream; read_restart
- * disables group and ID checks downstream; plugin disables unknown-name
- * errors downstream.  Only ERROR severity findings should gate a run.
+ * a '$' substitution is only checked for the variables it substitutes, a
+ * substitution anywhere on a line disables its argument-count check, and
+ * script features that make static analysis unreliable disable whole rule
+ * groups.  Any of include files, jump/label loops, if/then commands, or
+ * python scripting disables all definition-tracking rules (variable, group,
+ * and reference checks); jump/label additionally downgrades unknown commands
+ * to warnings; shell, geturl, and include disable file-existence checks
+ * downstream; read_restart disables group and ID checks downstream; plugin
+ * disables unknown-name errors downstream.  Only ERROR severity findings
+ * should gate a run.
  */
 class SyntaxChecker {
 public:
     /**
      * @brief Constructor
-     * @param syntax Syntax registry with name sets and command specs (not owned, may not be null)
+     * @param syntax Syntax registry with name sets and command specs (not owned, must not be null)
      */
     explicit SyntaxChecker(const LammpsSyntax *syntax) : syntax(syntax) {}
+
+    /** @brief Destructor */
     ~SyntaxChecker() = default;
 
     SyntaxChecker()                                 = delete;

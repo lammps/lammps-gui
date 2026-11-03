@@ -46,8 +46,9 @@ class SlideShow : public QDialog {
 public:
     /**
      * @brief Constructor
-     * @param fileName Path to first image file
-     * @param lammpsgui Pointer to LammpsGui for sending signals (optional;
+     * @param fileName Input file or first image file, used to derive default save-file names
+     *                 (the images themselves are added with addImage() or addMovie())
+     * @param lammpsgui Pointer to the main window (optional;
      *                  nullptr for a standalone viewer with no live simulation)
      * @param parent Parent widget
      */
@@ -177,7 +178,7 @@ private:
     void updateCacheIndicator();
 
 private:
-    LammpsGui *lammpsgui;       ///< Main widget pointer for receiving signals
+    LammpsGui *lammpsgui;       ///< Main window; nullptr for a standalone viewer
     QString filename;           ///< Input or first image file name for default save-file names
     ImageCache cache;           ///< Converted images and extracted movie frames
     QImage image;               ///< Currently displayed image

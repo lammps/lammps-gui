@@ -72,6 +72,12 @@ signals:
 protected:
     /**
      * @brief Filter out the keys a completing prompt has to own
+     *
+     * Tab completes or walks the list of matches, and Shift-Tab walks it the
+     * other way while it is shown.  Enter with the list shown only takes the
+     * highlighted match, if there is one: left alone, Qt would run the line and
+     * then put the completion back into the line it just cleared.
+     *
      * @param event Event to handle
      * @return true if the event was consumed
      */

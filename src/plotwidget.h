@@ -76,7 +76,8 @@ public:
      * @brief Place a legend in one of the plot corners (or turn it off)
      *
      * The legend lists each visible, named data series (raw / processed / fit /
-     * overlays); reference lines and unnamed marker-only mirrors are excluded.
+     * overlays) once; reference lines are excluded, and series sharing a name
+     * (a line and its marker-only mirror) collapse into a single entry.
      */
     void setLegendPos(LegendPos pos);
 

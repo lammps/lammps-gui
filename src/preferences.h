@@ -42,7 +42,7 @@ public:
     /**
      * @brief Constructor
      * @param lammps Pointer to LammpsWrapper for querying LAMMPS configuration
-     * @param lammpsgui Pointer to LammpsGui for sending signals
+     * @param lammpsgui Pointer to the main window, which is updated directly
      * @param parent Parent widget
      */
     explicit Preferences(LammpsWrapper *lammps, LammpsGui *lammpsgui, QWidget *parent = nullptr);
@@ -70,6 +70,8 @@ public:
      * @param val true if restart needed, false otherwise
      *
      * Some settings require restarting the application to take effect.
+     * Without a reason recorded by requestRelaunch(), the relaunch dialog
+     * names a changed LAMMPS library plugin path as the cause.
      */
     void setRelaunch(bool val) { needRelaunch = val; }
 
@@ -92,7 +94,7 @@ private:
     QDialogButtonBox *buttonBox; ///< Dialog buttons (OK, Cancel)
     QSettings *settings;         ///< Qt settings storage
     LammpsWrapper *lammps;       ///< LAMMPS interface for configuration queries
-    LammpsGui *lammpsgui;        ///< Main widget pointer for receiving signals
+    LammpsGui *lammpsgui;        ///< Main window, updated directly (e.g. thread count)
     bool needRelaunch;           ///< Flag indicating restart is needed
     QStringList relaunchReasons; ///< Settings that asked for the restart
 };
@@ -110,7 +112,7 @@ public:
      * @brief Constructor
      * @param settings Pointer to QSettings for storing preferences
      * @param lammps Pointer to LammpsWrapper for querying LAMMPS configuration
-     * @param lammpsgui Pointer to LammpsGui for sending signals
+     * @param lammpsgui Pointer to the main window, whose fonts are updated directly
      * @param parent Parent widget
      */
     explicit GeneralTab(QSettings *settings, LammpsWrapper *lammps, LammpsGui *lammpsgui,

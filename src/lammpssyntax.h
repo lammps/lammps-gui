@@ -92,11 +92,11 @@ enum class ArgRole : quint8 {
 };
 
 /**
- * @brief Role and (for ArgRole::Style) style category of one argument position
+ * @brief Role and (for ArgRole::Style and ArgRole::SubStyle) style category of one argument
  */
 struct ArgSpec {
     ArgRole role = ArgRole::Any;   ///< role of this argument position
-    StyleCat cat = StyleCat::None; ///< style category when role == ArgRole::Style
+    StyleCat cat = StyleCat::None; ///< style category when role is ArgRole::Style or SubStyle
 };
 
 /**
@@ -367,7 +367,8 @@ public:
     /// check whether a word is a known command name
     bool knownCommand(const QString &word) const { return knownStyle(StyleCat::Command, word); }
 
-    /// check whether a name is in the full style set of a category
+    /// check whether a name is in the full style set of a category ("none" is
+    /// always accepted for the pair, bond, angle, dihedral, improper, and kspace styles)
     bool knownStyle(StyleCat cat, const QString &name) const;
 
     /// check for the special argument words (INF, EDGE, NULL, SELF, if/then/else/elif)
@@ -390,7 +391,8 @@ public:
      *
      * Accelerator-suffixed style variants are filtered out.
      * @param cat category of the word list
-     * @param withNone prepend the "none" style (pair/bond/... styles)
+     * @param withNone add the "none" style (pair/bond/... styles) to the sorted list
+     * @return sorted list of names for completion
      */
     QStringList completionList(StyleCat cat, bool withNone) const;
 
@@ -401,9 +403,11 @@ public:
      * word under the cursor, and classifies it: the command completer on
      * word 0 of a fresh logical line, and per-argument completers from the
      * command spec table (style categories, group IDs, file names) plus the
-     * v_/c_/f_ reference prefixes and the read_data extra keywords.  Because
-     * the previous block state carries the active command across '&' line
-     * continuations, completion works on continuation lines as well.
+     * v_/c_/f_ reference prefixes, the read_data extra keywords, hybrid
+     * sub-styles, and the color names and keywords of the dump image and
+     * dump_modify commands.  Because the previous block state carries the
+     * active command across '&' line continuations, completion works on
+     * continuation lines as well.
      *
      * @param prevBlockState block state after the previous line (-1 or 0 for none)
      * @param line physical line the cursor is on

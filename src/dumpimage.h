@@ -94,8 +94,8 @@ struct DumpImageParams {
     double shinyfactor;    ///< shininess / specular factor
     bool antialias;        ///< enable full-scene anti-aliasing
     int dimension;         ///< system dimension (2 or 3)
-    int hrot;              ///< horizontal rotation angle
-    int vrot;              ///< vertical rotation angle
+    int hrot;              ///< horizontal rotation angle (theta of the `view` keyword)
+    int vrot;              ///< vertical rotation angle (phi of the `view` keyword)
     bool usessao;          ///< enable screen-space ambient occlusion
     double ssaoval;        ///< SSAO strength
     int ssaosamples;       ///< SSAO sampling directions, 0 = derived from the SSAO strength
@@ -178,7 +178,8 @@ struct DumpImageParams {
  * `dump_modify` options (colors, color maps, lighting, ...) are kept separate so
  * the caller can compose either an explicit `dump`/`dump_modify` pair or a
  * one-shot `write_dump` (via toWriteDumpCommand()), and so each builder step can
- * append to whichever string is logical. Both strings begin with a leading space.
+ * append to whichever string is logical. Both strings begin with a leading space
+ * (the `dump_modify` string may be empty).
  */
 struct DumpImageCommand {
     QString dumpargs;   ///< render options after `image <N> <file>`

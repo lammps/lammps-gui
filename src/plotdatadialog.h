@@ -83,7 +83,7 @@ public:
     /**
      * @brief Read a data file and build the column dialog for it
      *
-     * The block-structured output of the fix ave/time family is tried first,
+     * The block-structured output of the fix ave/\* styles is tried first,
      * since it is not a flat table and gets the dialog that can reduce it to
      * one; anything else goes through the flat-file parsers.
      *
@@ -91,7 +91,7 @@ public:
      * @param parent    Parent widget of the dialog
      * @param error     Receives what the parsers reported, or the file name
      *                  when they reported nothing; untouched on success
-     * @return The dialog, or nullptr when the file could not be read
+     * @return The dialog, or nullptr when the file could not be read or parsed
      */
     static std::unique_ptr<PlotDataDialog> fromFile(const QString &fileName, QWidget *parent,
                                                     QString *error);
@@ -198,7 +198,7 @@ private:
     QList<QCheckBox *> ychecks; ///< per-column y selection checkboxes
     QList<QLineEdit *> ynames;  ///< per-column name editors
     QLabel *sizeLabel;          ///< "N rows, M columns" summary above the column grid
-    QTableWidget *preview;      ///< Preview of the first rows (nullptr if there are none)
+    QTableWidget *preview;      ///< Preview of the first rows (hidden if there are none)
     QLineEdit *deriveNameEdit;  ///< Name field for the new derived column
     QLineEdit *deriveExprEdit;  ///< Expression field for the new derived column
 

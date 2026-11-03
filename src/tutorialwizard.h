@@ -31,7 +31,7 @@ public:
      * @brief Construct a tutorial wizard
      * @param collection Tutorial collection index
      * @param ntutorial Tutorial number within the collection
-     * @param lammpsgui Pointer to LammpsGui for sending signals
+     * @param lammpsgui Pointer to the main window that sets up the tutorial
      * @param parent Parent widget
      */
     TutorialWizard(int collection, int ntutorial, LammpsGui *lammpsgui, QWidget *parent = nullptr);
@@ -39,15 +39,16 @@ public:
     /**
      * @brief Accept the wizard and set up the tutorial
      *
-     * Called when the user completes the wizard. Sets up tutorial files
-     * and opens the tutorial in the main window.
+     * Called when the user completes the wizard. Creates the selected folder
+     * (or goes back to the folder selection if that fails) and has the main
+     * window download the tutorial files and open the tutorial input.
      */
     void accept() override;
 
 private:
     int collection;       ///< Tutorial collection index
     int ntutorial;        ///< Tutorial number identifier within the collection
-    LammpsGui *lammpsgui; ///< Main widget pointer for receiving signals
+    LammpsGui *lammpsgui; ///< Main window that sets up the tutorial files
 };
 
 #endif // TUTORIALWIZARD_H

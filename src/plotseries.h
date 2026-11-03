@@ -95,7 +95,7 @@ struct PlotAxis {
     double max = 1.0;                             ///< upper end of the displayed range
     QString title;                                ///< axis title
     QString labelFormat   = QStringLiteral("%g"); ///< printf-style tick label format
-    int subTicks          = 4;                    ///< minor subdivisions between major ticks
+    int subTicks          = 4;                    ///< minor ticks between adjacent major ticks
     bool gridVisible      = true;                 ///< draw major gridlines
     bool minorGridVisible = true;                 ///< draw minor gridlines
 };

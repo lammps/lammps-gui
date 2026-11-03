@@ -22,7 +22,7 @@
  * LAMMPS-GUI ships support for multiple, independently hosted tutorial
  * collections (e.g. the molecular soft-matter set and the materials-science
  * set).  Each collection is a numbered series of tutorials laid out identically
- * -- one `files/tutorial<N>/` folder per tutorial with a `.manifest` and an
+ * -- one `tutorial<N>/` folder per tutorial with a `.manifest` and an
  * optional `solution/` subfolder -- so the only thing that varies between
  * collections is this metadata.  The single source of truth is the table in
  * tutorials.cpp, consumed by the Tutorials menu and the TutorialWizard.
@@ -41,7 +41,7 @@ struct TutorialCollection {
     QStringList slugs;    ///< per-tutorial web-page slugs (count() entries, or empty)
     QStringList blurbs;   ///< per-tutorial HTML descriptions (count() entries)
     bool published;       ///< true once the whole collection is released (hides the teaser label)
-    QString status;       ///< menu label for an unpublished collection ("coming soon", "planned")
+    QString status;       ///< menu label for an unpublished collection ("beta", "planned")
     int available = 0;    ///< number of leading tutorials that are launchable now; the
                           ///< remaining count()-available entries appear as disabled teasers
 
@@ -54,7 +54,7 @@ struct TutorialCollection {
 /** @brief The available tutorial collections, in display order */
 const QList<TutorialCollection> &tutorialCollections();
 
-/** @brief Collection at @p index, clamped to a valid entry (0 if out of range) */
+/** @brief Collection at @p index; the first collection if @p index is out of range */
 const TutorialCollection &tutorialCollection(int index);
 
 #endif

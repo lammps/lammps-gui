@@ -84,7 +84,8 @@ float_mat operator*(const float_mat &a, const float_mat &b);
  * @brief Solve the linear system A*X = a via in-place LU decomposition
  * @param A Coefficient matrix
  * @param a Right-hand side(s); each column is an independent system
- * @return Solution matrix X with the same shape as @p a
+ * @return Solution matrix X with the same shape as @p a; it may hold non-finite
+ *         values (NaN or inf) if @p A is singular
  *
  * Setting @p a to the identity matrix yields the inverse of @p A.
  */
@@ -102,7 +103,8 @@ float_mat invert(const float_mat &A);
  * @param v     Input samples (assumed equally spaced)
  * @param width Half-window size; the filter window spans 2*width+1 points
  * @param deg   Polynomial degree fitted in each window (0 = moving average)
- * @return Smoothed vector with the same length as @p v
+ * @return Smoothed vector with the same length as @p v; all zeros if @p v is
+ *         shorter than the 2*width+1 window
  *
  * Fits a polynomial of degree @p deg to a sliding window of width 2*width+1
  * by least squares; non-symmetric windows are used near the borders.

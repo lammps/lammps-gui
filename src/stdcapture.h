@@ -41,31 +41,37 @@ public:
     /**
      * @brief Start capturing stdout
      *
-     * Redirects stdout to an internal pipe for capture
+     * Redirects stdout to an internal pipe for capture and verifies the
+     * redirect with a test marker (see isUsable())
      */
     void beginCapture();
 
     /**
      * @brief Stop capturing stdout and restore original stdout
      * @return true if capture was active, false otherwise
+     *
+     * Drains the output left in the pipe; getCapture() returns it.
      */
     bool endCapture();
 
     /**
-     * @brief Get all captured output and clear the buffer
-     * @return String containing all captured output
+     * @brief Get the output collected by the last endCapture()
+     * @return The output that had not yet been retrieved through getChunk()
+     *         when the capture ended, with trailing newlines removed
      */
     std::string getCapture();
 
     /**
-     * @brief Get a chunk of captured output without clearing
-     * @return String containing new output since last getChunk call
+     * @brief Read the next chunk of output from the pipe while capturing continues
+     * @return String containing new output since last getChunk call (empty
+     *         when there is none or no capture is active)
      */
     std::string getChunk();
 
     /**
      * @brief Get the buffer usage as a fraction of max buffer size
-     * @return Value between 0.0 and 1.0 indicating buffer fullness
+     * @return Value between 0.0 and 1.0: the largest chunk read by getChunk()
+     *         since beginCapture() relative to the read buffer size
      */
     double getBufferUse() const;
 

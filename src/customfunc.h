@@ -107,7 +107,8 @@ struct ColumnRefExpr {
  * Each distinct (column, accessor) pair is replaced by one generated variable
  * and reported in @ref ColumnRefExpr::refs so the caller can bind it.  An
  * unknown name, an unknown accessor, an empty span, or an unmatched brace
- * fails with a message naming the offender and the available columns.
+ * fails with a message naming the offender (and, for an unknown name, the
+ * available columns).
  *
  * @param expr  Expression with braced column references
  * @param names Column names, referenced by exact (case-sensitive) match

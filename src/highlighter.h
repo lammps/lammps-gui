@@ -44,7 +44,7 @@ class Highlighter : public QSyntaxHighlighter {
 public:
     /**
      * @brief Constructor
-     * @param syntax Syntax registry with name sets and command specs (not owned, may not be null)
+     * @param syntax Syntax registry with name sets and command specs (not owned, must not be null)
      * @param parent Parent text document to highlight
      */
     Highlighter(const LammpsSyntax *syntax, QTextDocument *parent);

@@ -35,7 +35,7 @@ enum class ViewSlot {
     Chart,     ///< Charts window with the thermo data of the current run
     Image,     ///< Snapshot image viewer
     SlideShow, ///< Slide show viewer for dump image sequences
-    Variables, ///< Variables window listing the active index variables
+    Variables, ///< Variables window listing the currently defined LAMMPS variables
     Command,   ///< Shell prompt with a scrollback
     Count      ///< Number of slots; not a view itself
 };
@@ -150,8 +150,8 @@ public:
      * @param slot Slot to raise
      *
      * Use for an explicit request from the user.  Unlike show(), this pulls the
-     * view to the front of its tab group, which is not wanted for the periodic
-     * updates during a run.
+     * view to the front of its tab group and gives it the keyboard focus, which
+     * is not wanted for the periodic updates during a run.
      */
     void raise(ViewSlot slot);
 
@@ -210,7 +210,7 @@ signals:
 public:
     /**
      * @brief Show a transient view as a tab beside an existing panel
-     * @param view  Widget to show; it keeps its own lifetime
+     * @param view  Widget to show; it is set to delete itself when closed
      * @param group Slot whose dock the new tab joins
      * @param title Short label for the tab -- the window title of a viewer is
      *              far too long to sit in one
@@ -306,7 +306,7 @@ private:
     bool splitpending = false; ///< An application of the proportions is scheduled
     bool applying     = false; ///< Resizing the docks ourselves, so do not track it
     bool showing      = false; ///< Changing a dock's visibility ourselves
-    double hsplit     = 0.0;   ///< Fraction of the width held by the right hand group
+    double hsplit     = 0.0;   ///< Fraction of the width held by the right-hand group
     double vsplit     = 0.0;   ///< Fraction of the height held by the bottom group
 
     QWidget *views[static_cast<int>(ViewSlot::Count)]{};     ///< Widget in each slot

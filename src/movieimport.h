@@ -61,7 +61,7 @@ struct MovieInfo {
  * @param interval Stride; 1 selects every frame, 2 every other one, ...
  * @return Number of selected frames, or 0 if the arguments are inconsistent
  *
- * The frame numbers may be counted from either 0 or 1, the result is the same.
+ * The frame numbers may be counted from either 0 or 1; the result is the same.
  */
 [[nodiscard]] extern int selectedFrameCount(int first, int last, int interval);
 

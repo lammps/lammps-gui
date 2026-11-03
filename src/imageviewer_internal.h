@@ -95,8 +95,8 @@ public:
     bool enabled;   ///< display graphics if true
     QString style;  ///< name of style
     int colorstyle; ///< color style for graphics: TYPE, ELEMENT, CONSTANT
-    QString color;  ///< custom color of graphics objects for style == CONSTANT
-    double opacity; ///< opacity of graphics objects for style == CONSTANT
+    QString color;  ///< custom color of graphics objects for `colorstyle` == CONSTANT
+    double opacity; ///< opacity of graphics objects
     double flag1;   ///< Flag #1 for graphics
     double flag2;   ///< Flag #2 for graphics
 };
@@ -120,7 +120,7 @@ public:
     QString color;   ///< color of region display
     double diameter; ///< diameter value for POINTS and FRAME
     double opacity;  ///< opacity for TRANSPARENT
-    int npoints;     ///< number of points to be used for POINTS style region display
+    int npoints;     ///< number of points for POINTS style, number of hull points otherwise
 };
 
 // ---- shared free helpers (defined in imageviewer.cpp) --------------------

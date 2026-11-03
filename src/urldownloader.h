@@ -24,8 +24,8 @@ class QWidget;
  * @brief Utility class for downloading files over HTTPS
  *
  * URLDownloader provides a synchronous interface for downloading files from
- * HTTPS URLs.  It respects the "https_proxy" preference setting (or the
- * https_proxy environment variable) when configured.
+ * HTTPS URLs.  It uses the proxy from the https_proxy environment variable or,
+ * when that is not set, from the "https_proxy" preference setting.
  *
  * @see Preferences for the proxy setting
  */
@@ -33,7 +33,7 @@ class URLDownloader {
 public:
     /**
      * @brief Construct a new URLDownloader
-     * @param parent Optional parent widget for progress dialogs
+     * @param parent Optional parent widget for progress and error dialogs
      */
     explicit URLDownloader(QWidget *parent = nullptr);
 
@@ -52,7 +52,7 @@ public:
      *
      * Performs a synchronous (blocking) download of the resource at \p url,
      * writing the result to the local file \p file.  Respects the configured
-     * HTTPS proxy setting.  Optionally display a dialog with the downloaded
+     * HTTPS proxy setting.  Optionally displays a dialog with the downloaded
      * URL and the location of the downloaded file.
      *
      * When a SHA256SUMS file is available in the same remote directory, the
@@ -62,7 +62,7 @@ public:
      * @param url   The HTTPS URL to download from
      * @param file  The local file path to write to
      * @param showDialog  Display a dialog with the downloaded URL and target file location while
-     * downloading
+     * downloading (only with a parent widget)
      * @param keepBackup  Rename an existing target file to a backup name instead of replacing
      * it in place; required to update a shared library that is currently loaded on Windows,
      * where a loaded library can be renamed but not deleted or overwritten.  The caller is
