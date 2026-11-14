@@ -22,7 +22,7 @@ contact:
 doi: 10.5281/zenodo.21035505
 type: software
 version: "3.1.3"
-date-released: "2026-12-31"
+date-released: "2026-11-13"
 license: GPL-2.0-or-later
 repository-code: "https://github.com/lammps/lammps-gui"
 url: "https://lammps-gui.lammps.org/"
