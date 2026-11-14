@@ -35,6 +35,12 @@
 // that are obvious for a window are not obvious there: closing the view has to
 // take the dock with it, and the dock's title bar is a widget we supply.  These
 // tests pin both down.
+//
+// The docked tests build the layout *before* they show the main window, as the
+// application does.  Tabifying the docks of a window that is already visible
+// crashes Qt 6.10.2 at random: QMainWindowLayout deletes a tab bar while it is
+// still walking the list of them to show each one (QTBUG-143708, fixed in Qt
+// 6.10.3 by deferring the deletion).
 class WindowLayoutTest : public ::testing::Test {
 protected:
     static void SetUpTestSuite()
@@ -75,8 +81,8 @@ QTemporaryDir *WindowLayoutTest::settingsdir = nullptr;
 TEST_F(WindowLayoutTest, DockTitleBarsHaveAValidSizeHint)
 {
     QMainWindow window;
-    window.show();
     WindowLayout layout(&window, LayoutMode::Docked);
+    window.show();
 
     // two panels of one group, so they are tabbed: a dock that is alone keeps a
     // title bar naming it, and only a tabbed one is given the empty placeholder
@@ -103,9 +109,9 @@ TEST_F(WindowLayoutTest, DockTitleBarsHaveAValidSizeHint)
 TEST_F(WindowLayoutTest, ClosingADockedViewClosesItsDock)
 {
     QMainWindow window;
+    WindowLayout layout(&window, LayoutMode::Docked);
     // a dock of a window that was never shown reports itself hidden either way
     window.show();
-    WindowLayout layout(&window, LayoutMode::Docked);
 
     auto *view = new QPlainTextEdit;
     layout.place(ViewSlot::Log, view);
@@ -128,8 +134,8 @@ TEST_F(WindowLayoutTest, ClosingADockedViewClosesItsDock)
 TEST_F(WindowLayoutTest, ClosingATransientViewRemovesItsDock)
 {
     QMainWindow window;
-    window.show();
     WindowLayout layout(&window, LayoutMode::Docked);
+    window.show();
 
     const int fixeddocks = window.findChildren<QDockWidget *>().size();
     auto *first          = new QPlainTextEdit;
@@ -202,8 +208,8 @@ TEST_F(WindowLayoutTest, SavingUsesTheVersionedKeyAndDropsTheLegacyOne)
     }
 
     QMainWindow window;
-    window.show();
     WindowLayout layout(&window, LayoutMode::Docked); // reads, and drops the legacy key
+    window.show();
     layout.place(ViewSlot::Log, new QPlainTextEdit);
     layout.show(ViewSlot::Log);
     QApplication::processEvents();
@@ -234,8 +240,8 @@ TEST_F(WindowLayoutTest, ClosingAPanelKeepsTheProportions)
 
     QMainWindow window;
     window.resize(1200, 900);
-    window.show();
     WindowLayout layout(&window, LayoutMode::Docked);
+    window.show();
 
     // two panels of the right hand group, with size hints far enough apart that
     // the group would resize itself when one of them goes away
@@ -273,9 +279,9 @@ TEST_F(WindowLayoutTest, ClosingAPanelKeepsTheProportions)
 TEST_F(WindowLayoutTest, DockFirstTeardownOfATransientView)
 {
     auto *window = new QMainWindow;
-    window->show();
     // a QObject child of the window, deleted along with it after the docks
     auto *layout = new WindowLayout(window, LayoutMode::Docked);
+    window->show();
     layout->place(ViewSlot::Chart, new QPlainTextEdit);
     layout->show(ViewSlot::Chart);
     layout->addAuxiliaryView(new QPlainTextEdit, ViewSlot::Chart, "aux");
@@ -320,8 +326,8 @@ TEST_F(WindowLayoutTest, DockedViewKeepsItsMonoDocumentFont)
     QFont prop = window.font();
     prop.setPointSize(prop.pointSize() + 2);
     window.setFont(prop);
-    window.show();
     WindowLayout layout(&window, LayoutMode::Docked);
+    window.show();
 
     auto *keeping = new MonoKeepingView;
     keeping->document()->setDefaultFont(monoFontFromSettings());
