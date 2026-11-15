@@ -1,8 +1,8 @@
-Sphinx >= 6, < 9.3.0
+Sphinx >= 7.3, < 9.3.0
 breathe
 sphinxcontrib-spelling
 sphinx-notfound-page
 sphinx-sitemap
 sphinx-licenseinfo
 linkchecker
-docutils > 0.18, < 0.23
+docutils >= 0.21, < 0.23

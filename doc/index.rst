@@ -10,6 +10,7 @@ LAMMPS-GUI Documentation
    .. image:: _static/lammps-gui-banner.webp
       :align: center
       :scale: 75%
+      :loading: link
 
 
 ****************

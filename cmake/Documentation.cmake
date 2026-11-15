@@ -27,14 +27,14 @@ if(BUILD_DOC OR BUILD_DOC_ONLY)
     message(WARNING "Doxygen not found. API documentation will not be generated.")
   endif()
 
-  # Current Sphinx versions require at least Python 3.8
+  # The required docutils version 0.21 and later needs at least Python 3.9
   # use default (or custom) Python executable, if version is sufficient
-  if(Python_VERSION VERSION_GREATER_EQUAL 3.8)
+  if(Python_VERSION VERSION_GREATER_EQUAL 3.9)
     set(Python3_EXECUTABLE ${Python_EXECUTABLE})
   endif()
   find_package(Python3 REQUIRED COMPONENTS Interpreter)
-  if(Python3_VERSION VERSION_LESS 3.8)
-    message(FATAL_ERROR "Python 3.8 and up is required to build the LAMMPS-GUI HTML documentation")
+  if(Python3_VERSION VERSION_LESS 3.9)
+    message(FATAL_ERROR "Python 3.9 and up is required to build the LAMMPS-GUI HTML documentation")
   endif()
   if (CMAKE_CROSSCOMPILING)
     # must force host python when cross-compiling
@@ -54,6 +54,8 @@ if(BUILD_DOC OR BUILD_DOC_ONLY)
 
   file(MAKE_DIRECTORY ${DOC_BUILD_DIR})
   configure_file(${SPHINX_CONFIG_FILE_TEMPLATE} ${DOC_BUILD_CONFIG_FILE})
+  # Sphinx reads docutils.conf only from the configuration directory
+  configure_file(${SPHINX_DIR}/docutils.conf ${DOC_BUILD_DIR}/docutils.conf COPYONLY)
   file(COPY ${SPHINX_DIR}/_static DESTINATION ${DOC_BUILD_DIR}/)
   file(COPY ${SPHINX_DIR}/_templates DESTINATION ${DOC_BUILD_DIR}/)
   file(COPY ${SPHINX_DIR}/LAMMPSLexer.py DESTINATION ${DOC_BUILD_DIR}/)

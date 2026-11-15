@@ -439,7 +439,7 @@ LAMMPS library, via ``-D LAMMPS_SOURCE_DIR=/path/to/lammps/src`` and
 ``-D LAMMPS_LIBRARY=/path/to/liblammps/file``.
 
 For standalone builds, the HTML version of this documentation is also
-built by default (``-D BUILD_DOC=on``).  This requires Python 3.8 or
+built by default (``-D BUILD_DOC=on``).  This requires Python 3.9 or
 later and downloads Sphinx and the other required Python packages into a
 virtual environment in the build folder; use ``-D BUILD_DOC=off`` to
 skip it.  The default installation prefix for standalone builds is
