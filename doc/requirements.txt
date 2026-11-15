@@ -1,6 +1,5 @@
 Sphinx >= 6, < 9.3.0
 breathe
-sphinxcontrib-jquery
 sphinxcontrib-spelling
 sphinx-notfound-page
 sphinx-sitemap

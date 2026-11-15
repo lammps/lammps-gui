@@ -48,7 +48,6 @@ needs_sphinx = '6.0.0'
 
 extensions = [
         'breathe',
-        'sphinxcontrib.jquery',
         'sphinx_sitemap',
         'notfound.extension',
         ]
