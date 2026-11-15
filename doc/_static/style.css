@@ -28,3 +28,88 @@ div.warning p.admonition-title {
 ul.simple {
     line-height: 100%;
 }
+
+/* let long names, paths, and URLs in inline code and in the API reference
+   wrap when they do not fit into a line instead of making the page wider */
+div.body span.pre, div.sphinxsidebar span.pre {
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+/* -- narrow screens -------------------------------------------------------- */
+
+/* drop the wide side margins and the minimum width of the sphinxdoc theme,
+   which make the page wider than the screen of tablets and phones */
+@media screen and (max-width: 1000px) {
+    body {
+        margin: 0;
+        min-width: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    div.body img {
+        height: auto;
+    }
+}
+
+/* on phones, move the sidebar below the text so the text can use the full
+   width of the screen and let wide tables scroll sideways in their own box */
+@media screen and (max-width: 760px) {
+    div.document {
+        text-align: left;
+    }
+
+    div.documentwrapper {
+        float: none;
+    }
+
+    div.bodywrapper {
+        margin: 0;
+        border-right: none;
+    }
+
+    div.body {
+        padding: 0.5em 12px 12px 12px;
+    }
+
+    div.sphinxsidebar {
+        float: none;
+        width: auto;
+        margin-left: 0;
+        padding: 0.5em 12px 12px 12px;
+        border-top: 1px solid #ccc;
+    }
+
+    /* keep the logo at the size it has in the sidebar on wide screens */
+    div.sphinxsidebar img.logo {
+        max-width: 200px;
+    }
+
+    /* keep the key combinations in the table of keyboard shortcuts on one line */
+    div.body table.shortcuts td:nth-child(odd) {
+        white-space: nowrap;
+    }
+
+    div.related ul {
+        height: auto;
+        overflow: hidden;
+    }
+
+    div.body table.docutils {
+        display: block;
+        overflow-x: auto;
+    }
+
+    /* show the columns of the general index one below the other */
+    div.body table.indextable td {
+        display: block;
+        width: auto !important;
+    }
+
+    /* screenshots sized relative to the text width would become too small
+       to recognize anything, so show at most two of them side by side */
+    div.body img[style*="%"] {
+        min-width: 45%;
+    }
+}

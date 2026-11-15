@@ -60,6 +60,10 @@ if(BUILD_DOC OR BUILD_DOC_ONLY)
   file(COPY ${SPHINX_DIR}/_templates DESTINATION ${DOC_BUILD_DIR}/)
   file(COPY ${SPHINX_DIR}/LAMMPSLexer.py DESTINATION ${DOC_BUILD_DIR}/)
   file(COPY ${CMAKE_SOURCE_DIR}/resources/icons/lammps-gui-banner.png DESTINATION ${DOC_BUILD_DIR})
+  # the copies above are only made when CMake runs, so re-run it when one of the files changes
+  file(GLOB DOC_COPIED_FILES CONFIGURE_DEPENDS ${SPHINX_DIR}/_static/* ${SPHINX_DIR}/_templates/*)
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${DOC_COPIED_FILES}
+    ${SPHINX_DIR}/LAMMPSLexer.py ${CMAKE_SOURCE_DIR}/resources/icons/lammps-gui-banner.png)
 
   # configure virtual environment for sphinx-build and related
   set(DOCENV_BINARY_DIR ${CMAKE_BINARY_DIR}/docenv/bin)

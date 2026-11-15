@@ -15,6 +15,7 @@ available (on macOS use the Command key instead of Ctrl/Control).
 .. list-table::
    :header-rows: 1
    :widths: 16 19 13 16 13 22
+   :class: shortcuts
 
    * - Shortcut
      - Function

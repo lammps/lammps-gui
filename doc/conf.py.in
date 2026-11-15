@@ -93,10 +93,12 @@ html_short_title = 'LAMMPS-GUI'
 html_logo = '_static/lammps-gui-banner.webp'
 html_theme = 'sphinxdoc'
 html_theme_options = {
-        "body_min_width": 700,
+        "body_min_width": 0,
         "body_max_width": 1200,
 }
 html_static_path = ['_static']
+# add the custom stylesheet to all pages, including the index and search pages
+html_css_files = ['style.css']
 html_baseurl = 'https://lammps-gui.lammps.org/'
 html_last_updated_fmt = '%b %d, %Y'
 html_show_sourcelink = False
