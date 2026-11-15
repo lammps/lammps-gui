@@ -57,6 +57,8 @@ if(BUILD_DOC OR BUILD_DOC_ONLY)
   # Sphinx reads docutils.conf only from the configuration directory
   configure_file(${SPHINX_DIR}/docutils.conf ${DOC_BUILD_DIR}/docutils.conf COPYONLY)
   file(COPY ${SPHINX_DIR}/_static DESTINATION ${DOC_BUILD_DIR}/)
+  # remove old copies first, so that a renamed or removed template no longer overrides the theme
+  file(REMOVE_RECURSE ${DOC_BUILD_DIR}/_templates)
   file(COPY ${SPHINX_DIR}/_templates DESTINATION ${DOC_BUILD_DIR}/)
   file(COPY ${SPHINX_DIR}/LAMMPSLexer.py DESTINATION ${DOC_BUILD_DIR}/)
   file(COPY ${CMAKE_SOURCE_DIR}/resources/icons/lammps-gui-banner.png DESTINATION ${DOC_BUILD_DIR})
@@ -68,7 +70,7 @@ if(BUILD_DOC OR BUILD_DOC_ONLY)
   # configure virtual environment for sphinx-build and related
   set(DOCENV_BINARY_DIR ${CMAKE_BINARY_DIR}/docenv/bin)
   set(DOCENV_REQUIREMENTS_FILE ${SPHINX_DIR}/requirements.txt)
-  set(DOCENV_DEPS ${DOCENV_REQUIREMENTS_FILE} ${SPHINX_DIR}/_templates/page.html)
+  set(DOCENV_DEPS ${DOCENV_REQUIREMENTS_FILE} ${SPHINX_DIR}/_templates/layout.html)
   add_custom_target(create-docenv
     COMMAND ${VIRTUALENV} docenv --clear
     COMMAND ${DOCENV_BINARY_DIR}/pip $ENV{PIP_OPTIONS} install --upgrade pip
