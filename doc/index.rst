@@ -262,16 +262,21 @@ the internals of LAMMPS-GUI or contribute to its development.
      browsers.  This leads to incompatibilities with older web browsers
      and specific vendor browsers (e.g. Internet Explorer on Windows)
      where parts of the pages are not rendered as expected (e.g. the
-     layout is broken or mathematical expressions not typeset).
+     layout is broken or mathematical expressions not typeset).  In that
+     case we recommend to install/use a different/newer web browser or
+     use the `PDF version of the manual
+     <https://download.lammps.org/packages/lammps-gui/lammps-gui-latest.pdf>`_
 
      The following web browser versions have been verified to work as
      expected on Linux, macOS, and Windows where available:
 
-     - Safari version 11.1 and later
-     - Firefox version 54 and later
-     - Chrome version 54 and later
-     - Opera version 41 and later
-     - Edge version 80 and later
+     - Safari version 15.4 and later
+     - Firefox version 92 and later
+     - Chrome version 93 and later
+     - Opera version 79 and later
+     - Edge version 93 and later
 
-     Also Android version 7.1 and later and iOS version 11 and later have
-     been verified to render this website as expected.
+     Also Android version 11 and later and iOS version 15.4 and later
+     have been verified to render this website as expected.
+
+     Web browser compatibility was last checked on 2026-11-15.
