@@ -185,4 +185,19 @@ TEST(FormatAxisLabel, NoPlaceholderReturnedUnchanged)
     EXPECT_EQ(formatAxisLabel(3.0, "%y"), "%y"); // unknown specifier
 }
 
+TEST(FormatAxisLabel, OnlyFirstConversionSubstituted)
+{
+    // further conversions are copied literally and must not read missing arguments
+    EXPECT_EQ(formatAxisLabel(1.5, "%g %s"), "1.5 %s");
+    EXPECT_EQ(formatAxisLabel(1.5, "%g%n"), "1.5%n");
+    EXPECT_EQ(formatAxisLabel(3.0, "%d of %d"), "3 of %d");
+    EXPECT_EQ(formatAxisLabel(2.5, "%.1f %"), "2.5 %");
+    EXPECT_EQ(formatAxisLabel(50.0, "%%%d%%"), "%50%");
+}
+
+TEST(FormatAxisLabel, UnusableWidthReturnedUnchanged)
+{
+    EXPECT_EQ(formatAxisLabel(1.5, "%99999999999g"), "%99999999999g");
+}
+
 } // namespace

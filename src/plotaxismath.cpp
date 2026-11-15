@@ -66,6 +66,18 @@ bool isLengthModifier(char c)
     return c == 'l' || c == 'h' || c == 'L' || c == 'j' || c == 'z' || c == 't' || c == 'q';
 }
 
+// copy the literal text of a format string, turning each escaped "%%" into "%"
+std::string unescapePercent(const std::string &text)
+{
+    std::string out;
+    out.reserve(text.size());
+    for (std::size_t i = 0; i < text.size(); ++i) {
+        out.push_back(text[i]);
+        if ((text[i] == '%') && (i + 1 < text.size()) && (text[i + 1] == '%')) ++i;
+    }
+    return out;
+}
+
 } // namespace
 
 std::string formatAxisLabel(double value, const std::string &format)
@@ -90,9 +102,8 @@ std::string formatAxisLabel(double value, const std::string &format)
     if (pct == std::string::npos) return fmt;
 
     // copy flags, width, and precision; then strip any length modifier
-    std::size_t j          = pct + 1;
-    const std::string head = fmt.substr(0, pct); // literal prefix (may contain "%%")
-    std::string body       = "%";
+    std::size_t j    = pct + 1;
+    std::string body = "%";
     while (j < n && (fmt[j] == '-' || fmt[j] == '+' || fmt[j] == ' ' || fmt[j] == '#' ||
                      fmt[j] == '0' || (fmt[j] >= '0' && fmt[j] <= '9') || fmt[j] == '.')) {
         body.push_back(fmt[j]);
@@ -102,30 +113,31 @@ std::string formatAxisLabel(double value, const std::string &format)
         ++j;
     if (j >= n) return fmt; // malformed: no conversion character
 
-    const char conv        = fmt[j];
-    const std::string tail = fmt.substr(j + 1); // literal suffix (may contain "%%")
+    const char conv = fmt[j];
 
-    auto compose = [&](const char *lengthmod) {
-        return head + body + lengthmod + std::string(1, conv) + tail;
+    // only the validated conversion specification is passed to snprintf() as
+    // format; the text around it is copied literally, so that a second
+    // conversion like "%s" or "%n" cannot access arguments that do not exist
+    auto spec = [&](const char *lengthmod) {
+        return body + lengthmod + std::string(1, conv);
     };
 
     char buf[256];
+    int len = -1;
     switch (conv) {
         case 'd':
         case 'i':
         case 'o':
         case 'u':
         case 'x':
-        case 'X': {
-            const std::string f = compose("ll");
-            std::snprintf(buf, sizeof(buf), f.c_str(), static_cast<long long>(std::llround(value)));
-            return buf;
-        }
-        case 'c': {
-            const std::string f = compose("");
-            std::snprintf(buf, sizeof(buf), f.c_str(), static_cast<int>(std::llround(value)));
-            return buf;
-        }
+        case 'X':
+            len = std::snprintf(buf, sizeof(buf), spec("ll").c_str(),
+                                static_cast<long long>(std::llround(value)));
+            break;
+        case 'c':
+            len = std::snprintf(buf, sizeof(buf), spec("").c_str(),
+                                static_cast<int>(std::llround(value)));
+            break;
         case 'e':
         case 'E':
         case 'f':
@@ -133,15 +145,17 @@ std::string formatAxisLabel(double value, const std::string &format)
         case 'g':
         case 'G':
         case 'a':
-        case 'A': {
-            const std::string f = compose("");
-            std::snprintf(buf, sizeof(buf), f.c_str(), value);
-            return buf;
-        }
+        case 'A':
+            len = std::snprintf(buf, sizeof(buf), spec("").c_str(), value);
+            break;
         default:
             // unknown specifier: return the format unchanged
             return fmt;
     }
+    // snprintf() failed, e.g. for a field width that is too large for an int
+    if (len < 0) return fmt;
+
+    return unescapePercent(fmt.substr(0, pct)) + buf + unescapePercent(fmt.substr(j + 1));
 }
 
 int tickDecimals(double interval)

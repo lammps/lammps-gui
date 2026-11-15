@@ -265,7 +265,7 @@ the internals of LAMMPS-GUI or contribute to its development.
      layout is broken or mathematical expressions not typeset).  In that
      case we recommend to install/use a different/newer web browser or
      use the `PDF version of the manual
-     <https://download.lammps.org/packages/lammps-gui/lammps-gui-latest.pdf>`_
+     <https://download.lammps.org/packages/lammps-gui/lammps-gui-latest.pdf>`_.
 
      The following web browser versions have been verified to work as
      expected on Linux, macOS, and Windows where available:

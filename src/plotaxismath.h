@@ -56,7 +56,10 @@ std::vector<double> tickValues(double min, double max, double interval, double a
  * specifier (d, i, o, u, x, X, c) formats the value as an integer (rounded);
  * a floating specifier (e, E, f, F, g, G, a, A) formats it as a double. Any
  * length modifier in the format is normalized so passing, e.g., "%d" is safe.
- * A format without a usable conversion specifier is returned unchanged.
+ * Only the first conversion is substituted; the text before and after it is
+ * copied literally with "%%" standing for a single percent sign, so that any
+ * further conversion (e.g. "%s") appears verbatim in the label. A format
+ * without a usable conversion specifier is returned unchanged.
  */
 std::string formatAxisLabel(double value, const std::string &format);
 
