@@ -71,9 +71,14 @@ std::string unescapePercent(const std::string &text)
 {
     std::string out;
     out.reserve(text.size());
-    for (std::size_t i = 0; i < text.size(); ++i) {
+    std::size_t i = 0;
+    while (i < text.size()) {
         out.push_back(text[i]);
-        if ((text[i] == '%') && (i + 1 < text.size()) && (text[i + 1] == '%')) ++i;
+        // skip over the second character of an escaped "%%"
+        if ((text[i] == '%') && (i + 1 < text.size()) && (text[i + 1] == '%'))
+            i += 2;
+        else
+            ++i;
     }
     return out;
 }
