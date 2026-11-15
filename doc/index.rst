@@ -7,7 +7,7 @@ LAMMPS-GUI Documentation
 
 .. only:: html
 
-   .. image:: _images/lammps-gui-banner.png
+   .. image:: _static/lammps-gui-banner.webp
       :align: center
       :scale: 75%
 

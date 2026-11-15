@@ -88,7 +88,9 @@ master_doc = 'index'
 
 html_title = 'LAMMPS-GUI Documentation'
 html_short_title = 'LAMMPS-GUI'
-html_logo = 'lammps-gui-banner.png'
+# use a WebP copy of the banner on the web pages. it is about a tenth of
+# the size of the PNG version, which is still used for the PDF and the GUI
+html_logo = '_static/lammps-gui-banner.webp'
 html_theme = 'sphinxdoc'
 html_theme_options = {
         "body_min_width": 700,
