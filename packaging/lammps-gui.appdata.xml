@@ -58,6 +58,16 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="3.1.4" timestamp="1794736457">
+      <description>
+        <p>Maintenance release</p>
+        <ul>
+          <li>Improve load times of the online documentation</li>
+          <li>Avoid crashes in unit testing with Ubuntu 26.04 GitHub runners due to a Qt bug</li>
+          <li>Update web browser and Python version requirements</li>
+        </ul>
+      </description>
+    </release>
     <release version="3.1.3" timestamp="1794620121">
       <description>
         <p>Maintenance release</p>
